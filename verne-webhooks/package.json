@@ -1,0 +1,38 @@
+{
+  "name": "verne-webhooks",
+  "version": "0.0.1",
+  "description": "VerneMQ webhook adapter",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webhook": "node build/src/index.js"
+  },
+  "keywords": [
+    "vernemq",
+    "mqtt",
+    "webhook"
+  ],
+  "author": "Eduardo Garcia Misiuk, Muhamed Avila, Jonaphael Aristil",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@dojot/dojot-module-logger": "0.0.1-alpha.5",
+    "@types/body-parser": "^1.17.1",
+    "@types/express": "^4.17.1",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^12.7.5",
+    "@types/uuid": "^3.4.5",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "moment": "^2.24.0",
+    "typescript": "^3.6.3",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "jest": "^24.9.0"
+  }
+}
