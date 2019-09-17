@@ -5,8 +5,8 @@
 [![DeepScan grade](https://deepscan.io/api/teams/5314/projects/7122/branches/66277/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5314&pid=7122&bid=66277)
 [![codecov](https://codecov.io/gh/dojot/ejbca/branch/development/graph/badge.svg)](https://codecov.io/gh/dojot/ejbca)
 
-Security Rest API using EJBCA backend
+Dojot PaaS
 
 ## Overview
 
-VerneMQ Webhook service ... (in construction!)
+Dojot PaaS services ... (in construction!)
