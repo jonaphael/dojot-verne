@@ -1,34 +1,29 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: vernemq.com/v1alpha1
+kind: VerneMQ
 metadata:
-  name: vernemq
+  labels:
+    vernemq: k8s
+  name: k8s
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: vernemq
-  template:
-    metadata:
-      labels:
-        app: vernemq
-    spec:
-      containers:
-      - name: vernemq
-        image: eduardogmisiuk/dojot_verne
-        ports:
-        - containerPort: 1883
-          name: mqtt
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: vernemq-service
-spec:
-  type: NodePort
-  selector:
-    app: vernemq
-  ports:
-  - protocol: TCP
-    port: 1883
-    targetPort: 1883
-    nodePort: 32321
+  baseImage: erlio/docker-vernemq
+  config:
+    configs:
+    - name: allow_register_during_netsplit
+      value: "on"
+    - name: allow_publish_during_netsplit
+      value: "on"
+    - name: allow_subscribe_during_netsplit
+      value: "on"
+    - name: allow_unsubscribe_during_netsplit
+      value: "on"
+    - name: allow_anonymous
+      value: "on"
+    listeners:
+    - address: 0.0.0.0
+      port: 1883
+    - address: 0.0.0.0
+      port: 1888
+      websocket: true
+    plugins: []
+  serviceAccountName: vernemq-k8s
+  size: 5
