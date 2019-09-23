@@ -18,8 +18,13 @@ interface IDojotMessage {
 const TAG = { filename: "utils" };
 const messages: Map<string, object> = new Map();
 
-function setPayload(mqttPayload: object, cname: string) {
-  const value = {
+/**
+ * Creates the message to be sent to Kafka.
+ * @param mqttPayload MQTT message received from the device
+ * @param cname device identifier
+ */
+function setPayload(mqttPayload: object, cname: string): IDojotMessage {
+  const value: IDojotMessage = {
     data: mqttPayload,
     metadata: {
       messageId: uuid(),
@@ -30,7 +35,7 @@ function setPayload(mqttPayload: object, cname: string) {
 
   messages.set(value.metadata.messageId, value);
 
-  console.log(`Number of stored messages: ${messages.size}`);
+  logger.debug(`Number of stored messages: ${messages.size}`, TAG);
 
   return value;
 }
