@@ -71,8 +71,12 @@ function setPayload(mqttPayload: object, cname: string): IDojotMessage {
   return value;
 }
 
+/**
+ * Retrieves one message from the registry.
+ * @param id ID of the message to be retrieved
+ */
 function getPayload(id: string) {
   return messages.get(id);
 }
 
-export { setPayload, getPayload };
+export default { setPayload, getPayload, validateTopic };
