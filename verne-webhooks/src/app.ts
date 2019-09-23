@@ -7,6 +7,9 @@ import verneRoute from "../routes/verneRoute";
 
 const TAG = { filename: "app" };
 
+/**
+ * Manages the Express app.
+ */
 class App {
   public isInitialized: boolean;
   private app: express.Application | null;
@@ -18,6 +21,9 @@ class App {
     this.httpServer = null;
   }
 
+  /**
+   * Initializes the Express app.
+   */
   public initApp() {
     this.isInitialized = false;
 
