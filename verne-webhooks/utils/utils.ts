@@ -1,6 +1,21 @@
+"use strict";
+import { logger } from "@dojot/dojot-module-logger";
 import moment from "moment";
 import uuid from "uuid/v4";
 
+/* Interfaces */
+interface IMetadata {
+  messageId: string;
+  receivedTs: number;
+  thingId: string;
+}
+interface IDojotMessage {
+  data: object;
+  metadata: IMetadata;
+}
+
+/* Variables */
+const TAG = { filename: "utils" };
 const messages: Map<string, object> = new Map();
 
 function setPayload(mqttPayload: object, cname: string) {
