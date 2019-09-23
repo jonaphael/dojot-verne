@@ -47,7 +47,7 @@ class App {
    */
   public stopApp() {
     if (this.isInitialized) {
-      logger.info("Stopping the server.", TAG);
+      logger.info("Stopping the server...", TAG);
       this.isInitialized = false;
       this.httpServer!.close();
     }
