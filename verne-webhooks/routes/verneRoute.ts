@@ -17,12 +17,15 @@ const verneRoute = (app: express.Application) => {
     logger.debug("Received request in /pub", TAG);
     logger.debug(`Request body:\n${util.inspect(req.body)}`, TAG);
 
-    const payload = utils.setPayload(req.body.payload, req.body.username);
-    logger.debug(`Created payload:\n${util.inspect(payload)}`, TAG);
+    const configTopic = /\/config.*/;
 
-    res.status(200).send({});
-  });
+    // Verifying whether the message is a configuration one
+    if (configTopic.test(req.body.topic)) {
+      logger.debug("Message is from /config topic. Discarding!", TAG);
 
+      res.status(200).send({});
+      return;
+    }
 
     // Verifying the validity of the topic
     if (!ProjectUtils.validateTopic(req.body.username, req.body.topic)) {
@@ -32,7 +35,10 @@ const verneRoute = (app: express.Application) => {
       return;
     }
 
+    const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
+    logger.debug(`Created payload:\n${util.inspect(payload)}`, TAG);
 
+    res.status(200).send({});
   });
 };
 
