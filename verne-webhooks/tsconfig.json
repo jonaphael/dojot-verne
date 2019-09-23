@@ -57,6 +57,8 @@
     "node_modules"
   ],
   "include": [
-    "src"
+    "src",
+    "utils",
+    "routes"
   ]
 }
