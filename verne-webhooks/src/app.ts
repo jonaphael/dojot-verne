@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import express = require("express");
 import { Server } from "http";
 import verneRoute from "../routes/verneRoute";
+import config from "./config";
 
 const TAG = { filename: "app" };
 
@@ -35,8 +36,8 @@ class App {
     verneRoute(this.app);
 
     /* Starting the server */
-    this.httpServer = this.app.listen(4000, () => {
-      logger.info("Listening on port 4000.", TAG);
+    this.httpServer = this.app.listen(config.vernemq.port, () => {
+      logger.info(`Listening on port ${config.vernemq.port}.`, TAG);
       this.isInitialized = true;
     });
   }
