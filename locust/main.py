@@ -6,5 +6,5 @@ class Client(Locust):
     logging.info("Initializing client...")
     task_set = IoT_Device
 
-    min_wait = 2000
-    max_wait = 5000
+    min_wait = 250
+    max_wait = 250

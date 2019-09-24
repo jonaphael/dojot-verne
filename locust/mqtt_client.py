@@ -15,11 +15,11 @@ from locust import TaskSet, task, seq_task
 
 TENANT = "admin"
 REQUEST_TYPE = 'MQTT'
-MESSAGE_TYPE_PUB = 'PUB'
+MESSAGE_TYPE_PUB = 'publish'
 PUBLISH_TIMEOUT = 5000
 
 # Dir of Certificates
-# Just a mock
+# Just a test!
 CA_CRT = "/l/disk0/kevin/Downloads/ca.crt"
 DEVICE_CRT = "/l/disk0/kevin/Downloads/admin_46b6c7.crt"
 PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
@@ -27,7 +27,8 @@ PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 class MQTT_Client:
     
     def __init__(self):
-        self.mqttc = mqtt.Client("admin:46b6c7")
+        self.device_id = random.randint(1, 1001)
+        self.mqttc = mqtt.Client("admin:" + str(self.device_id))
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
@@ -36,9 +37,9 @@ class MQTT_Client:
         return self.mqttc
 
     def connect(self):
-        self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
-        self.mqttc.tls_insecure_set(True)
-        self.mqttc.connect("172.17.0.3", 8883, 60)
+        #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
+        #self.mqttc.tls_insecure_set(True)
+        self.mqttc.connect("172.17.0.2", 1883, 60)
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
@@ -48,7 +49,7 @@ class MQTT_Client:
         self.mqttc.loop(timeout=0.01)
 
     def publishing(self):
-        topic = "/{0}/{1}/attrs".format(TENANT, '46b6c7')
+        topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
         payload = {'int': 1}
 
         start_time = time.time()
@@ -106,20 +107,18 @@ class MQTT_Client:
             logging.info("message is none")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
-                name="message_found",
+                name="publish",
                 response_time=0,
                 exception=ValueError("Published message could not be found"),
             )
             return
 
-        total_time = Utils.time_delta(message.start_time, end_time)
-        logging.info("total time: " + str(total_time))
-
-       
+        total_time = Utils.time_delta(message['start_time'], end_time)
+  
         logging.info("message sent")
         Utils.fire_locust_success(
             request_type=REQUEST_TYPE,
-            name=message.name,
+            name=message['name'],
             response_time=total_time,
-            response_length=len(message.payload),
+            response_length=len(message['payload']),
         )
