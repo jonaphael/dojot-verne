@@ -12,12 +12,12 @@ class IoT_Device(TaskSet):
 
         self.client_mqtt.connect()     
 
-    @seq_task(1)
-    @task
+    @task(1)
     def loop(self):
         self.client_mqtt.loop()
 
-    @task
+    @task(1)
     def publish(self):
        self.client_mqtt.publishing()
+       self.client_mqtt.loop()
     
