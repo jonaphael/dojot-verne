@@ -28,7 +28,7 @@ class MQTT_Client:
     
     def __init__(self):
         self.device_id = random.randint(1, 1001)
-        self.mqttc = mqtt.Client("admin:" + str(self.device_id))
+        self.mqttc = mqtt.Client()
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
@@ -39,7 +39,7 @@ class MQTT_Client:
     def connect(self):
         #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
         #self.mqttc.tls_insecure_set(True)
-        self.mqttc.connect("172.17.0.2", 1883, 60)
+        self.mqttc.connect("172.17.0.4", 1883, 60)
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))

@@ -9,3 +9,13 @@ The main objective of the load testing is connect 100K devices IoT with dojot pl
 [Locust]( https://locust.io/)
 
 [Paho-MQTT Python Library](https://pypi.org/project/paho-mqtt/)
+
+# Dockerfile
+
+Currently is been used a docker-compose file, but you can run manually as you want.
+
+```shell
+sudo docker build -t locust-mqtt .
+sudo docker run -it -d -p 8089:8089 locust-mqtt
+sudo docker exec -it <CONTAINER_ID> /bin/bash -c "locust -f main.py Client"
+```
