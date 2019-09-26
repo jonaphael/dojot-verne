@@ -1,4 +1,4 @@
-FROM alpine:3.8 as basis
+FROM alpine:3.10 as basis
 
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
@@ -95,7 +95,7 @@ RUN set -ex \
 	&& python3 --version
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 19.0.3
+ENV PYTHON_PIP_VERSION 19.1.1
 
 RUN set -ex; \
 	\
@@ -127,6 +127,7 @@ RUN apk update && \
         zeromq-dev \
         bash \
         libzmq \
+				redis \
 				jq \
 				curl \
 				netcat-openbsd
@@ -134,4 +135,4 @@ RUN apk update && \
 WORKDIR /usr/src/app
 ENV PYTHONPATH="/usr/src/app"
 COPY . /usr/src/app
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
