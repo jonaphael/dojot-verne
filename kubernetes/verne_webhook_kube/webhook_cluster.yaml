@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-verne
+spec:
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: webhook-verne
+  replicas: 2
+  template: #templates for the pods
+    metadata:
+      labels:
+        app: webhook-verne
+    spec:
+      containers:
+      - name: webhook-verne
+        image: eduardogmisiuk/verne_webhooks
