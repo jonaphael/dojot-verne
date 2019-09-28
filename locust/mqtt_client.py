@@ -13,8 +13,13 @@ import threading
 from utils import Utils
 from locust import TaskSet, task, seq_task
 
+MQTT_HOST = os.environ.get("DOJOT_MQTT_HOST", "localhost")
+MQTT_PORT = int(os.environ.get("DOJOT_MQTT_PORT", "1883"))
+MQTT_TIMEOUT = int(os.environ.get("DOJOT_MQTT_TIMEOUT", "60"))
+MQTT_QOS = 1
+
 TENANT = "admin"
-REQUEST_TYPE = 'MQTT'
+REQUEST_TYPE = 'mqtt'
 MESSAGE_TYPE_PUB = 'publish'
 PUBLISH_TIMEOUT = 5000
 
@@ -28,7 +33,7 @@ class MQTT_Client:
     
     def __init__(self):
         self.device_id = random.randint(1, 1001)
-        self.mqttc = mqtt.Client("admin:" + str(self.device_id))
+        self.mqttc = mqtt.Client()
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
@@ -39,7 +44,7 @@ class MQTT_Client:
     def connect(self):
         #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
         #self.mqttc.tls_insecure_set(True)
-        self.mqttc.connect("172.17.0.2", 1883, 60)
+        self.mqttc.connect(MQTT_HOST, MQTT_PORT, MQTT_TIMEOUT)
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
@@ -59,7 +64,7 @@ class MQTT_Client:
             res = self.mqttc.publish(
                     topic=topic,
                     payload=json.dumps(payload),
-                    qos=1,
+                    qos=MQTT_QOS,
                     retain=False
                 )
 
@@ -69,7 +74,7 @@ class MQTT_Client:
                 logging.error(str(err))
                 Utils.fire_locust_failure(
                     request_type=REQUEST_TYPE,
-                    name='publish',
+                    name=MESSAGE_TYPE_PUB,
                     response_time=Utils.time_delta(start_time, time.time()),
                     exception=ValueError(err)
                 )
@@ -79,11 +84,11 @@ class MQTT_Client:
 
             self.pubmmap[mid] = {
                 'name': MESSAGE_TYPE_PUB, 
-                'qos': 1, 
+                'qos': MQTT_QOS, 
                 'topic': topic,
                 'payload': payload,
                 'start_time': start_time, 
-                'timed_out':10000, 
+                'timed_out':PUBLISH_TIMEOUT, 
                 'messages': 'messages'
             }
 
@@ -91,7 +96,7 @@ class MQTT_Client:
             logging.error(str(e))
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
-                name='publish',
+                name=MESSAGE_TYPE_PUB,
                 response_time=Utils.time_delta(start_time, time.time()),
                 exception=e,
             )
@@ -107,7 +112,7 @@ class MQTT_Client:
             logging.info("message is none")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
-                name="publish",
+                name=MESSAGE_TYPE_PUB,
                 response_time=0,
                 exception=ValueError("Published message could not be found"),
             )
