@@ -30,9 +30,12 @@ DEVICE_CRT = "/l/disk0/kevin/Downloads/admin_46b6c7.crt"
 PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 
 class MQTT_Client:
-    
-    def __init__(self):
+
+    def __init__(self, device_id):
+        username = '{0}:{1}'.format(TENANT, device_id)
+
         self.mqttc = mqtt.Client()
+        self.mqttc.username_pw_set(username, '')
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
@@ -47,7 +50,7 @@ class MQTT_Client:
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
-    
+
     def loop(self):
         logging.info("Starting loop...")
         self.mqttc.loop(timeout=0.01)
@@ -82,12 +85,12 @@ class MQTT_Client:
                 logging.error(res)
 
             self.pubmmap[mid] = {
-                'name': MESSAGE_TYPE_PUB, 
-                'qos': MQTT_QOS, 
+                'name': MESSAGE_TYPE_PUB,
+                'qos': MQTT_QOS,
                 'topic': topic,
                 'payload': payload,
-                'start_time': start_time, 
-                'timed_out':PUBLISH_TIMEOUT, 
+                'start_time': start_time,
+                'timed_out':PUBLISH_TIMEOUT,
                 'messages': 'messages'
             }
 
@@ -118,7 +121,7 @@ class MQTT_Client:
             return
 
         total_time = Utils.time_delta(message['start_time'], end_time)
-  
+
         logging.info("message sent")
         Utils.fire_locust_success(
             request_type=REQUEST_TYPE,

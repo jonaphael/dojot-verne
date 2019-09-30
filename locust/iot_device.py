@@ -12,9 +12,9 @@ class IoT_Device(TaskSet):
 
     def on_start(self):
         self.device_id = cache.next_device_id()
-        self.client_mqtt = MQTT_Client()  
+        self.client_mqtt = MQTT_Client(self.device_id)
 
-        self.client_mqtt.connect()     
+        self.client_mqtt.connect()
 
     @task(1)
     def loop(self):
@@ -24,4 +24,3 @@ class IoT_Device(TaskSet):
     def publish(self):
        self.client_mqtt.publishing(self.device_id)
        self.client_mqtt.loop()
-    

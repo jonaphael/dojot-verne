@@ -1,5 +1,4 @@
 "use strict";
-import { logger } from "@dojot/dojot-module-logger";
 import moment from "moment";
 import uuid from "uuid/v4";
 
@@ -13,10 +12,6 @@ interface IDojotMessage {
   data: object;
   metadata: IMetadata;
 }
-
-/* Variables */
-const TAG = { filename: "utils" };
-const messages: Map<string, object> = new Map();
 
 /* Functions */
 
@@ -64,19 +59,7 @@ function setPayload(mqttPayload: object, cname: string): IDojotMessage {
     },
   };
 
-  messages.set(value.metadata.messageId, value);
-
-  logger.debug(`Number of stored messages: ${messages.size}`, TAG);
-
   return value;
 }
 
-/**
- * Retrieves one message from the registry.
- * @param id ID of the message to be retrieved
- */
-function getPayload(id: string) {
-  return messages.get(id);
-}
-
-export default { setPayload, getPayload, validateTopic };
+export default { setPayload, validateTopic };
