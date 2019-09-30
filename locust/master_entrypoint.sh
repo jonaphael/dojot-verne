@@ -71,7 +71,8 @@ done
 echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' fully started."
 
 echo "Start executing test setup ..."
-
+bash flushall.sh && \
+bash setup.sh && \
 echo "... Setup accomplished." && \
 echo "Starting locust master node ..." &&
 locust -f main.py -H ${DOJOT_MQTT_HOST}:${DOJOT_MQTT_PORT} --master

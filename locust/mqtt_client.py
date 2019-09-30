@@ -13,7 +13,7 @@ import threading
 from utils import Utils
 from locust import TaskSet, task, seq_task
 
-MQTT_HOST = os.environ.get("DOJOT_MQTT_HOST", "localhost")
+MQTT_HOST = os.environ.get("DOJOT_MQTT_HOST", "127.0.0.1")
 MQTT_PORT = int(os.environ.get("DOJOT_MQTT_PORT", "1883"))
 MQTT_TIMEOUT = int(os.environ.get("DOJOT_MQTT_TIMEOUT", "60"))
 MQTT_QOS = 1
@@ -24,7 +24,7 @@ MESSAGE_TYPE_PUB = 'publish'
 PUBLISH_TIMEOUT = 5000
 
 # Dir of Certificates
-# Just a test!
+# Just a test! These cert will be stay on Redis
 CA_CRT = "/l/disk0/kevin/Downloads/ca.crt"
 DEVICE_CRT = "/l/disk0/kevin/Downloads/admin_46b6c7.crt"
 PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
@@ -32,7 +32,6 @@ PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 class MQTT_Client:
     
     def __init__(self):
-        self.device_id = random.randint(1, 1001)
         self.mqttc = mqtt.Client()
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_publish = self.locust_on_publish
@@ -44,7 +43,7 @@ class MQTT_Client:
     def connect(self):
         #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
         #self.mqttc.tls_insecure_set(True)
-        self.mqttc.connect(MQTT_HOST, MQTT_PORT, MQTT_TIMEOUT)
+        self.mqttc.connect(host=MQTT_HOST, port=MQTT_PORT, keepalive=MQTT_TIMEOUT)
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
@@ -53,8 +52,8 @@ class MQTT_Client:
         logging.info("Starting loop...")
         self.mqttc.loop(timeout=0.01)
 
-    def publishing(self):
-        topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
+    def publishing(self, device_id):
+        topic = "/{0}/{1}/attrs".format(TENANT, device_id)
         payload = {'int': 1}
 
         start_time = time.time()
