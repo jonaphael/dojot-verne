@@ -19,6 +19,7 @@ services:
       - ..:/usr/src/app
     ports:
       - 8089:8089
+      - 5557:5557
     healthcheck:
       test: curl --fail -s http://localhost:8089 || exit 1
       interval: 5s
