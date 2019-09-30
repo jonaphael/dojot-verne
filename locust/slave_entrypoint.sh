@@ -2,6 +2,7 @@
 set -ex
 
 # Dojot parameters
+LOCUST_MASTER_HOST=${LOCUST_MASTER_HOST:-"127.0.0.1"}
 DOJOT_MQTT_HOST=${DOJOT_MQTT_HOST:-"127.0.0.1"}
 DOJOT_MQTT_PORT=${DOJOT_MQTT_PORT:-"1883"}
 
@@ -49,4 +50,4 @@ done
 echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' fully started."
 
 echo "Starting locust slave node ..."
-locust -f main.py --slave --master-host=locust-master
+locust -f main.py --slave --master-host=${LOCUST_MASTER_HOST}
