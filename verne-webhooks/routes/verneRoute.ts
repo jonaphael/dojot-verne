@@ -29,7 +29,7 @@ const verneRoute = (app: express.Application) => {
 
     // Verifying the validity of the topic
     if (!ProjectUtils.validateTopic(req.body.username, req.body.topic)) {
-      logger.debug(`Invalid message from username ${req.body.username} to topic ${req.body.topic}. Discarding!`, TAG);
+      logger.info(`Invalid message from username ${req.body.username} to topic ${req.body.topic}. Discarding!`, TAG);
 
       res.status(400).send({ message: "Invalid topic: username validation has errored" });
       return;
