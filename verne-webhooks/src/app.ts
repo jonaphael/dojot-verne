@@ -1,8 +1,9 @@
 "use strict";
-import { logger } from "@dojot/dojot-module-logger";
+import { getHTTPRouter as getLoggerRouter, logger } from "@dojot/dojot-module-logger";
 import bodyParser from "body-parser";
 import express = require("express");
 import { Server } from "http";
+import morgan from "morgan";
 import verneRoute from "../routes/verneRoute";
 import config from "./config";
 
@@ -31,6 +32,8 @@ class App {
     this.app = express();
     this.app.use(bodyParser.json({ type: "*/*" }));
     this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(morgan("short"));
+    this.app.use(getLoggerRouter());
 
     /* Creating the routes */
     verneRoute(this.app);
