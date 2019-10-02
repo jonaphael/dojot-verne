@@ -10,7 +10,7 @@ The Dojot VerneMQ Webhooks service is responsible for receiving the messages sen
 ## **Overview**
 
 When a message is sent from an IoT device to VerneMQ, some webhooks are triggered, so it can be treated.
-This service receives these messages routed from VerneMQ, so we can treat them.
+This service receives these messages routed from VerneMQ, adding dojot metadata to them.
 
 Whenever a message is received, we transform it to the following model:
 ```js
