@@ -54,7 +54,7 @@ echo "... Created template ${TEMPLATE_ID}."
 # Create Devices
 N=0 # Number of created devices
 I=0 # Iteration
-INCREMENT=500 # Number of devices created in batch
+INCREMENT=1000 # Number of devices created in batch
 KEY=1 # Incremental key for the device
 while [ ${N} -lt ${NUMBER_OF_DEVICES} ]
 do

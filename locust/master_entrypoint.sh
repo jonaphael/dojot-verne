@@ -13,6 +13,9 @@ REDIS_HOST=${REDIS_HOST:-"127.0.0.1"}
 REDIS_PORT=${REDIS_PORT:-"6379"}
 REDIS_PASSWD=${REDIS_PASSWD:-""}
 
+# Enables device ID generation when 1, disables when 0
+GENERATE_IDS=${GENERATE_IDS:-1}
+
 # Waiting for redis for at most 3 minutes
 START_TIME=$(date +'%s')
 echo "Witing for Redis fully start. Host '${REDIS_HOST}', '${REDIS_PORT}'..."
@@ -70,9 +73,14 @@ while [ -z "${RESPONSE}" ]; do
 done
 echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' fully started."
 
-echo "Start executing test setup ..."
-bash flushall.sh && \
-bash setup.sh && \
-echo "... Setup accomplished." && \
+# Verifying whether it should delete all device IDs and then recreate
+if [ ${GENERATE_IDS} -eq "1" ]
+then
+    echo "Start executing test setup ..."
+    bash flushall.sh && \
+    bash setup.sh
+    echo "... Setup accomplished." && \
+fi
+
 echo "Starting locust master node ..." &&
 locust -f main.py -H ${DOJOT_MQTT_HOST}:${DOJOT_MQTT_PORT} --master
