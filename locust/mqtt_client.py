@@ -5,7 +5,7 @@
 import paho.mqtt.client as mqtt
 import os
 import logging
-import time
+from time import gmtime, strftime, time
 import json
 import random
 import threading
@@ -31,14 +31,14 @@ PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 
 class MQTT_Client:
 
-    def __init__(self, device_id):
+    def __init__(self, device_id, filename_dir):
         username = '{0}:{1}'.format(TENANT, device_id)
 
         self.mqttc = mqtt.Client()
         self.mqttc.username_pw_set(username, '')
-        self.mqttc.on_connect = self.on_connect
-        self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
+
+        self.filename_dir = filename_dir
 
     def get_client(self):
         return self.mqttc
@@ -48,20 +48,15 @@ class MQTT_Client:
         #self.mqttc.tls_insecure_set(True)
         self.mqttc.connect(host=MQTT_HOST, port=MQTT_PORT, keepalive=MQTT_TIMEOUT)
 
-    def on_connect(self, client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
-
-    def loop(self):
-        logging.info("Starting loop...")
-        self.mqttc.loop(timeout=0.01)
+    def loop(self, time_loop):
+        self.mqttc.loop(timeout=time_loop)
 
     def publishing(self, device_id):
         topic = "/{0}/{1}/attrs".format(TENANT, device_id)
         payload = {'int': 1}
 
-        start_time = time.time()
+        start_time = time()
 
-        logging.info(f"Publishing in topic {topic}")
         try:
             res = self.mqttc.publish(
                     topic=topic,
@@ -77,12 +72,12 @@ class MQTT_Client:
                 Utils.fire_locust_failure(
                     request_type=REQUEST_TYPE,
                     name=MESSAGE_TYPE_PUB,
-                    response_time=Utils.time_delta(start_time, time.time()),
+                    response_time=Utils.time_delta(start_time, time()),
                     exception=ValueError(err)
                 )
-
-                logging.info("publish ERROR: err,mid:"+str(err)+","+str(mid)+"")
-                logging.error(res)
+                log_file = open(self.filename_dir, "a")
+                log_file.write("publish ERROR: err,mid:"+str(err)+","+str(mid)+"\n")
+                log_file.close()
 
             self.pubmmap[mid] = {
                 'name': MESSAGE_TYPE_PUB,
@@ -94,24 +89,38 @@ class MQTT_Client:
                 'messages': 'messages'
             }
 
+            message = self.pubmmap.pop(mid, None)
+            end_time = time()
+            total_time = Utils.time_delta(message['start_time'], end_time)
+            
+            Utils.fire_locust_success(
+                request_type=REQUEST_TYPE,
+                name=message['name'],
+                response_time=total_time,
+                response_length=len(message['payload']),
+            )
+
         except Exception as e:
-            logging.error(str(e))
+            log_file = open(self.filename_dir, "a")
+            log_file.write(str(e)+"\n")
+            log_file.close()
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
-                response_time=Utils.time_delta(start_time, time.time()),
+                response_time=Utils.time_delta(start_time, time()),
                 exception=e,
             )
 
     def locust_on_publish(self, client, userdata, mid):
         logging.info("--locust_on_publish--")
 
-        end_time = time.time()
-        print(self.pubmmap)
+        end_time = time()
         message = self.pubmmap.pop(mid, None)
 
         if message is None:
-            logging.info("message is none")
+            log_file = open(self.filename_dir, "a")
+            log_file.write("message is none\n")
+            log_file.close()
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
@@ -122,7 +131,6 @@ class MQTT_Client:
 
         total_time = Utils.time_delta(message['start_time'], end_time)
 
-        logging.info("message sent")
         Utils.fire_locust_success(
             request_type=REQUEST_TYPE,
             name=message['name'],
