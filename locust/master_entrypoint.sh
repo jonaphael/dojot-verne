@@ -13,6 +13,9 @@ REDIS_HOST=${REDIS_HOST:-"127.0.0.1"}
 REDIS_PORT=${REDIS_PORT:-"6379"}
 REDIS_PASSWD=${REDIS_PASSWD:-""}
 
+#Environment
+DOJOT_ENV=${DOJOT_ENV:-"n"}
+
 # Enables device ID generation when 1, disables when 0
 GENERATE_IDS=${GENERATE_IDS:-1}
 
@@ -35,24 +38,27 @@ while [ -z "${PONG}" ]; do
 done
 echo "Redis at host '${REDIS_HOST}', port '${REDIS_PORT}' fully started."
 
-# Waiting for dojot API Gateway for at most 3 minutes
-START_TIME=$(date +'%s')
-echo "Waiting for dojot API Gateway fully start. Host '${DOJOT_URL}'..."
-echo "Try to connect to dojot API Gateway... "
-RESPONSE=`curl --fail -s ${DOJOT_URL} || echo ""`
-while [ -z "${RESPONSE}" ]; do
-    sleep 3
-    echo "Retry to connect to dojot API Gateway ... "
+if [ "${DOJOT_ENV}" == "y" ]
+then
+    # Waiting for dojot API Gateway for at most 3 minutes
+    START_TIME=$(date +'%s')
+    echo "Waiting for dojot API Gateway fully start. Host '${DOJOT_URL}'..."
+    echo "Try to connect to dojot API Gateway... "
     RESPONSE=`curl --fail -s ${DOJOT_URL} || echo ""`
+    while [ -z "${RESPONSE}" ]; do
+        sleep 3
+        echo "Retry to connect to dojot API Gateway ... "
+        RESPONSE=`curl --fail -s ${DOJOT_URL} || echo ""`
 
-    ELAPSED_TIME=$(($(date +'%s') - ${START_TIME}))
-    if [ ${ELAPSED_TIME} -gt 180 ]
-    then
-        echo "dojot API Gateway is taking too long to fully start. Exiting!"
-        exit 2
-    fi
-done
-echo "dojot API Gatewat at '${DOJOT_URL}' fully started."
+        ELAPSED_TIME=$(($(date +'%s') - ${START_TIME}))
+        if [ ${ELAPSED_TIME} -gt 180 ]
+        then
+            echo "dojot API Gateway is taking too long to fully start. Exiting!"
+            exit 2
+        fi
+    done
+    echo "dojot API Gatewat at '${DOJOT_URL}' fully started."
+fi
 
 # Waiting for dojot MQTT broker for at most 3 minutes
 START_TIME=$(date +'%s')
@@ -74,13 +80,16 @@ done
 echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' fully started."
 
 # Verifying whether it should delete all device IDs and then recreate
-if [ ${GENERATE_IDS} -eq "1" ]
+if [ ${GENERATE_IDS} -eq "1" -a "${DOJOT_ENV}" == "y" ]
 then
-    echo "Start executing test setup ..."
-    bash flushall.sh && \
-    bash setup.sh
-    echo "... Setup accomplished." && \
+    echo "Start flushing ..."
+    bash flushall.sh
 fi
+
+echo "Adding data ..."
+bash setup.sh
+echo "... Setup accomplished."
+
 
 echo "Starting locust master node ..." &&
 locust -f main.py -H ${DOJOT_MQTT_HOST}:${DOJOT_MQTT_PORT} --master
