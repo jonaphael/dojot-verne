@@ -21,7 +21,13 @@ echo 'Getting jwt token ...'
 JWT=$(curl --silent -X POST ${DOJOT_URL}/auth \
 -H "Content-Type:application/json" \
 -d "{\"username\": \"${DOJOT_USER}\", \"passwd\" : \"${DOJOT_PASSWD}\"}" | jq '.jwt' | tr -d '"')
-echo "... Got jwt token ${JWT}."
+
+if [ -z "$JWT" ];then
+    echo "--- There's no token! ---"
+    exit 1
+else 
+    echo "... Got jwt token ${JWT}."
+fi
 
 # Create Template
 echo 'Creating template ...'
@@ -49,7 +55,15 @@ TEMPLATE_ID=$(curl --silent -X POST ${DOJOT_URL}/template \
                     "value_type" : "geo:point"}
                ]
     }' | jq '.template.id')
-echo "... Created template ${TEMPLATE_ID}."
+
+if [$? -ne 0]
+then
+  echo "Could not create template."
+  exit 1
+else
+  echo "Create template exit code: $?"
+  echo "... Created template ${TEMPLATE_ID}."
+fi
 
 # Create Devices
 N=0 # Number of created devices
@@ -77,12 +91,19 @@ do
         \"attrs\": {},
         \"label\": \"CargoContainer_${I}\"
       }" | jq '.devices[].id' | tr -d '"')
-  for DEVICE_ID in ${DEVICE_IDS}
-  do
-    echo "SET ${KEY} ${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
-    let KEY=KEY+1
-  done
-  echo "... Created ${N} devices from ${NUMBER_OF_DEVICES}"
-  let I=I+1
+  
+  if [ $? -eq 0 ]
+  then
+    for DEVICE_ID in ${DEVICE_IDS}
+    do
+      echo "SET ${KEY} ${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
+      let KEY=KEY+1
+    done
+    echo "... Created ${N} devices from ${NUMBER_OF_DEVICES}"
+    let I=I+1
+  else
+    echo "Could not create devices."
+    exit 1
+  fi
 done
 
