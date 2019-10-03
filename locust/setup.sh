@@ -95,7 +95,8 @@ then
 else
 
   # get the number of items already registered in redis
-  DEVICE_SIZE=$(echo "info keyspace" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" | grep -E -o "keys=[0-9]+" | grep -E -o "[0-9]+")
+  DEVICE_SIZE=$(echo "DBSIZE" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}")
+  
   echo "Number of devices already saved in database: ${DEVICE_SIZE} devices."
   NUMBER_DEVICES_ADD="$(echo "$NUMBER_OF_DEVICES - $DEVICE_SIZE" | bc)"
 
