@@ -15,7 +15,7 @@ services:
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
       REDIS_PASSWD: ""
-      NUMBER_OF_DEVICES: "10"
+      NUMBER_OF_DEVICES: "30000"
       GENERATE_IDS: "1"
       DOJOT_ENV: "n"
     command: bash master_entrypoint.sh
@@ -31,7 +31,7 @@ services:
       retries: 3
 
   redis:
-    image: redis:alpine
+    image: redis:5.0.5-alpine3.10
     restart: always
     logging:
       driver: json-file
