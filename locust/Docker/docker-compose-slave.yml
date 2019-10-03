@@ -7,12 +7,12 @@ services:
       - ..:/usr/src/app
     environment:
       # Don't forget to set the environment variables
-      DOJOT_MQTT_HOST: "10.50.11.191"
-      DOJOT_MQTT_PORT: "30010"
+      DOJOT_MQTT_HOST: "10.202.21.1"
+      DOJOT_MQTT_PORT: "1883"
       DOJOT_MQTT_TIMEOUT: "60"
-      LOCUST_MASTER_HOST: "10.202.70.102"
-      REDIS_HOST: "10.202.70.102"
-      REDIS_PORT: "6380"
+      LOCUST_MASTER_HOST: "10.202.21.1"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
       REDIS_PASSWD: ""
       TASK_MIN_TIME: "1000"
       TASK_MAX_TIME: "1000"
