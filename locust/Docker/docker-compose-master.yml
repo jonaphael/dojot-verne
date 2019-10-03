@@ -12,10 +12,11 @@ services:
       DOJOT_MQTT_HOST: "10.50.11.95"
       DOJOT_MQTT_PORT: "30010"
       DOJOT_MQTT_TIMEOUT: "60"
+      LOCUST_LOG_DIR: "logs/exec_1"
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
       REDIS_PASSWD: ""
-      NUMBER_OF_DEVICES: "30000"
+      NUMBER_OF_DEVICES: "1000"
       GENERATE_IDS: "1"
       DOJOT_ENV: "n"
     command: bash master_entrypoint.sh
