@@ -106,7 +106,6 @@ class MQTT_Client:
             )
 
     def locust_on_publish(self, client, userdata, mid):
-        logging.info("--locust_on_publish--")
 
         end_time = time.time()
         message = self.pubmmap.pop(mid, None)
