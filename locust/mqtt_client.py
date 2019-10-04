@@ -61,7 +61,13 @@ class MQTT_Client:
     def connect(self):
         #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
         #self.mqttc.tls_insecure_set(True)
-        self.mqttc.connect(host=MQTT_HOST, port=MQTT_PORT, keepalive=MQTT_TIMEOUT)
+        try:
+          #It is important to do an asynchronous connect, given that we will have
+          #multiple connections happening in a single server during a Locust test
+          self.mqttc.connect_async(host=MQTT_HOST, port=MQTT_PORT)
+          self.mqttc.loop_start()
+        except Exception as e:
+            print(e)
 
     def loop(self, time_loop):
         rc = self.mqttc.loop(timeout=time_loop)

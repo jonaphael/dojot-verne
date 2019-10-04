@@ -34,8 +34,5 @@ class IoT_Device(TaskSet):
 
     @task
     def publish(self):
-        if time.time() - self.init_time >= 30.0:
-            self.init_time = time.time()
-            self.client_mqtt.publishing(self.device_id)
-
-        self.client_mqtt.loop(0.05)
+        self.init_time = time.time()
+        self.client_mqtt.publishing(self.device_id)
