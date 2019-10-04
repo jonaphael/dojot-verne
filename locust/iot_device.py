@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import uuid
 from datetime import datetime
 
 from locust import TaskSet, task, seq_task
@@ -12,10 +13,12 @@ cache.connect()
 
 timestamp = int(datetime.timestamp(datetime.now()))
 
-if not os.path.exists('logs/'):
-    os.makedirs("logs/")
-    
-filename_dir = "logs/{0}.log".format(timestamp)
+LOG_DIR = os.environ.get("LOCUST_LOG_DIR", None)
+
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+filename_dir = "{0}/{1}.log".format(LOG_DIR, uuid.uuid4())
 
 class IoT_Device(TaskSet):
 
@@ -26,10 +29,13 @@ class IoT_Device(TaskSet):
 
         self.init_time = 0.0
 
+    def on_stop(self):
+        self.client_mqtt.save_log_list()
+
     @task
     def publish(self):
         if time.time() - self.init_time >= 30.0:
             self.init_time = time.time()
             self.client_mqtt.publishing(self.device_id)
-            
+
         self.client_mqtt.loop(0.05)

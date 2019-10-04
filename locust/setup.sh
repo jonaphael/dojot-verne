@@ -96,7 +96,7 @@ else
 
   # get the number of items already registered in redis
   DEVICE_SIZE=$(echo "DBSIZE" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}")
-  
+
   echo "Number of devices already saved in database: ${DEVICE_SIZE} devices."
   NUMBER_DEVICES_ADD="$(echo "$NUMBER_OF_DEVICES - $DEVICE_SIZE" | bc)"
 
@@ -107,7 +107,7 @@ else
     DEVICE_SIZE="$(echo "$DEVICE_SIZE + 1" | bc)"
     for DEVICE_ID in $(seq ${DEVICE_SIZE} 1 ${MORE_DEVICE});
     do
-      echo "SET ${DEVICE_ID} DEV:${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
+      echo "SET ${DEVICE_ID} DEV${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
     done
   elif [ ${NUMBER_DEVICES_ADD} -eq 0 ]
   then
