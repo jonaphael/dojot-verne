@@ -58,7 +58,13 @@ class MQTT_Client:
         self.mqttc.connect(host=MQTT_HOST, port=MQTT_PORT, keepalive=MQTT_TIMEOUT)
 
     def loop(self, time_loop):
-        self.mqttc.loop(timeout=time_loop)
+        rc = self.mqttc.loop(timeout=time_loop)
+
+        if rc != mqtt.MQTT_ERR_SUCCESS:
+            try:
+                self.mqttc.reconnect()
+            except Exception as e:
+                lst_log_error.append(str(e))
 
     def publishing(self, device_id):
         topic = "/{0}/{1}/attrs".format(TENANT, device_id)

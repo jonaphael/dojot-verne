@@ -81,7 +81,7 @@ echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' 
 
 # Verifying whether it should delete all device IDs and then recreate
 
-if [ "${REDIS_BACKUP}" == "n"]
+if [ "${REDIS_BACKUP}" == "n" ]
 then
     if [ ${GENERATE_IDS} -eq "1" -a "${DOJOT_ENV}" == "y" ]
     then
