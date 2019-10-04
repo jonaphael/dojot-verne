@@ -32,6 +32,10 @@ PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 
 lst_log_error = list()
 
+class DisconnectError(Exception):
+    pass
+
+
 class MQTT_Client:
 
     def __init__(self, device_id, filename_dir):
@@ -39,6 +43,8 @@ class MQTT_Client:
 
         self.mqttc = mqtt.Client()
         self.mqttc.username_pw_set(username, '')
+        self.mqttc.on_connect = self.locust_on_connect
+        self.mqttc.on_disconnect = self.locust_on_disconnect
         self.mqttc.on_publish = self.locust_on_publish
         self.pubmmap = {}
 
@@ -134,3 +140,23 @@ class MQTT_Client:
             response_time=total_time,
             response_length=len(message['payload']),
         )
+
+    def locust_on_connect(self, client, flags_dict, userdata, rc):
+        if rc == 0:
+            Utils.fire_locust_success(
+                request_type=REQUEST_TYPE,
+                name='connect',
+                response_time=0,
+                response_length=0
+            )
+
+    def locust_on_disconnect(self, client, userdata, rc):
+        print("--locust_on_disconnect--, RC: " + str(rc))
+
+        if rc != 0:
+            Utils.fire_locust_failure(
+                request_type=REQUEST_TYPE,
+                name='disconnect',
+                response_time=0,
+                exception=DisconnectError("disconnected"),
+            )
