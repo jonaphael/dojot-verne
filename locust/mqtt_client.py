@@ -32,6 +32,18 @@ PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 
 lst_log_error = list()
 
+
+class LocustError(Exception):
+    pass
+
+
+class TimeoutError(ValueError):
+    pass
+
+
+class ConnectError(Exception):
+    pass
+
 class DisconnectError(Exception):
     pass
 
@@ -68,15 +80,6 @@ class MQTT_Client:
           self.mqttc.loop_start()
         except Exception as e:
             print(e)
-
-    def loop(self, time_loop):
-        rc = self.mqttc.loop(timeout=time_loop)
-
-        if rc != mqtt.MQTT_ERR_SUCCESS:
-            try:
-                self.mqttc.reconnect()
-            except Exception as e:
-                lst_log_error.append(str(e))
 
     def publishing(self, device_id):
         topic = "/{0}/{1}/attrs".format(TENANT, device_id)
@@ -166,3 +169,6 @@ class MQTT_Client:
                 response_time=0,
                 exception=DisconnectError("disconnected"),
             )
+        
+        self.mqttc.reconnect()
+

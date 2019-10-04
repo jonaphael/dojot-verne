@@ -26,13 +26,11 @@ class IoT_Device(TaskSet):
         self.device_id = cache.next_device_id()
         self.client_mqtt = MQTT_Client(self.device_id, filename_dir)
         self.client_mqtt.connect()
-
-        self.init_time = 0.0
+        time.sleep(2)
 
     def on_stop(self):
         self.client_mqtt.save_log_list()
 
     @task
     def publish(self):
-        self.init_time = time.time()
         self.client_mqtt.publishing(self.device_id)
