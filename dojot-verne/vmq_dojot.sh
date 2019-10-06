@@ -132,12 +132,6 @@ _retrieveCACertificate()
     _saveFormattedCRT "${certCaFile}" "${certCa}"
 }
 
-_startVerne()
-{
-  cd ..
-  start_vernemq 
-}
-
 ##Generate private key and sign certificate crt
 _generateCertificates()
 {
@@ -152,19 +146,16 @@ _generateCertificates()
 main() 
 {
   ## Try to connect to EJBCA first
-  #_connectEJBCA
+  _connectEJBCA
 
   ## generate the certs from EJBCA
-  #_generateCertificates
+  _generateCertificates
 
   ## retrieve to host
-  #_retrieveCACertificate
+  _retrieveCACertificate
 
   ## remove unused certs
-  #_removeUnused
-
-  ## start verne
-  _startVerne
+  _removeUnused
 }
 
 
