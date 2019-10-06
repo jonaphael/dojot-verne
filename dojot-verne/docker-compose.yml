@@ -1,0 +1,13 @@
+version: '3'
+services:
+  vmq-dojot:
+    image: muhamedavila/vmq_dojot:1.8.0
+    environment:
+      # Don't forget to set the environment variables
+      CERT_EJBCA_API_BROKER: "ejbca_simple"
+      CERT_EJBCA_URL: "5583"
+
+  ejbca_simple:
+    image: muhamedavila/simple_ejbca_dojot
+    hostname: localhost
+    restart: always
