@@ -70,7 +70,13 @@ class MQTT_Client:
                                      keepalive=120)
             self.mqttc.loop_start()
         except Exception as e:
-            print(e)
+            Utils.fire_locust_failure(
+                request_type=REQUEST_TYPE,
+                name='connect',
+                response_time=0,
+                response_length=0,
+                exception=ConnectError("disconnected")
+            )
 
     def publishing(self):
         topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
