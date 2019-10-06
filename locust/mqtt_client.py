@@ -16,19 +16,13 @@ from locust import TaskSet, task, seq_task
 
 MQTT_HOST = os.environ.get("DOJOT_MQTT_HOST", "127.0.0.1")
 MQTT_PORT = int(os.environ.get("DOJOT_MQTT_PORT", "1883"))
-MQTT_TIMEOUT = int(os.environ.get("DOJOT_MQTT_TIMEOUT", "60"))
 MQTT_QOS = 1
 
 TENANT = "admin"
 REQUEST_TYPE = 'mqtt'
 MESSAGE_TYPE_PUB = 'publish'
-PUBLISH_TIMEOUT = 5000
+PUBLISH_TIMEOUT = 40000
 
-# Dir of Certificates
-# Just a test! These cert will be stay on Redis
-CA_CRT = "/l/disk0/kevin/Downloads/ca.crt"
-DEVICE_CRT = "/l/disk0/kevin/Downloads/admin_46b6c7.crt"
-PRIVATE_KEY = "/l/disk0/kevin/Downloads/admin_46b6c7.key"
 
 lst_log_error = list()
 
@@ -44,6 +38,7 @@ class TimeoutError(ValueError):
 class ConnectError(Exception):
     pass
 
+
 class DisconnectError(Exception):
     pass
 
@@ -53,13 +48,15 @@ class MQTT_Client:
     def __init__(self, device_id, filename_dir):
         username = '{0}:{1}'.format(TENANT, device_id)
 
-        self.mqttc = mqtt.Client()
+        self.mqttc = mqtt.Client(client_id=device_id)
+        self.device_id = device_id
         self.mqttc.username_pw_set(username, '')
+
         self.mqttc.on_connect = self.locust_on_connect
         self.mqttc.on_disconnect = self.locust_on_disconnect
         self.mqttc.on_publish = self.locust_on_publish
-        self.pubmmap = {}
 
+        self.pubmmap = {}
         self.filename_dir = filename_dir
 
     def save_log_list(self):
@@ -67,35 +64,28 @@ class MQTT_Client:
         log_file.writelines(lst_log_error)
         log_file.close()
 
-    def get_client(self):
-        return self.mqttc
-
     def connect(self):
-        #self.mqttc.tls_set(CA_CRT, DEVICE_CRT, PRIVATE_KEY)
-        #self.mqttc.tls_insecure_set(True)
         try:
-          #It is important to do an asynchronous connect, given that we will have
-          #multiple connections happening in a single server during a Locust test
-          self.mqttc.connect_async(host=MQTT_HOST, port=MQTT_PORT)
-          self.mqttc.loop_start()
+            self.mqttc.connect_async(host=MQTT_HOST, port=MQTT_PORT,
+                                     keepalive=120)
+            self.mqttc.loop_start()
         except Exception as e:
             print(e)
 
-    def publishing(self, device_id):
-        topic = "/{0}/{1}/attrs".format(TENANT, device_id)
+    def publishing(self):
+        topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
         payload = {'int': 1}
 
         start_time = time.time()
 
         try:
             res = self.mqttc.publish(
-                    topic=topic,
-                    payload=json.dumps(payload),
-                    qos=MQTT_QOS,
-                    retain=False
-                )
+                topic=topic,
+                payload=json.dumps(payload),
+                qos=MQTT_QOS
+            )
 
-            [ err, mid ] = res
+            [err, mid] = res
 
             if err:
                 Utils.fire_locust_failure(
@@ -104,6 +94,7 @@ class MQTT_Client:
                     response_time=Utils.time_delta(start_time, time.time()),
                     exception=ValueError(err)
                 )
+
                 timestamp = int(datetime.timestamp(datetime.now()))
                 msg_error = "Time: {0} - {1}\n".format(timestamp, str(err))
                 lst_log_error.append(msg_error)
@@ -114,7 +105,7 @@ class MQTT_Client:
                 'topic': topic,
                 'payload': payload,
                 'start_time': start_time,
-                'timed_out':PUBLISH_TIMEOUT,
+                'timed_out': PUBLISH_TIMEOUT,
                 'messages': 'messages'
             }
 
@@ -169,6 +160,5 @@ class MQTT_Client:
                 response_time=0,
                 exception=DisconnectError("disconnected"),
             )
-        
-        self.mqttc.reconnect()
 
+        self.mqttc.reconnect()
