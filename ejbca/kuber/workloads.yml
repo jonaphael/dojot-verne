@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ejbca
+spec:
+  selector:
+    matchLabels:
+      app: ejbca
+  replicas: 2
+  template: # template for the pods
+    metadata:
+      labels:
+        app: ejbca
+    spec:
+      containers:
+      - name: ejbca
+        image: ejbca_new
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4096Mi"
+          requests:
+            cpu: "1"
+            memory: "1536Mi"
