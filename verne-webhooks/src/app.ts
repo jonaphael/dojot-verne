@@ -6,6 +6,7 @@ import { Server } from "http";
 import morgan from "morgan";
 import verneRoute from "../routes/verneRoute";
 import config from "./config";
+import KafkaMesssenger from "../kafka/kafkaMessenger";
 
 const TAG = { filename: "app" };
 
@@ -37,6 +38,10 @@ class App {
 
     /* Creating the routes */
     verneRoute(this.app);
+
+    /* create the kafka Messenger (messenger) */
+    const kafkaMessenger = new KafkaMesssenger(config.kafka.producer);
+    kafkaMessenger.produceMessage("{ 'message' : 123 }");
 
     /* Starting the server */
     this.httpServer = this.app.listen(config.vernemq.port, () => {
