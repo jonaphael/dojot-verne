@@ -41,11 +41,7 @@ if __name__ == "__main__":
     #pipe.execute() 
     logging.info(f"Total inserts " + str(NUM_OF_INSERT_BY_THREAD * NUM_OF_THREAD)+ " in (s) " + str(end - start) + " thr: " + str(NUM_OF_THREAD) + " loop: "+ str(NUM_OF_INSERT_BY_THREAD) )
 
-#Process total inserts   1000 in 32.75894546508789
-#Threads total inserts   1000 in 32.03735899925232
 
-#Pipe
-#Threadstotal inserts  pipe geral  1000 in 32.34785008430481
 #Total inserts 10000 in (s) 1161.1937227249146 thr: 1000 loop: 10 - inseridos +/- 9700
 #Total inserts 10000 in (s) 618.5327394008636 thr: 100 loop: 100
 
