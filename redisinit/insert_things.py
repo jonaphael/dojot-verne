@@ -6,8 +6,8 @@ import logging
 import time
 from thing import Thing
 
-NUM_OF_INSERT_BY_THREAD = 10
-NUM_OF_THREAD = 10
+NUM_OF_INSERT_BY_THREAD = 100
+NUM_OF_THREAD = 100
 
 #r = redis.Redis(host = conf.redis_host, port = conf.redis_port, db = 0)
 #pipe = r.pipeline()
@@ -22,7 +22,6 @@ def register_thing(name):
         logging.debug(f"{i} in Thread {name} : {thing_id}")
         obj = Thing.Create_Thing(thing_id)   
         #r.hmset(thing_id,obj)  
-        #if(obj.thing_certificate!=""):
         pipe.hmset(thing_id,obj)  
     pipe.execute() 
     end = time.time()
@@ -49,9 +48,7 @@ if __name__ == "__main__":
 # sudo docker run --name ejbca_simple --hostname localhost -p 5583:5583 -d muhamedavila/simple_ejbca_dojot
 # docker inspect ejbca_simple
 # http://ip:5583
-# docker logs -f ejbca_simple
-# Total inserts 100 in(s) 5.754554986953735 thr: 10 loop: 10
-
+# docker logs -f ejbca_simpl
 
 # sudo docker run --name my-redis-container -d redis
 # docker inspect my-redis-container
