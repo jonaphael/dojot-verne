@@ -1,4 +1,5 @@
 import Kafka from "node-rdkafka"
+import config from "../src/config";
 import { logger } from "@dojot/dojot-module-logger";
 
 const TAG = { filename: "kafka" };
@@ -34,24 +35,47 @@ export default class KafkaMesssenger {
     private _producerOnReady() {
         this.producerReady = true;
         logger.info("Producer is ready", TAG);
+        const message = { "status" : "ready" }
+        this.produceMessage(message);
     }
 
     private _producerOnError(error: Error) {
         logger.warn(`Error from producer ${error}`, TAG);
     }
     
-    produceMessage(payload: any) {
+    produceMessage(payload: any, topicParam?: string, keyParam ?: string) {
         if (!this.producerReady) {
-            logger.info(`Producer is not ready ignoring payload`, TAG);
+            logger.warn(`Producer is not ready ignoring payload`, TAG);
             return;
         }
         
-        logger.info(`Sending payload ${payload} ....`, TAG);
+        let topic = undefined;
+        if (topicParam === undefined) {
+            topic = config.kafka.topic;
+        }
+        else {
+            topic = topicParam;
+        }
 
+        let key = undefined;
+
+        if (keyParam === undefined) {
+            key = config.kafka.key;
+        } 
+        else { 
+            key = keyParam;
+        }
+        
+        logger.info(`Sending payload '${JSON.stringify(payload)}' to topic ${topic}`, TAG);
+        
         try {
-            this.producer.produce()    
+            const payloadStr = JSON.stringify(payload);
+            const message = Buffer.from(payloadStr);
+            console.log("Message is" + message + "Payload is" + payloadStr)
+ 
+            this.producer.produce(topic, config.kafka.partition, message, key, Date.now())    
         } catch (error) {
-            
+            logger.warn(`A problem occurred when sending the payload ${error}`, TAG);
         }
     }
 }

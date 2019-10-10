@@ -8,8 +8,11 @@ const app = {
 
 const kafka = {
   producer : {
-    'metadata.broker.list': process.env.MYKAFKA_ALL || 'kafka-ip-service:9093'
-  }
+    'metadata.broker.list': process.env.KAFKA_PRODUCER_BROKER_LIST || 'kafka-ip-service:9093'
+  },
+  topic: process.env.KAFKA_PRODUCER_TOPIC || "vernemq-epic-topic",
+  partition: process.env.KAFKA_PRODUCER_PARTITION || -1,
+  key: process.env.KAFKA_PRODUCER_KEY || 'vernemq-epic-key'
 }
 
 export default { app, vernemq, kafka };

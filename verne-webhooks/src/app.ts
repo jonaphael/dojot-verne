@@ -35,13 +35,13 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(morgan("short"));
     this.app.use(getLoggerRouter());
-
-    /* Creating the routes */
-    verneRoute(this.app);
-
+    
     /* create the kafka Messenger (messenger) */
     const kafkaMessenger = new KafkaMesssenger(config.kafka.producer);
-    kafkaMessenger.produceMessage("{ 'message' : 123 }");
+    
+    /* Creating the routes */
+    verneRoute(this.app, kafkaMessenger);
+
 
     /* Starting the server */
     this.httpServer = this.app.listen(config.vernemq.port, () => {

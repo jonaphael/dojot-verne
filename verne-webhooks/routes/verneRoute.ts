@@ -1,6 +1,7 @@
 import { logger } from "@dojot/dojot-module-logger";
 import express from "express";
 import ProjectUtils from "../utils/utils";
+import KafkaMesssenger from "../kafka/kafkaMessenger";
 
 const TAG = { filename: "verneRoute" };
 
@@ -8,7 +9,7 @@ const TAG = { filename: "verneRoute" };
  * VerneMQ webhooks routes creation function.
  * @param app Express application to be used
  */
-const verneRoute = (app: express.Application) => {
+const verneRoute = (app: express.Application, kafkaMessenger: KafkaMesssenger) => {
   /**
    * Endpoint for webhook on_publish
    */
@@ -26,6 +27,7 @@ const verneRoute = (app: express.Application) => {
 
     }
 
+    kafkaMessenger.produceMessage(payload);
     res.status(200).send({});
   });
 };
