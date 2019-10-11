@@ -102,10 +102,10 @@ class MQTT_Client:
                 exception=ConnectError("disconnected")
             )
 
-    def publishing(self):
-        topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
-        payload = {'int': 1}
+    def publishing(self) -> None:
+        """Handles the publishing of messages to MQTT host."""
 
+        payload = { 'int': 1 }
         start_time = time.time()
 
         try:
@@ -116,16 +116,7 @@ class MQTT_Client:
             )
 
             if err:
-                Utils.fire_locust_failure(
-                    request_type=REQUEST_TYPE,
-                    name=MESSAGE_TYPE_PUB,
-                    response_time=Utils.time_delta(start_time, time.time()),
-                    exception=ValueError(err)
-                )
-
-                timestamp = int(datetime.timestamp(datetime.now()))
-                msg_error = "Time: {0} - {1}\n".format(timestamp, str(err))
-                lst_log_error.append(msg_error)
+                raise ValueError(err)
 
             self.pubmmap[mid] = {
                 'name': MESSAGE_TYPE_PUB,
@@ -138,11 +129,14 @@ class MQTT_Client:
             }
 
         except Exception as e:
+            timestamp = int(datetime.timestamp(datetime.now()))
+            err_msg = "{0}\nTime: {1} - {2}\n".format(Utils.error_message(int(str(e))), timestamp, str(e))
+            self.lst_log_error.append(err_msg)
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
                 response_time=Utils.time_delta(start_time, time.time()),
-                exception=e,
+                exception=err_msg,
             )
 
     def locust_on_publish(self, client, userdata, mid):
