@@ -55,5 +55,5 @@ class Client(MqttLocust):
     """The client that will run the tasks when hatched."""
 
     task_set = ThingBehavior
-    min_wait = int(TASK_MIN_TIME)
-    max_wait = int(TASK_MAX_TIME)
+    min_wait = config['locust']['task_min_time']
+    max_wait = config['locust']['task_max_time']
