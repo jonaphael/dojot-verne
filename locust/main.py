@@ -34,18 +34,26 @@ class MqttLocust(Locust):
 
 
 class ThingBehavior(TaskSet):
+    """MQTT pub/sub load test class. It specifies the transmission and reception behaviours
+    of messages from the MQTT broker."""
+
     @task
     def publish(self):
+        """Publishes a message to MQTT broker."""
         self.client.publishing()
 
     def on_start(self):
         time.sleep(5)
+        self.client.subscribing()
 
     def on_stop(self):
+        # Saving the log messages in a file
         self.client.save_log_list()
 
 
 class Client(MqttLocust):
+    """The client that will run the tasks when hatched."""
+
     task_set = ThingBehavior
     min_wait = int(TASK_MIN_TIME)
     max_wait = int(TASK_MAX_TIME)
