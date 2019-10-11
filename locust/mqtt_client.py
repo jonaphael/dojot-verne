@@ -180,6 +180,52 @@ class MQTT_Client:
                 response_time=Utils.time_delta(start_time, time.time()),
                 exception=err_msg,
             )
+
+
+    ###############
+    ## Callbacks ##
+    ###############
+
+    def locust_on_subscribe(self, client: mqtt.Client, userdata, mid, granted_qos) -> None:
+        """Subscription callback function."""
+
+        end_time = time.time()
+        message = self.submmap.pop(mid, None)
+
+        if message is None:
+            if config['app']['debug']:
+                logging.error("subscribe message is None")
+            self.lst_log_error.append("subscribe message is None\n")
+            Utils.fire_locust_failure(
+                request_type=REQUEST_TYPE,
+                name=MESSAGE_TYPE_SUB,
+                response_time=0,
+                exception=ValueError("Subscribed message could not be found"),
+            )
+            return
+
+        total_time = float(Utils.time_delta(message['start_time'], end_time))
+
+        if total_time > float(message['timed_out']):
+            if config['app']['debug']:
+                logging.error("subscribe timed out, response time: {0}".format(total_time))
+            Utils.fire_locust_failure(
+                request_type=REQUEST_TYPE,
+                name=MESSAGE_TYPE_SUB,
+                response=total_time,
+                exception=TimeoutError("subscribe timed out")
+            )
+
+        else:
+            if config['app']['debug']:
+                logging.info("Subscription received")
+            Utils.fire_locust_success(
+                request_type=REQUEST_TYPE,
+                name=message['name'],
+                response_time=total_time,
+                response_length=0
+            )
+
     def locust_on_publish(self, client: mqtt.Client, userdata, mid) -> None:
         """Publishing callback function. """
 
