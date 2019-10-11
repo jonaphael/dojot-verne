@@ -45,19 +45,39 @@ class DisconnectError(Exception):
 
 class MQTT_Client:
 
-    def __init__(self, device_id, filename_dir):
-        username = '{0}:{1}'.format(TENANT, device_id)
+    def __init__(self, device_id: str, client_dir: str, run_id: str):
+        """MQTT client constructor.
 
-        self.mqttc = mqtt.Client(client_id=device_id)
+        Args:
+            device_id (string): device identifier
+            client_dir (string): directory to export data from the client
+            run_id (string): client run identifier
+        """
+
         self.device_id = device_id
-        self.mqttc.username_pw_set(username, '')
+        self.client_dir = client_dir
+        self.run_id = run_id
 
+        self.username = '{0}:{1}'.format(TENANT, device_id)
+        self.topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
+
+        self.lst_log_error = list()
+
+        # Configuring MQTT client
+        self.mqttc = mqtt.Client(client_id=device_id)
+        self.mqttc.username_pw_set(self.username, '')
+
+        # Registering MQTT client callbacks
         self.mqttc.on_connect = self.locust_on_connect
         self.mqttc.on_disconnect = self.locust_on_disconnect
         self.mqttc.on_publish = self.locust_on_publish
+        self.mqttc.on_subscribe = self.locust_on_subscribe
+        self.mqttc.on_message = self.locust_on_message
 
         self.pubmmap = {}
-        self.filename_dir = filename_dir
+        self.submmap = {}
+        self.recvmqueue = Queue()
+
 
     def save_log_list(self):
         log_file = open(self.filename_dir, "w")
