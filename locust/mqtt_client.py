@@ -251,6 +251,11 @@ class MQTT_Client:
             response_length=len(message['payload']),
         )
 
+        self.recvmqueue.put({
+            # The end_time for publish is the start_time for the subscribed clients
+            'start_time': end_time,
+        })
+
     def locust_on_connect(self, client: mqtt.Client, flags_dict, userdata, rc) -> None:
         """Connection callback function."""
 
