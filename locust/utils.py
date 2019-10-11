@@ -1,18 +1,58 @@
 from locust import events
+import paho.mqtt.client as mqtt
 
 class Utils():
+    """Project Utils class."""
 
     @staticmethod
-    def time_delta(t1, t2):
-        return int((t2 - t1) * 1000)
+    def time_delta(start: float, end: float) -> int:
+        """Calculates the difference between two time values.
+
+        Args:
+            start (float): initial time
+            end (float): final time
+
+        Returns:
+            int: difference between the two times (in milliseconds).
+        """
+
+        return int((end - start) * 1000)
 
     @staticmethod
     def fire_locust_failure(**kwargs):
+        """Fires the request_failure event in Locust.
+
+        Args:
+            kwargs: Locust event keyword arguments.
+        """
+
         events.request_failure.fire(**kwargs)
 
     @staticmethod
     def fire_locust_success(**kwargs):
-        events.request_success.fire(**kwargs)        @staticmethod
+        """Fires the request_success event in Locust.
+
+        Args:
+            kwargs: Locust event keyword arguments.
+        """
+
+        events.request_success.fire(**kwargs)
+
+    @staticmethod
+    def str_to_bool(string: str) -> bool:
+        """Converts a string to bool.
+
+        Args:
+            str (string): string to be converted. Accepted values: 'True', 'False'. Any other
+            value will be considered False.
+
+        Returns:
+            bool
+        """
+
+        return True if string == "True" else False
+
+    @staticmethod
     def error_message(error: int) -> str:
         """Converts the error code from Locust in an understandable string."""
 
