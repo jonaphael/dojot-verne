@@ -4,29 +4,32 @@ import time
 import uuid
 
 from locust import Locust, task, TaskSet, events
+
+from config import config
 from mqtt_client import MQTT_Client
-
 from redis_client import RedisClient
-cache = RedisClient()
-cache.connect()
-
-TASK_MIN_TIME = os.environ.get("TASK_MIN_TIME", "1000")
-TASK_MAX_TIME = os.environ.get("TASK_MAX_TIME", "1000")
-
-
-LOG_DIR = os.environ.get("LOCUST_LOG_DIR", '/log')
-
-if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
-
-filename_dir = "{0}/{1}.log".format(LOG_DIR, uuid.uuid4())
 
 
 class MqttLocust(Locust):
+    """Locust client using MQTT."""
+
     def __init__(self, *args, **kwargs):
         super(Locust, self).__init__(*args, **kwargs)
+
+        # Connects to Redis database that stores the device_id for each client
+        cache = RedisClient()
+        cache.connect()
         device_id = cache.next_device_id()
-        self.client = MQTT_Client(device_id, filename_dir)
+
+        # UUID to identify the client run
+        run_id = uuid.uuid4()
+        # The directory named 'run_id' will be used to store all files related to the client's run
+        client_dir = "{0}/{1}/".format(config['locust']['log_dir'], run_id)
+
+        # Since the UUID is unique, we do not check whether the directory exists or not
+        os.makedirs(client_dir)
+
+        self.client = MQTT_Client(device_id, client_dir, run_id)
         self.client.connect()
 
 
