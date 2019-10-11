@@ -279,3 +279,17 @@ class MQTT_Client:
             )
 
         self.mqttc.reconnect()
+
+    def locust_on_message(self, client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
+        """Message reception callback function."""
+
+        if message is not None:
+            saved_message = self.recvmqueue.get()
+
+            if saved_message is not None:
+                Utils.fire_locust_success(
+                    request_type=REQUEST_TYPE,
+                    name=MESSAGE_TYPE_RECV_MESSAGE,
+                    response_time=Utils.time_delta(saved_message['start_time'], time.time()),
+                    response_length=len(message.payload)
+                )
