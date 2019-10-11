@@ -139,6 +139,47 @@ class MQTT_Client:
                 exception=err_msg,
             )
 
+    def subscribing(self, topic: str=None) -> None:
+        """Handles the subscription in MQTT topics.
+
+        Args:
+            topic (string): topic to subscribe
+        """
+
+        if topic is None:
+            topic = self.topic
+
+        start_time = time.time()
+
+        try:
+            err, mid = self.mqttc.subscribe((topic, config['mqtt']['qos']))
+
+            if err:
+                raise ValueError(err)
+
+            self.submmap[mid] = {
+                'name': MESSAGE_TYPE_SUB,
+                'qos': config['mqtt']['qos'],
+                'topic': topic,
+                'payload': "",
+                'start_time': start_time,
+                'timed_out': config['mqtt']['sub_timeout'],
+                'messages': 'messages'
+            }
+
+            if config['app']['debug']:
+                logging.info("Successfully subscribed")
+
+        except Exception as e:
+            err_msg = Utils.error_message(int(str(e)))
+            self.lst_log_error.append(err_msg)
+
+            Utils.fire_locust_failure(
+                request_type=REQUEST_TYPE,
+                name=MESSAGE_TYPE_SUB,
+                response_time=Utils.time_delta(start_time, time.time()),
+                exception=err_msg,
+            )
     def locust_on_publish(self, client: mqtt.Client, userdata, mid) -> None:
         """Publishing callback function. """
 
