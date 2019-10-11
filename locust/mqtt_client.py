@@ -10,21 +10,21 @@ import time
 import json
 import random
 import threading
+from queue import Queue
 
 from utils import Utils
+from config import config
+
 from locust import TaskSet, task, seq_task
 
-MQTT_HOST = os.environ.get("DOJOT_MQTT_HOST", "127.0.0.1")
-MQTT_PORT = int(os.environ.get("DOJOT_MQTT_PORT", "1883"))
-MQTT_QOS = 1
 
 TENANT = "admin"
 REQUEST_TYPE = 'mqtt'
+MESSAGE_TYPE_CONNECT = 'connect'
+MESSAGE_TYPE_DISCONNECT = 'disconnect'
 MESSAGE_TYPE_PUB = 'publish'
-PUBLISH_TIMEOUT = 40000
-
-
-lst_log_error = list()
+MESSAGE_TYPE_SUB = 'subscribe'
+MESSAGE_TYPE_RECV_MESSAGE = 'recv_message'
 
 
 class LocustError(Exception):
