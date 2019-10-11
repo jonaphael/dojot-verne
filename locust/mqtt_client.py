@@ -85,12 +85,15 @@ class MQTT_Client:
         log_file.writelines(self.lst_log_error)
         log_file.close()
 
-    def connect(self):
+    def connect(self) -> None:
+        """Connects to MQTT host."""
+
         try:
-            self.mqttc.connect_async(host=MQTT_HOST, port=MQTT_PORT,
-                                     keepalive=120)
+            self.mqttc.connect_async(host=config['mqtt']['host'], port=config['mqtt']['port'],
+                                     keepalive=config['mqtt']['con_timeout'])
             self.mqttc.loop_start()
         except Exception as e:
+            self.lst_log_error.append(e)
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name='connect',
@@ -106,13 +109,11 @@ class MQTT_Client:
         start_time = time.time()
 
         try:
-            res = self.mqttc.publish(
-                topic=topic,
+            err, mid = self.mqttc.publish(
+                topic=self.topic,
                 payload=json.dumps(payload),
-                qos=MQTT_QOS
+                qos=config['mqtt']['qos']
             )
-
-            [err, mid] = res
 
             if err:
                 Utils.fire_locust_failure(
@@ -128,11 +129,11 @@ class MQTT_Client:
 
             self.pubmmap[mid] = {
                 'name': MESSAGE_TYPE_PUB,
-                'qos': MQTT_QOS,
-                'topic': topic,
+                'qos': config['mqtt']['qos'],
+                'topic': self.topic,
                 'payload': payload,
                 'start_time': start_time,
-                'timed_out': PUBLISH_TIMEOUT,
+                'timed_out': config['mqtt']['pub_timeout'],
                 'messages': 'messages'
             }
 
@@ -172,7 +173,7 @@ class MQTT_Client:
         if rc == 0:
             Utils.fire_locust_success(
                 request_type=REQUEST_TYPE,
-                name='connect',
+                name=MESSAGE_TYPE_CONNECT,
                 response_time=0,
                 response_length=0
             )
@@ -183,7 +184,7 @@ class MQTT_Client:
         if rc != 0:
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
-                name='disconnect',
+                name=MESSAGE_TYPE_DISCONNECT,
                 response_time=0,
                 exception=DisconnectError("disconnected"),
             )
