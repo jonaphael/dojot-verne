@@ -251,7 +251,9 @@ class MQTT_Client:
             response_length=len(message['payload']),
         )
 
-    def locust_on_connect(self, client, flags_dict, userdata, rc):
+    def locust_on_connect(self, client: mqtt.Client, flags_dict, userdata, rc) -> None:
+        """Connection callback function."""
+
         if rc == 0:
             Utils.fire_locust_success(
                 request_type=REQUEST_TYPE,
