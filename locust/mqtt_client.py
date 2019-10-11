@@ -139,13 +139,14 @@ class MQTT_Client:
                 exception=err_msg,
             )
 
-    def locust_on_publish(self, client, userdata, mid):
+    def locust_on_publish(self, client: mqtt.Client, userdata, mid) -> None:
+        """Publishing callback function. """
 
         end_time = time.time()
         message = self.pubmmap.pop(mid, None)
 
         if message is None:
-            lst_log_error.append("message is none\n")
+            self.lst_log_error.append("publish message is none\n")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
@@ -172,8 +173,8 @@ class MQTT_Client:
                 response_length=0
             )
 
-    def locust_on_disconnect(self, client, userdata, rc):
-        print("--locust_on_disconnect--, RC: " + str(rc))
+    def locust_on_disconnect(self, client: mqtt.Client, userdata, rc) -> None:
+        """Disconnection callback function."""
 
         if rc != 0:
             Utils.fire_locust_failure(
