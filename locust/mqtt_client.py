@@ -78,10 +78,11 @@ class MQTT_Client:
         self.submmap = {}
         self.recvmqueue = Queue()
 
+    def save_log_list(self) -> None:
+        """Saves the list of log messages in the log file."""
 
-    def save_log_list(self):
-        log_file = open(self.filename_dir, "w")
-        log_file.writelines(lst_log_error)
+        log_file = open(self.client_dir + config['locust']['log_file'], "w")
+        log_file.writelines(self.lst_log_error)
         log_file.close()
 
     def connect(self):
