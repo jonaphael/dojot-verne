@@ -1,0 +1,2 @@
+pattern write %u/#
+pattern read %u/#

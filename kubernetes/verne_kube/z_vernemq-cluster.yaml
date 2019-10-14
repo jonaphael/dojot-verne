@@ -5,7 +5,7 @@ metadata:
     vernemq: k8s
   name: k8s
 spec:
-  baseImage: erlio/docker-vernemq
+  baseImage: muhamedavila/vmq_dojot
   env:
     ## BASE-64 config
     - name: VERNEMQ_CONF
@@ -31,3 +31,4 @@ spec:
     plugins: []
   serviceAccountName: vernemq-k8s
   size: 1
+  version: 1.9.0
