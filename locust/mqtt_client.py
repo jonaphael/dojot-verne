@@ -130,8 +130,8 @@ class MQTT_Client:
 
         except Exception as e:
             timestamp = int(datetime.timestamp(datetime.now()))
-            err_msg = "{0}\nTime: {1} - {2}\n".format(Utils.error_message(int(str(e))), timestamp, str(e))
-            self.lst_log_error.append(err_msg)
+            err_msg = Utils.error_message(int(str(e)))
+            self.lst_log_error.append("{0}\nTime: {1} - {2}\n".format(err_msg, timestamp, str(e)))
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
