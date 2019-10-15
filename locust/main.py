@@ -44,7 +44,6 @@ class ThingBehavior(TaskSet):
 
     def on_start(self):
         time.sleep(5)
-        self.client.subscribing()
 
     def on_stop(self):
         # Saving the log messages in a file

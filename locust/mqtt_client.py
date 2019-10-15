@@ -260,6 +260,7 @@ class MQTT_Client:
         """Connection callback function."""
 
         if rc == 0:
+            self.subscribing()
             Utils.fire_locust_success(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_CONNECT,
