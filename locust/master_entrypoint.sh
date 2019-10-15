@@ -94,6 +94,7 @@ then
     echo "... Setup accomplished."
 else
     echo "Reading from backup."
+    echo "SET device_count 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
 fi
 
 
