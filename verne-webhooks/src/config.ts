@@ -2,6 +2,11 @@ const vernemq = {
   port: process.env.VERNE_WEBHOOKS_PORT || 4000,
 };
 
+const app = {
+  log_level: process.env.VERNE_WEBHOOKS_LOG_LEVEL || "info",
+};
+
+
 const messenger = {
   kafka: {
     producer: {
@@ -54,4 +59,4 @@ const messenger = {
   }
 };
 
-export default { vernemq, messenger };
+export default { app, messenger, vernemq };

@@ -37,6 +37,7 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(morgan("short"));
     this.app.use(getLoggerRouter());
+    logger.setLevel(config.app.log_level);
       
     // initialize messenger
     this.messenger = new Messenger("vernemq-epic", config.messenger);
