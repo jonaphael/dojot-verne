@@ -6,7 +6,7 @@ import { Server } from "http";
 import morgan from "morgan";
 import verneRoute from "../routes/verneRoute";
 import config from "./config";
-import KafkaMesssenger from "../kafka/kafkaMessenger";
+import { Messenger } from "@dojot/dojot-module"
 
 const TAG = { filename: "app" };
 
@@ -17,11 +17,13 @@ class App {
   public isInitialized: boolean;
   private app: express.Application | null;
   private httpServer: Server | null;
+  private messenger: Messenger | null;
 
   constructor() {
     this.isInitialized = false;
     this.app = null;
     this.httpServer = null;
+    this.messenger = null;
   }
 
   /**
@@ -35,12 +37,17 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(morgan("short"));
     this.app.use(getLoggerRouter());
-    
-    /* create the kafka Messenger (messenger) */
-    const kafkaMessenger = new KafkaMesssenger(config.kafka.producer);
-    
+      
+    // initialize messenger
+    this.messenger = new Messenger("vernemq-epic", config.messenger);
+    this.messenger.init().then(() => {
+      this.messenger!.createChannel(config.messenger.kafka.dojot.subjects.verne, "rw")
+    }).catch((error: any) => {
+      logger.debug(`... failed to initialize the IoT agent messenger. Error: ${error.toString()}`, TAG);
+    })
+
     /* Creating the routes */
-    verneRoute(this.app, kafkaMessenger);
+    verneRoute(this.app, this.messenger);
 
 
     /* Starting the server */
