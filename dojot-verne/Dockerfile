@@ -14,3 +14,4 @@ USER vernemq
 ENTRYPOINT ["/command.sh"]
 
 CMD ["./vmq_dojot.sh"]
+COPY vmq.acl etc/vmq.acl
