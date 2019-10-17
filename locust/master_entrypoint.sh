@@ -80,15 +80,23 @@ done
 echo "dojot MQTT broker at host '${DOJOT_MQTT_HOST}', port '${DOJOT_MQTT_PORT}' fully started."
 
 # Verifying whether it should delete all device IDs and then recreate
-if [ ${GENERATE_IDS} -eq "1" -a "${DOJOT_ENV}" == "y" ]
+
+if [ "${REDIS_BACKUP}" == "n" ]
 then
-    echo "Start flushing ..."
-    bash flushall.sh
+    if [ ${GENERATE_IDS} -eq "1" -a "${DOJOT_ENV}" == "y" ]
+    then
+        echo "Start flushing ..."
+        bash flushall.sh
+    fi
+
+    echo "Adding data ..."
+    bash setup.sh
+    echo "... Setup accomplished."
+else
+    echo "Reading from backup."
+    echo "SET device_count 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
 fi
 
-echo "Adding data ..."
-bash setup.sh
-echo "... Setup accomplished."
 
 
 echo "Starting locust master node ..." &&

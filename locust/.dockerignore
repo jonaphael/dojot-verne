@@ -1,0 +1,12 @@
+# Docker
+Dockerfile
+Docker
+.dockerignore
+
+# Python
+__pycache__
+
+# Github
+.git
+.github
+.gitignore

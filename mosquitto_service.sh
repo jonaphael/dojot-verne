@@ -40,7 +40,7 @@ done
 # Sending n_msgs messages
 for i in `seq 1 $n_msgs`
 do
-	mosquitto_pub -h $host -p $port -t /testTopic -m '{"temperature": -10.8, "location": "-22.817457, -47.073856"}' -i testID -u testUser &
+	mosquitto_pub -h $host -p $port -t admin:123abc/device-data -m '{"temperature": -10.8, "location": "-22.817457, -47.073856"}' -u admin:123abc &
 	echo "Message $i"
 	sleep $interval
 done

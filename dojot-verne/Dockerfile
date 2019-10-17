@@ -1,3 +1,3 @@
 FROM erlio/docker-vernemq
 
-COPY vernemq.conf etc/
+COPY vmq.acl etc/vmq.acl
