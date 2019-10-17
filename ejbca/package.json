@@ -20,6 +20,7 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
+    "node-cache": "^4.2.1",
     "node-forge": "^0.8.5",
     "promise-retry": "^1.1.1",
     "soap": "^0.29.0"

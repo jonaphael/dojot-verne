@@ -1,4 +1,6 @@
 const ejbcaUtils = require('../utils/ejbcaUtils')
+const NodeCache = require("node-cache");
+const myCache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
 
 /* EJBCA ROUTES */
 let ejbcaRoute = (app, client) => {
@@ -162,7 +164,16 @@ let ejbcaRoute = (app, client) => {
                 return res.status(400).send({ 'soap error': err.toString() });
             }
 
-            return res.status(200).send('user created/edited with success.');
+            let clientObj = {status: 0}
+            // save in cache
+            myCache.set(userData.username, clientObj, function (cacheErr, success) {
+                if (!cacheErr && success) {
+                    return res.status(200).send('user created/edited with success.');
+                }
+                else {
+                    return res.status(500).send({ 'error': 'Internal'});
+                }
+            });
         });
     });
 
@@ -264,11 +275,29 @@ let ejbcaRoute = (app, client) => {
         // (the cert can only be obtained if the user have NEW status)
         // reference: https://araschnia.unam.mx/doc/ws/index.html
 
-        try {
-            await ejbcaUtils.findUserandReset(client, username);
-        } catch (error) {
-            return res.status(404).send({ 'soap error': error });
-        }
+
+        // FIX: for time improves, we cache the username and his cert status (0 - Not already generated | 1- already g enerated)
+        // here we check if the user in cache already generated the cert
+        myCache.get(username, async (err, value) => {
+            if (!err) {
+                if (value != undefined && value.status == 1) {
+                    try {
+                        await ejbcaUtils.findUserandReset(client, username);
+                    } catch (error) {
+                        return res.status(404).send({ 'soap error': error });
+                    }
+                }
+                else {
+                    value.status = 1;
+                    myCache.set(username, value.status, function (cacheErr) {
+                        if (cacheErr) {
+                            return res.status(500).send({ 'error': 'Internal' });
+                        }
+
+                    });
+                }
+            }
+        });
 
         let args = {
             arg0: username,
