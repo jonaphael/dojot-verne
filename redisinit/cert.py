@@ -4,6 +4,9 @@ import json
 from OpenSSL import crypto
 import conf
 
+import logging
+urllib3_logger = logging.getLogger('urllib3')
+urllib3_logger.setLevel(logging.CRITICAL)
 
 class Certificate:
 
@@ -81,16 +84,6 @@ class Certificate:
         CAName = conf.ejbca_CAName
         # create the ejbca user
         req = json.dumps({
-            "caName": CAName,
-            "certificateProfileName": certificateProfileName,
-            "clearPwd": True,
-            "endEntityProfileName": endEntityProfileName,
-            "keyRecoverable": False,
-            "password": "dojot",
-            "sendNotification": False,
-            "status": 10,
-            "subjectDN": "CN=" + self.cName,
-            "tokenType": "USERGENERATED",
             "username": self.cName
         })
 
@@ -103,6 +96,8 @@ class Certificate:
         
         if response.status_code != 200:
             print ("Error createEJBCAUser")
+
+        response.connection.close()
 
     def signCert(self):
         csr = self.csrPEM
@@ -127,3 +122,4 @@ class Certificate:
         else:
             print ("Error signCert" )
         
+        response.connection.close()

@@ -7,19 +7,26 @@ import time
 from thing import Thing
 
 NUM_OF_INSERT_BY_THREAD = 100
-NUM_OF_THREAD = 100
+NUM_OF_THREAD = 10
+BATCH_SIZE = 100
 
 #r = redis.Redis(host = conf.redis_host, port = conf.redis_port, db = 0)
 #pipe = r.pipeline()
 
 def register_thing(name):
     start = time.time()
-    logging.info(f"Thread {name} starting ")
     r = redis.Redis(host = conf.redis_host, port = conf.redis_port, db = 0)
     pipe = r.pipeline()
-    for i in range(NUM_OF_INSERT_BY_THREAD): 
+    start_batch_time = start
+    for i in range(NUM_OF_INSERT_BY_THREAD):
+
+        if i % BATCH_SIZE == 0:
+            end_batch_time = time.time()
+            diff = end_batch_time - start_batch_time
+            start_batch_time = end_batch_time
+            logging.info("Execution time: {} secs by Thread {} with batch {}".format(diff, name, i))
+
         thing_id = str(uuid.uuid4().hex)
-        logging.debug(f"{i} in Thread {name} : {thing_id}")
         obj = Thing.Create_Thing(thing_id)   
         #r.hmset(thing_id,obj)  
         pipe.hmset(thing_id,obj)  
