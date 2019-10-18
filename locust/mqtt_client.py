@@ -63,6 +63,8 @@ class MQTT_Client:
 
         self.lst_log_error = list()
 
+        self.is_connected = False
+
         # Configuring MQTT client
         self.mqttc = mqtt.Client(client_id=device_id)
         self.mqttc.username_pw_set(self.username, '')
@@ -261,6 +263,7 @@ class MQTT_Client:
 
         if rc == 0:
             self.subscribing()
+            self.is_connected = True
             Utils.fire_locust_success(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_CONNECT,
@@ -272,6 +275,7 @@ class MQTT_Client:
         """Disconnection callback function."""
 
         if rc != 0:
+            self.is_connected = False
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_DISCONNECT,
