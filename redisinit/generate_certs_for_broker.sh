@@ -1,29 +1,13 @@
 #!/bin/sh
 
-#########################################################
-### Required Packages: openssl, curl, jq
-### Expected environment variables, example:
-: '
-export CERT_CANAME='IOTmidCA'
-export CERT_EJBCA_API_URL='http://localhost:8000'
-export CERT_CNAME='vernemq_2'
-export CERT_DNS='localhost'
-export CERT_CA_FILE='ca.crt'
-export CERT_CERT_FILE='cert.crt'
-export CERT_KEY_FILE='cert.key'
-'
-#########################################################
+certCAName='IOTmidCA'
+certEjbcaApiUrl="http://10.50.11.150:5583"
+certDns='localhost'
+certCaFile='ca.crt'
 
-certCAName=$CERT_CANAME
-certEjbcaApiUrl=$CERT_EJBCA_API_URL
-certCname=$CERT_CNAME
-certDns=$CERT_DNS
-certCaFile=$CERT_CA_FILE
-certCertFile=$CERT_CERT_FILE
-certKeyFile=$CERT_KEY_FILE
-
+N_BROKER=$1
+password="dojot"
 keyLength=2048
-password=$(openssl rand -hex 3)
 
 _saveFormattedCRT()
 {
@@ -34,57 +18,51 @@ _saveFormattedCRT()
 
   (echo  "-----BEGIN CERTIFICATE-----"
   echo ${rawCRT}
-  echo "-----END CERTIFICATE-----"  ) > tempfile.crt
+  echo "-----END CERTIFICATE-----"  ) > cert/tempfile.crt
 
-  openssl x509 -inform pem -in tempfile.crt -out ${nameFile}
+  openssl x509 -inform pem -in cert/tempfile.crt -out cert/${nameFile}
 
 }
 ##Generate key par (private and public key)
 _generateKeyPair()
 {
-  echo "Generating KeyPar in ${certKeyFile}"
-  openssl genrsa -out  ${certKeyFile} ${keyLength}
-  chmod +x ${certKeyFile}
+  local certKeyFile="$1.key"
+  echo "Generating KeyPar in cert/${certKeyFile}"
+  openssl genrsa -out  cert/${certKeyFile} ${keyLength}
+  chmod +x cert/${certKeyFile}
 }
 
 ##Create CSR (cert wih some infos and sign with private key )
 _createCSR()
 {
+  local certKeyFile="$1.key"
+  local certCname="$1"
+  local certCsrFile="$1.csr"
+
   echo "Create CSR for ${certCname}"
-  openssl req -new  -sha256 -out ${certCname}.csr -key ${certKeyFile} \
-            -addext "subjectAltName = DNS:${certDns}" \
-	        -addext "keyUsage = Digital Signature, Non Repudiation, Key Encipherment" \
-            -addext "basicConstraints  =  CA:FALSE" \
+  openssl req -new  -sha256 -out cert/${certCsrFile} -key cert/${certKeyFile} \
             --subj "/CN=${certCname}"
 }
 
 ##create entity in ejbca
 _createEntity()
 {
+    local certCname="$1"
     echo "Create Entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/user"
     CREATE_USER_CA_STATUS=$(curl --silent -X POST ${certEjbcaApiUrl}/user \
     -H "Content-Type:application/json" \
     -H "Accept:application/json" \
-    -d  "{
-        \"caName\": \"${certCAName}\",
-        \"certificateProfileName\": \"CFREE\",
-        \"endEntityProfileName\": \"EMPTY_CFREE\",
-        \"clearPwd\": true,
-        \"keyRecoverable\": false,
-        \"password\": \"${password}\",
-        \"sendNotification\": false,
-        \"status\": 10,
-        \"subjectDN\": \"CN=${certCname}\",
-        \"tokenType\": \"USERGENERATED\",
-        \"username\": \"${certCname}\"
-    }" | jq '.status')
+    -d  "{\"username\": \"${certCname}\"}")
 }
 
 ##sign csr in ejbca
 _signCert()
 {
+    local certCname="$1"
+    local certCertFile="$1.crt"
+
     echo "Signing cert for entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 "
-    csrContent=`cat ${certCname}.csr  | sed '1,1d;$ d' | tr -d '\r\n'`
+    csrContent=`cat cert/${certCname}.csr  | sed '1,1d;$ d' | tr -d '\r\n'`
 
     signCertCa=$(curl --silent -X POST ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 \
     -H "Content-Type:application/json" \
@@ -111,14 +89,19 @@ retrieveCACertificate()
 ##Generate private key and sign certificate crt
 generateCertificates()
 {
-    _generateKeyPair
-    _createCSR
-    _createEntity
-    _signCert
+  
+  local N_BROKER=${1:-"1"}
+
+  for i in $(seq 1 $N_BROKER); do
+    _generateKeyPair "vernemq-k8s-$(expr $i - 1)"
+    _createCSR "vernemq-k8s-$(expr $i - 1)"
+    _createEntity "vernemq-k8s-$(expr $i - 1)"
+    _signCert "vernemq-k8s-$(expr $i - 1)"
+  done
 }
 
-generateCertificates
+generateCertificates $N_BROKER
 
-retrieveCACertificate
+#retrieveCACertificate
 
 
