@@ -11,6 +11,7 @@ import json
 import random
 import threading
 from queue import Queue
+from log_controller import LogController
 
 from utils import Utils
 from config import config
@@ -59,9 +60,9 @@ class MQTT_Client:
         self.run_id = run_id
 
         self.username = '{0}:{1}'.format(TENANT, device_id)
-        self.topic = "/{0}/{1}/attrs".format(TENANT, self.device_id)
+        self.topic = "{0}/attrs".format(self.username)
 
-        self.lst_log_error = list()
+        self.log = LogController(self.client_dir)
 
         self.is_connected = False
 
@@ -80,13 +81,6 @@ class MQTT_Client:
         self.submmap = {}
         self.recvmqueue = Queue()
 
-    def save_log_list(self) -> None:
-        """Saves the list of log messages in the log file."""
-
-        log_file = open(self.client_dir + config['locust']['log_file'], "w")
-        log_file.writelines(self.lst_log_error)
-        log_file.close()
-
     def connect(self) -> None:
         """Connects to MQTT host."""
 
@@ -95,7 +89,7 @@ class MQTT_Client:
                                      keepalive=config['mqtt']['con_timeout'])
             self.mqttc.loop_start()
         except Exception as e:
-            self.lst_log_error.append(e)
+            self.log.append_log(e)
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name='connect',
@@ -133,7 +127,7 @@ class MQTT_Client:
         except Exception as e:
             timestamp = int(datetime.timestamp(datetime.now()))
             err_msg = Utils.error_message(int(str(e)))
-            self.lst_log_error.append("{0}\nTime: {1} - {2}\n".format(err_msg, timestamp, str(e)))
+            self.log.append_log("{0}\nTime: {1} - {2}\n".format(err_msg, timestamp, str(e)))
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
@@ -174,7 +168,7 @@ class MQTT_Client:
 
         except Exception as e:
             err_msg = Utils.error_message(int(str(e)))
-            self.lst_log_error.append(err_msg)
+            self.log.append_log(err_msg)
 
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
@@ -197,7 +191,7 @@ class MQTT_Client:
         if message is None:
             if config['app']['debug']:
                 logging.error("subscribe message is None")
-            self.lst_log_error.append("subscribe message is None\n")
+            self.log.append_log("subscribe message is None\n")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_SUB,
@@ -235,7 +229,7 @@ class MQTT_Client:
         message = self.pubmmap.pop(mid, None)
 
         if message is None:
-            self.lst_log_error.append("publish message is none\n")
+            self.log.append_log("publish message is none\n")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
