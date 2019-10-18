@@ -8,6 +8,7 @@ RUN apt-get update && \
 COPY command.sh /
 
 COPY vmq_dojot.sh /vernemq
+COPY cert/ /vernemq/cert/
 
 USER vernemq
 

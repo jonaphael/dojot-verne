@@ -3,16 +3,17 @@
 # vmq_dojot.sh
 #
 uuid=$(uuidgen)
-CERT_CNAME="vernemq_${uuid}"
+CERT_CNAME="${HOSTNAME:-"vernemq"}"
 CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"ejbca_simple"}
 CERT_EJBCA_API_PORT=${CERT_EJBCA_API_PORT:-"5583"}
 CERT_EJBCA_URL="http://${CERT_EJBCA_API_BROKER}"
-CERT_DNS="vmq_${uuid}"
+CERT_DNS="$HOSTNAME"
 CERT_CA_FILE='ca.crt'
-CERT_CERT_FILE='cert.crt'
-CERT_KEY_FILE='cert.key'
-CERT_CSR_FILE='cert.csr'
+CERT_CERT_FILE="$HOSTNAME.crt"
+CERT_KEY_FILE="$HOSTNAME.key"
+CERT_CSR_FILE="$HOSTNAME.csr"
 CERT_CANAME='IOTmidCA'
+IS_K8S_ENV=${K8S_ENV:-"y"}
 
 certCAName=$CERT_CANAME
 certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
@@ -23,13 +24,24 @@ certCertFile=$CERT_CERT_FILE
 certKeyFile=$CERT_KEY_FILE
 certCsrFile=$CERT_CSR_FILE
 
+USE_STATIC_CERTS=${STATIC_CERT:-"n"}
+CERT_DIRECTORY="cert"
+
 keyLength=2048
 password="dojot"
 
+_removeCRTDir()
+{
+  if [ -d "$CERT_DIRECTORY" ]; 
+  then
+    rm -rf cert
+  fi
+}
+
 _createCRTDir()
 {
-  mkdir certs
-  cd certs
+  mkdir cert
+  cd cert
 }
 
 _connectEJBCA()
@@ -145,17 +157,43 @@ _generateCertificates()
 
 main() 
 {
-  ## Try to connect to EJBCA first
-  _connectEJBCA
+  if [ "${USE_STATIC_CERTS}" = "n" ]
+  then
+    ## remove static cert dir
+    _removeCRTDir
 
-  ## generate the certs from EJBCA
-  _generateCertificates
+    ## Try to connect to EJBCA first
+    _connectEJBCA
 
-  ## retrieve to host
-  _retrieveCACertificate
+    ## generate the certs from EJBCA
+    _generateCertificates
 
-  ## remove unused certs
-  _removeUnused
+    ## retrieve to host
+    _retrieveCACertificate
+
+    ## remove unused certs
+    _removeUnused
+  else
+    echo "Using static certificates... checking if exists.."
+    if [ -d "$CERT_DIRECTORY" ]; 
+    then
+      echo "checking if certs is correctly installed.."
+      if [ -e "cert/$HOSTNAME.crt" -a -e "cert/ca.crt" ]
+      then
+        echo "All ok!"
+      else
+        echo "Certs are not correctly installed.. closing application.."
+        exit 3
+      fi
+    else
+      echo "certs dir not exists, closing application.."
+      exit 3
+    fi
+  fi
+  if [ "${IS_K8S_ENV}" = "n" ]
+  then
+    start_vernemq
+  fi
 }
 
 
