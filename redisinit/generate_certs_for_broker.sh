@@ -41,7 +41,10 @@ _createCSR()
 
   echo "Create CSR for ${certCname}"
   openssl req -new  -sha256 -out cert/${certCsrFile} -key cert/${certKeyFile} \
-            --subj "/CN=${certCname}"
+          -addext "subjectAltName = DNS:${certDns}" \
+	        -addext "keyUsage = Digital Signature, Non Repudiation, Key Encipherment" \
+          -addext "basicConstraints  =  CA:FALSE" \
+          --subj "/CN=${certCname}"
 }
 
 ##create entity in ejbca
