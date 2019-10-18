@@ -102,6 +102,6 @@ generateCertificates()
 
 generateCertificates $N_BROKER
 
-#retrieveCACertificate
+retrieveCACertificate
 
 
