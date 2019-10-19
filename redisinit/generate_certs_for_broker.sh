@@ -1,8 +1,9 @@
 #!/bin/sh
 
 certCAName='IOTmidCA'
-certEjbcaApiUrl="http://10.50.11.150:5583"
-certDns='localhost'
+certEjbcaApiUrl="http://172.17.0.2:5583"
+##ATENTION:THIS DNS/ADDR MUST BE EQUAL TO KUBERNETES ADDR (OR PROXY/LB)
+certDns='10.50.11.227'
 certCaFile='ca.crt'
 
 N_BROKER=$1
@@ -36,13 +37,13 @@ _generateKeyPair()
 _createCSR()
 {
   local certKeyFile="$1.key"
-  local certCname="$1"
+  local certCname=$(echo -n "$1" | base64)
   local certCsrFile="$1.csr"
 
   echo "Create CSR for ${certCname}"
   openssl req -new  -sha256 -out cert/${certCsrFile} -key cert/${certKeyFile} \
-          -addext "subjectAltName = DNS:${certDns}" \
-	        -addext "keyUsage = Digital Signature, Non Repudiation, Key Encipherment" \
+	        -addext "subjectAltName = DNS:${certDns}" \
+          -addext "keyUsage = Digital Signature, Non Repudiation, Key Encipherment" \
           -addext "basicConstraints  =  CA:FALSE" \
           --subj "/CN=${certCname}"
 }
@@ -50,7 +51,7 @@ _createCSR()
 ##create entity in ejbca
 _createEntity()
 {
-    local certCname="$1"
+    local certCname=$(echo -n "$1" | base64)
     echo "Create Entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/user"
     CREATE_USER_CA_STATUS=$(curl --silent -X POST ${certEjbcaApiUrl}/user \
     -H "Content-Type:application/json" \
@@ -61,11 +62,12 @@ _createEntity()
 ##sign csr in ejbca
 _signCert()
 {
-    local certCname="$1"
+    local certCsr="$1.csr"
+    local certCname=$(echo -n "$1" | base64)
     local certCertFile="$1.crt"
 
     echo "Signing cert for entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 "
-    csrContent=`cat cert/${certCname}.csr  | sed '1,1d;$ d' | tr -d '\r\n'`
+    csrContent=`cat cert/${certCsr}  | sed '1,1d;$ d' | tr -d '\r\n'`
 
     signCertCa=$(curl --silent -X POST ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 \
     -H "Content-Type:application/json" \
