@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mqtt-client
+spec:
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: mqtt-client
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: mqtt-client
+    spec:
+      containers:
+      - name: mqtt-client
+        image: eduardogmisiuk/mqtt_client
