@@ -7,3 +7,6 @@ spec:
   type: ClusterIP
   selector:
     app: mqtt-client
+  ports:
+  - name: webhook-verne
+    port: 4001
