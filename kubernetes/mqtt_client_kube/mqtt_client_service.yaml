@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mqtt-client
+  namespace: dojot
 spec:
   type: ClusterIP
   selector:
