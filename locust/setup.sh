@@ -19,16 +19,20 @@ REDIS_PASSWD=${REDIS_PASSWD:-""}
 # Devices
 NUMBER_OF_DEVICES=${NUMBER_OF_DEVICES:-"10000"}
 
-
-if [ "${DOJOT_ENV}" == "y" ]
+if [ "${DOJOT_ENV}" == "y"]
 then
-
   # Get JWT Token
   echo 'Getting jwt token ...'
   JWT=$(curl --silent -X POST ${DOJOT_URL}/auth \
   -H "Content-Type:application/json" \
   -d "{\"username\": \"${DOJOT_USER}\", \"passwd\" : \"${DOJOT_PASSWD}\"}" | jq '.jwt' | tr -d '"')
-  echo "... Got jwt token ${JWT}."
+
+  if [ -z "$JWT" ];then
+      echo "--- There's no token! ---"
+      exit 1
+  else 
+      echo "... Got jwt token ${JWT}."
+  fi
 
   # Create Template
   echo 'Creating template ...'
@@ -56,27 +60,26 @@ then
                       "value_type" : "geo:point"}
                 ]
       }' | jq '.template.id')
-  echo "... Created template ${TEMPLATE_ID}."
 
-  # Create Devices
-  N=0 # Number of created devices
-  I=0 # Iteration
-  INCREMENT=1000 # Number of devices created in batch
-  KEY=1 # Incremental key for the device
-  while [ ${N} -lt ${NUMBER_OF_DEVICES} ]
-  do
-    let REMAINING=NUMBER_OF_DEVICES-N
-    if [ ${INCREMENT} -gt ${NUMBER_OF_DEVICES} ]
-    then
-      INCREMENT=${NUMBER_OF_DEVICES}
-    elif [ ${INCREMENT} -gt ${REMAINING} ]
-    then
-      let INCREMENT=REMAINING
-    fi
-    let N=N+INCREMENT
+  if [$? -ne 0]
+  then
+    echo "Could not create template."
+    exit 1
+  else
+    echo "Create template exit code: $?"
+    echo "... Created template ${TEMPLATE_ID}."
+  fi
 
-    echo "Creating ${INCREMENT} new devices (Iteration = ${I}) ..."
-    DEVICE_IDS=$(curl --silent -X POST ${DOJOT_URL}/device?count=${INCREMENT}\&verbose=false \
+    # Get JWT Token
+    echo 'Getting jwt token ...'
+    JWT=$(curl --silent -X POST ${DOJOT_URL}/auth \
+    -H "Content-Type:application/json" \
+    -d "{\"username\": \"${DOJOT_USER}\", \"passwd\" : \"${DOJOT_PASSWD}\"}" | jq '.jwt' | tr -d '"')
+    echo "... Got jwt token ${JWT}."
+
+    # Create Template
+    echo 'Creating template ...'
+    TEMPLATE_ID=$(curl --silent -X POST ${DOJOT_URL}/template \
     -H 'Content-Type:application/json' \
     -H "Authorization: Bearer ${JWT}" \
     -d  "{
@@ -84,19 +87,26 @@ then
           \"attrs\": {},
           \"label\": \"CargoContainer_${I}\"
         }" | jq '.devices[].id' | tr -d '"')
-    for DEVICE_ID in ${DEVICE_IDS}
-    do
-      echo "SET ${KEY} ${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
-      let KEY=KEY+1
-    done
-    echo "... Created ${N} devices from ${NUMBER_OF_DEVICES}"
-    let I=I+1
+    
+    if [ $? -eq 0 ]
+    then
+      for DEVICE_ID in ${DEVICE_IDS}
+      do
+        echo "SET ${KEY} ${DEVICE_ID}" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
+        let KEY=KEY+1
+      done
+      echo "... Created ${N} devices from ${NUMBER_OF_DEVICES}"
+      let I=I+1
+    else
+      echo "Could not create devices."
+      exit 1
+    fi
   done
+
 else
 
-  # get the number of items already registered in redis
+# get the number of items already registered in redis
   DEVICE_SIZE=$(echo "DBSIZE" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}")
-
   echo "Number of devices already saved in database: ${DEVICE_SIZE} devices."
   NUMBER_DEVICES_ADD="$(echo "$NUMBER_OF_DEVICES - $DEVICE_SIZE" | bc)"
 
