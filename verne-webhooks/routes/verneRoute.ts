@@ -25,6 +25,13 @@ const verneRoute = (app: express.Application) => {
 
     res.status(200).send({ "result": "ok" });
   });
+
+  /**
+   * Endpoint for webhook auth_on_register
+   */
+  app.post("/reg", (_req: express.Request, res: express.Response) => {
+    res.status(200).send({ "result": "ok" });
+  });
 };
 
 export default verneRoute;
