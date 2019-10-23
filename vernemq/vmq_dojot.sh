@@ -11,22 +11,24 @@ export CERT_EJBCA_URL= '5583'
 export STATIC_CERT='n'
 export K8S_ENV = 'n'
 export HOSTNAME = 'vernemq-k8s-0'
+export CRL_UPDATE_TIME = '0 */2 * * *'
 '
 #########################################################
-
-
-uuid=$(uuidgen)
 CERT_CNAME="${HOSTNAME:-"vernemq"}"
 CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"ejbca_simple"}
 CERT_EJBCA_API_PORT=${CERT_EJBCA_API_PORT:-"5583"}
 CERT_EJBCA_URL="http://${CERT_EJBCA_API_BROKER}"
 CERT_DNS="$HOSTNAME"
 CERT_CA_FILE='ca.crt'
+CERT_CRL_FILE='ca.crl'
 CERT_CERT_FILE="$HOSTNAME.crt"
 CERT_KEY_FILE="$HOSTNAME.key"
 CERT_CSR_FILE="$HOSTNAME.csr"
 CERT_CANAME='IOTmidCA'
 IS_K8S_ENV=${K8S_ENV:-"y"}
+#Read up on cron patterns here (http://crontab.org/)
+#By default will be updated every 2 hours
+CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-'0 */2 * * *'}"
 
 certCAName=$CERT_CANAME
 certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
@@ -36,6 +38,7 @@ certCaFile=$CERT_CA_FILE
 certCertFile=$CERT_CERT_FILE
 certKeyFile=$CERT_KEY_FILE
 certCsrFile=$CERT_CSR_FILE
+certCrlFile=$CERT_CRL_FILE
 
 USE_STATIC_CERTS=${STATIC_CERT:-"n"}
 CERT_DIRECTORY="cert"
@@ -47,6 +50,7 @@ _removeCRTDir()
 {
   if [ -d "$CERT_DIRECTORY" ];
   then
+    chmod +x -R cert
     rm -rf cert
   fi
 }
@@ -54,6 +58,7 @@ _removeCRTDir()
 _createCRTDir()
 {
   mkdir cert
+  chmod +x -R cert
   cd cert
 }
 
@@ -157,6 +162,27 @@ _retrieveCACertificate()
     _saveFormattedCRT "${certCaFile}" "${certCa}"
 }
 
+##Get from PKI the CRL certificate
+_retrieveCRLCertificate()
+{
+    #make the script executable
+    chmod +x _retrieveCRLCertificate.sh
+    #execute
+    sh ./../_retrieveCRLCertificate.sh
+}
+
+_cronTabCRL()
+{
+    #write out current crontab
+    crontab -l > mycron
+    #make the script executable
+    chmod +x ../_retrieveCRLCertificate.sh
+    #echo new cron into cron file
+    echo "$CRL_UPDATE_TIME /usr/bin/sh ../_retrieveCRLCertificate.sh" >> mycron
+    #install new cron file
+    crontab mycron
+    rm mycron
+}
 ##Generate private key and sign certificate crt
 _generateCertificates()
 {
@@ -183,6 +209,12 @@ main()
 
     ## retrieve to host
     _retrieveCACertificate
+
+    ## retrieve crl
+    _retrieveCRLCertificate
+
+    ## create cron tab to update CRL
+    _cronTabCRL
 
     ## remove unused certs
     _removeUnused
