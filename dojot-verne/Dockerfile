@@ -1,4 +1,4 @@
-FROM erlio/docker-vernemq
+FROM vernemq/vernemq
 
 USER root
 
@@ -9,10 +9,11 @@ COPY command.sh /
 
 COPY vmq_dojot.sh /vernemq
 COPY cert/ /vernemq/cert/
+COPY vmq.acl etc/vmq.acl
 
 USER vernemq
 
 ENTRYPOINT ["/command.sh"]
 
 CMD ["./vmq_dojot.sh"]
-COPY vmq.acl etc/vmq.acl
+

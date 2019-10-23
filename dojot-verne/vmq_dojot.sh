@@ -1,7 +1,20 @@
 #!/bin/sh
-#
-# vmq_dojot.sh
-#
+
+# mosquitto_pub -h localhost -p 1883 -t admin/attrs -m '{"Temperatura": 100}'  -u admin
+
+#########################################################
+### Required Packages: openssl, curl, jq
+### Expected environment variables, example:
+: '
+export CERT_EJBCA_API_BROKER = 'ejbca_simple'
+export CERT_EJBCA_URL= '5583'
+export STATIC_CERT='n'
+export K8S_ENV = 'n'
+export HOSTNAME = 'vernemq-k8s-0'
+'
+#########################################################
+
+
 uuid=$(uuidgen)
 CERT_CNAME="${HOSTNAME:-"vernemq"}"
 CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"ejbca_simple"}
@@ -32,7 +45,7 @@ password="dojot"
 
 _removeCRTDir()
 {
-  if [ -d "$CERT_DIRECTORY" ]; 
+  if [ -d "$CERT_DIRECTORY" ];
   then
     rm -rf cert
   fi
@@ -152,10 +165,10 @@ _generateCertificates()
     _createCSR
     _createEntity
     _signCert
-    
+
 }
 
-main() 
+main()
 {
   if [ "${USE_STATIC_CERTS}" = "n" ]
   then
@@ -175,7 +188,7 @@ main()
     _removeUnused
   else
     echo "Using static certificates... checking if exists.."
-    if [ -d "$CERT_DIRECTORY" ]; 
+    if [ -d "$CERT_DIRECTORY" ];
     then
       echo "checking if certs is correctly installed.."
       if [ -e "cert/$HOSTNAME.crt" -a -e "cert/ca.crt" ]
