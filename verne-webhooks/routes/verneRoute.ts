@@ -32,6 +32,13 @@ const verneRoute = (app: express.Application) => {
   app.post("/reg", (_req: express.Request, res: express.Response) => {
     res.status(200).send({ "result": "ok" });
   });
+
+  /**
+   * Endpoint for webhook auth_on_subscribe
+   */
+  app.post("/sub", (_req: express.Request, res: express.Response) => {
+    res.status(200).send({ "result": "ok" });
+  });
 };
 
 export default verneRoute;
