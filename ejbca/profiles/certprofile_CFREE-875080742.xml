@@ -24,18 +24,18 @@
 
   <!--TODO: WE NEED TO CHECK THE IMPACT OF THIS..
       THOSE CHANGES IS ONLY FOR NOW-->
-  <void method="put">
-   <string>usecertificatestorage</string>
-   <boolean>false</boolean>
-  </void>
-  <void method="put">
-   <string>storecertificatedata</string>
-   <boolean>false</boolean>
-  </void>
-  <void method="put">
-   <string>usecertificaterequesthistory</string>
-   <boolean>false</boolean>
-  </void>
+<!--  <void method="put">-->
+<!--   <string>usecertificatestorage</string>-->
+<!--   <boolean>false</boolean>-->
+<!--  </void>-->
+<!--  <void method="put">-->
+<!--   <string>storecertificatedata</string>-->
+<!--   <boolean>false</boolean>-->
+<!--  </void>-->
+<!--  <void method="put">-->
+<!--   <string>usecertificaterequesthistory</string>-->
+<!--   <boolean>false</boolean>-->
+<!--  </void>-->
   <!--TODO: WE NEED TO CHECK THE IMPACT OF THIS..
       THOSE CHANGES IS ONLY FOR NOW-->
 
