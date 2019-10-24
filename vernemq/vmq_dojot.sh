@@ -1,17 +1,15 @@
 #!/bin/sh
 
-# mosquitto_pub -h localhost -p 1883 -t admin/attrs -m '{"Temperatura": 100}'  -u admin
-
 #########################################################
 ### Required Packages: openssl, curl, jq
 ### Expected environment variables, example:
 : '
-export CERT_EJBCA_API_BROKER = 'ejbca_simple'
-export CERT_EJBCA_URL= '5583'
+export CERT_EJBCA_API_BROKER='ejbca_simple'
+export CERT_EJBCA_URL='5583'
 export STATIC_CERT='n'
-export K8S_ENV = 'n'
-export HOSTNAME = 'vernemq-k8s-0'
-export CRL_UPDATE_TIME = '0 */2 * * *'
+export K8S_ENV='n'
+export HOSTNAME='vernemq-k8s-0'
+export CRL_UPDATE_TIME='0 */2 * * *'
 '
 #########################################################
 CERT_CNAME="${HOSTNAME:-"vernemq"}"
@@ -28,7 +26,8 @@ CERT_CANAME='IOTmidCA'
 IS_K8S_ENV=${K8S_ENV:-"y"}
 #Read up on cron patterns here (http://crontab.org/)
 #By default will be updated every 2 hours
-CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-'0 */2 * * *'}"
+#CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
+CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"* * * * *"}"
 
 certCAName=$CERT_CANAME
 certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
@@ -50,7 +49,6 @@ _removeCRTDir()
 {
   if [ -d "$CERT_DIRECTORY" ];
   then
-    chmod +x -R cert
     rm -rf cert
   fi
 }
@@ -58,7 +56,6 @@ _removeCRTDir()
 _createCRTDir()
 {
   mkdir cert
-  chmod +x -R cert
   cd cert
 }
 
@@ -91,7 +88,7 @@ _connectEJBCA()
 _removeUnused()
 {
   rm tempfile.crt
-  rm cert.csr
+  rm "$HOSTNAME.csr"
 }
 
 _saveFormattedCRT()
@@ -138,7 +135,7 @@ _createEntity()
 _signCert()
 {
     echo "Signing cert for entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 "
-    csrContent=`cat cert.csr  | sed '1,1d;$ d' | tr -d '\r\n'`
+    csrContent=`cat  ${certCsrFile}  | sed '1,1d;$ d' | tr -d '\r\n'`
 
     signCertCa=$(curl --silent -X POST ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 \
     -H "Content-Type:application/json" \
@@ -165,23 +162,17 @@ _retrieveCACertificate()
 ##Get from PKI the CRL certificate
 _retrieveCRLCertificate()
 {
-    #make the script executable
-    chmod +x _retrieveCRLCertificate.sh
     #execute
-    sh ./../_retrieveCRLCertificate.sh
+    chmod +x /vernemq/_retrieveCRLCertificate.sh
+    sh /vernemq/_retrieveCRLCertificate.sh
+
 }
 
 _cronTabCRL()
 {
-    #write out current crontab
-    crontab -l > mycron
     #make the script executable
-    chmod +x ../_retrieveCRLCertificate.sh
-    #echo new cron into cron file
-    echo "$CRL_UPDATE_TIME /usr/bin/sh ../_retrieveCRLCertificate.sh" >> mycron
-    #install new cron file
-    crontab mycron
-    rm mycron
+    chmod +x /vernemq/_retrieveCRLCertificate.sh
+    echo "$CRL_UPDATE_TIME    /vernemq/_retrieveCRLCertificate.sh" > /etc/crontabs/root
 }
 ##Generate private key and sign certificate crt
 _generateCertificates()
@@ -191,7 +182,11 @@ _generateCertificates()
     _createCSR
     _createEntity
     _signCert
+}
 
+_startCronService()
+{
+    crond -b -l 0 -L /var/log/cron.log
 }
 
 main()
@@ -215,6 +210,8 @@ main()
 
     ## create cron tab to update CRL
     _cronTabCRL
+
+    _startCronService
 
     ## remove unused certs
     _removeUnused
@@ -246,3 +243,4 @@ main()
     # MAIN             #
 ########################
 main
+

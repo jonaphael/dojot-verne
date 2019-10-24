@@ -1,19 +1,17 @@
-FROM vernemq/vernemq
+FROM vernemq/vernemq:alpine-latest
 
 USER root
-
-RUN apt-get update && \
-    apt-get -y install uuid-runtime && \
-    apt-get -y install cron
 
 COPY command.sh /
 
 COPY vmq_dojot.sh /vernemq
 COPY _retrieveCRLCertificate.sh /vernemq
 COPY cert/ /vernemq/cert/
-COPY vmq.acl etc/vmq.acl
+#COPY vmq.acl etc/vmq.acl
 
-USER vernemq
+RUN chmod 777  /vernemq/vmq_dojot.sh
+RUN chmod 777  /vernemq/_retrieveCRLCertificate.sh
+RUN chmod 777 -R  /vernemq/cert/
 
 ENTRYPOINT ["/command.sh"]
 

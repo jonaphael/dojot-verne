@@ -107,11 +107,11 @@ let ejbcaRoute = (app, client) => {
 
         let delta = false;
 
-        if (req.query.update && req.query.delta.toLowerCase() == 'true') {
+        if (req.query.delta && req.query.delta.toLowerCase() === 'true') {
             delta = true;
         }
 
-        if (req.query.update && req.query.update.toLowerCase() == 'true') {
+        if (req.query.update && req.query.update.toLowerCase() === 'true') {
             //renew the CRL
             ejbcaUtils.crlRenew(caname);
         }
