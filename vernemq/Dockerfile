@@ -7,7 +7,7 @@ COPY command.sh /
 COPY vmq_dojot.sh /vernemq
 COPY _retrieveCRLCertificate.sh /vernemq
 COPY cert/ /vernemq/cert/
-#COPY vmq.acl etc/vmq.acl
+COPY vmq.acl etc/vmq.acl
 
 RUN chmod 777  /vernemq/vmq_dojot.sh
 RUN chmod 777  /vernemq/_retrieveCRLCertificate.sh

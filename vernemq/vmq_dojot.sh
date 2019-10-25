@@ -26,8 +26,7 @@ CERT_CANAME='IOTmidCA'
 IS_K8S_ENV=${K8S_ENV:-"y"}
 #Read up on cron patterns here (http://crontab.org/)
 #By default will be updated every 2 hours
-#CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
-CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"* * * * *"}"
+CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
 
 certCAName=$CERT_CANAME
 certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"

@@ -11,6 +11,7 @@ services:
       STATIC_CERT: "n"
       K8S_ENV: "n"
       HOSTNAME: "broker"
+      CRL_UPDATE_TIME: "*/10 * * * *" #every 10 min
       DOCKER_VERNEMQ_LOG__CONSOLE: "both"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "debug"
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
