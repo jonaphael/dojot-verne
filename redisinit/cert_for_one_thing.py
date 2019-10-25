@@ -10,8 +10,6 @@ if __name__ == "__main__":
 
     thing_id = str(uuid.uuid4().hex)
     obj = Thing.Create_Thing(thing_id)   
-
-    print (obj)
     
     with open(thing_id+".key", "w") as keyFile:
         keyFile.write(str(obj['private_key']))
