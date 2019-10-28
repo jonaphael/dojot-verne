@@ -54,9 +54,9 @@ const messenger = {
   },
 };
 
-const paho = {
+const mqtt = {
   host: process.env.DOJOT_MQTT_HOST || "10.50.11.227",
   port: Number(process.env.DOJOT_MQTT_PORT) || 30010,
 };
 
-export default { messenger, paho, vernemq };
+export default { messenger, mqtt, vernemq };
