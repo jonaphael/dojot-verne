@@ -1,13 +1,13 @@
 import dojot from "@dojot/dojot-module";
 import { logger } from "@dojot/dojot-module-logger";
-import paho from "paho-mqtt";
+import mqtt from "mqtt";
 import config from "./config";
 
 const TAG = { filename: "MqttClientApp" };
 
 class App {
   private messenger: dojot.Messenger | null;
-  private mqttc: paho.Client | null;
+  private mqttc: mqtt.Client | null;
   private isConnected: boolean;
 
   constructor() {
@@ -20,42 +20,58 @@ class App {
     this.messenger = new dojot.Messenger("mqtt-client", config.messenger);
 
     this.messenger!.init().then(() => {
-      // Initializing Kafka
-      this.messenger!.createChannel(config.messenger.kafka.dojot.subjects.verne, "rw");
-
-      // Initializing MQTT client
-      this.mqttc = new Paho.MQTT.Client(config.paho.host, config.paho.port, "admin:mqtt_client");
-      this.mqttc.connect({ onSuccess: this.onConnect });
-      this.mqttc.onConnectionLost = this.onConnectionLost;
-
-      const kafkaMessagesBind = this.onKafkaMessages.bind(this);
-      this.messenger!.on(config.messenger.kafka.dojot.subjects.verne, "message", kafkaMessagesBind);
-
+      this.initKafka();
+      this.initMqtt();
     }).catch((error: any) => {
       logger.debug(`... failed to initialize the IoT agent messenger. Error: ${error.toString()}`, TAG);
     });
   }
 
-  private onKafkaMessages(tenant: string, message: any) {
-    const mqttMessage: Paho.MQTT.Message = new Paho.MQTT.Message(message);
-    mqttMessage.destinationName = `${tenant}:${message.metadata.thingId}/config`;
-    this.sendMessage(mqttMessage);
+  private initKafka() {
+    this.messenger!.createChannel(config.messenger.kafka.dojot.subjects.verne, "rw");
+
+    const kafkaOnMessageBind = this.kafkaOnMessage.bind(this);
+    this.messenger!.on(config.messenger.kafka.dojot.subjects.verne, "message", kafkaOnMessageBind);
   }
 
-  private onConnect() {
+  private initMqtt() {
+    this.mqttc = mqtt.connect(`mqtt://${config.mqtt.host}:${config.mqtt.port}`);
+
+    const mqttOnConnectBind = this.mqttOnConnect.bind(this);
+    const mqttOnDisconnectBind = this.mqttOnDisconnect.bind(this);
+    this.mqttc.on("connect", mqttOnConnectBind);
+    this.mqttc.on("disconnect", mqttOnDisconnectBind);
+  }
+
+  /* Kafka Events */
+
+  /**
+   * Message receiving callback for Kafka.
+   * @param tenant message tenant
+   * @param message payload
+   */
+  private kafkaOnMessage(tenant: string, message: any) {
+    const topic = `${tenant}:${message.metadata.thingId}/config`;
+    this.publishMessage(topic, message);
+  }
+
+  /* MQTT Events */
+
+  private mqttOnConnect() {
     this.isConnected = true;
   }
 
-  private onConnectionLost(res: Paho.MQTT.MQTTError) {
-    if (res.errorCode !== 0) {
-      this.isConnected = false;
-      this.mqttc!.connect({ onSuccess: this.onConnect });
-    }
+  private mqttOnDisconnect() {
+    this.isConnected = false;
+    this.mqttc!.reconnect();
+    // TODO: close Kafka connection
   }
 
-  private sendMessage(message: Paho.MQTT.Message) {
+  /* MQTT Functions */
+
+  private publishMessage(topic: string, message: any) {
     if (this.isConnected) {
-      this.mqttc!.send(message);
+      this.mqttc!.publish(topic, message);
     }
   }
 }
