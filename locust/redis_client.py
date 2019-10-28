@@ -2,6 +2,7 @@ import logging
 import redis
 import os
 
+from utils import Utils
 from config import config
 
 
@@ -12,10 +13,17 @@ class RedisClient():
         """Attempts to stablish a connection."""
 
         try:
-            self.cache = redis.Redis(host=config['locust']['redis']['host'], port=config['locust']['redis']['port'], db=0)
-        except Exception:
-            logging.error("error on connect to redis")
+            self.certificates = redis.Redis(
+                host=config['locust']['redis']['host'],
+                port=config['locust']['redis']['port'],
+                db=config['locust']['redis']['certificates_db'])
+            self.mapped = redis.Redis(
+                host=config['locust']['redis']['host'],
+                port=config['locust']['redis']['port'],
+                db=config['locust']['redis']['mapped_db'])
 
+        except Exception as e:
+            logging.error(str(e.with_traceback()))
 
     def next_device_id(self) -> int:
         """Retrieves the next device_id in the list.
