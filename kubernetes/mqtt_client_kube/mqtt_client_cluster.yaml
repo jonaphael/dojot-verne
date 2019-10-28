@@ -4,7 +4,7 @@ metadata:
   name: mqtt-client
   namespace: dojot
 spec:
-  minReadySeconds: 30
+  serviceName: "mqtt-client"
   selector:
     matchLabels:
       app: mqtt-client
