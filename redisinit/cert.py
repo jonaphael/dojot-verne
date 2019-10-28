@@ -33,7 +33,7 @@ class Certificate:
         key = crypto.PKey()
         key.generate_key(crypto.TYPE_RSA, bitLen)
         key_file = None
-        return crypto.dump_privatekey(crypto.FILETYPE_PEM, key)
+        return crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8")
 
     def generateCSR(self):
         # based on https://github.com/cjcotton/python-csr

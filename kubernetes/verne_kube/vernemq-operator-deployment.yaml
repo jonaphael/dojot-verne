@@ -31,7 +31,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: vmq-operator
-        image: vernemq/vmq-operator:latest
+        image: muhamedavila/vmq-operator
         name: vmq-operator
       nodeSelector:
         beta.kubernetes.io/os: linux
