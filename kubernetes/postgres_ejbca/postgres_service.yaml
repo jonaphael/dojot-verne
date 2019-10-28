@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-ejbca
+spec:
+  type: ClusterIP 
+  selector:
+    app: postgres-ejbca
+  ports:
+  - name: postgres-ejbca
+    port: 5432
