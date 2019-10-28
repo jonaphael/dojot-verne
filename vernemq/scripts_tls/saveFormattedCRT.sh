@@ -1,5 +1,9 @@
 #!/bin/bash
 
+BASE_DIR=${BASE_DIR:-"/vernemq"}
+
+. ${BASE_DIR}/scripts_tls/_initVariables.sh
+
 _saveFormattedCRT()
 {
   nameFile=$1
@@ -9,8 +13,9 @@ _saveFormattedCRT()
 
   (echo  "-----BEGIN CERTIFICATE-----"
   echo ${rawCRT}
-  echo "-----END CERTIFICATE-----"  ) > tempfile.crt
+  echo "-----END CERTIFICATE-----"  ) > ${certDir}/tempfile.crt
 
-  openssl x509 -inform pem -in tempfile.crt -out ${nameFile}
+  openssl x509 -inform pem -in ${certDir}/tempfile.crt -out ${nameFile}
 
+  rm ${certDir}/tempfile.crt
 }
