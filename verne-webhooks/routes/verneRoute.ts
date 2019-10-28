@@ -10,7 +10,7 @@ const TAG = { filename: "verneRoute" };
  */
 const verneRoute = (app: express.Application) => {
   /**
-   * Endpoint for webhook on_publish
+   * Endpoint for webhook auth_on_publish
    */
   app.post("/pub", (req: express.Request, res: express.Response) => {
 
@@ -19,14 +19,25 @@ const verneRoute = (app: express.Application) => {
     // Verifying whether the message is a configuration one
     if (configTopic.test(req.body.topic)) {
       logger.debug("Message is from /config topic. Discarding!", TAG);
-
-    }
-    else {
+    } else {
       ProjectUtils.setPayload(req.body.payload, req.body.username);
-
     }
 
-    res.status(200).send({});
+    res.status(200).send({ "result": "ok" });
+  });
+
+  /**
+   * Endpoint for webhook auth_on_register
+   */
+  app.post("/reg", (_req: express.Request, res: express.Response) => {
+    res.status(200).send({ "result": "ok" });
+  });
+
+  /**
+   * Endpoint for webhook auth_on_subscribe
+   */
+  app.post("/sub", (_req: express.Request, res: express.Response) => {
+    res.status(200).send({ "result": "ok" });
   });
 };
 
