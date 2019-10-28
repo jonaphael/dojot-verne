@@ -15,8 +15,13 @@ config = {
         'log_dir':              os.environ.get("LOCUST_LOG_DIR", "/log"),
         'log_message_limit':    int(os.environ.get("LOCUST_LOG_MESSAGE_LIMIT", 1000)),
         'redis': {
-            'port':       int(os.environ.get("REDIS_PORT", 6379)),
-            'host':       os.environ.get("REDIS_HOST", "127.0.0.1"),
+            'certificates_db':      int(os.environ.get("REDIS_CERTIFICATES_DB", 0)),
+            'mapped_db':            int(os.environ.get("REDIS_MAPPED_DB", 1)),
+            'host':                 os.environ.get("REDIS_HOST", "127.0.0.1"),
+            'port':                 int(os.environ.get("REDIS_PORT", 6379)),
+            'map_device_ids':       Utils.str_to_bool(os.environ.get("MAP_DEVICE_IDS", "False")),
+            'cert_dir':             os.environ.get("CERT_DIR", "cert/"),
+            'ca_cert_file':         os.environ.get("CA_CERT_FILE", "ca.crt"),
         }
     },
 
