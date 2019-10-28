@@ -25,15 +25,16 @@ class RedisClient():
         except Exception as e:
             logging.error(str(e.with_traceback()))
 
-    def next_device_id(self) -> int:
+    def next_device_id(self) -> str:
         """Retrieves the next device_id in the list.
 
         It is important that each client has a unique ID to simulate our scenario,
         since there is no repetition in IDs in any scenario."""
 
         try:
-            device_count = self.cache.incr('device_count')
-            device_id = self.cache.get(device_count)
-            return device_id
-        except Exception:
-            logging.error("error to get device identifier")
+            device_count = self.mapped.incr('device_count')
+            device_id = self.mapped.get(device_count)
+            return device_id.decode('utf-8')
+        except Exception as e:
+            logging.error(str(e.with_traceback()))
+
