@@ -24,12 +24,10 @@ GENERATE_IDS=${GENERATE_IDS:-1}
 
 # Waiting for redis for at most 3 minutes
 START_TIME=$(date +'%s')
-echo "Witing for Redis fully start. Host '${REDIS_HOST}', '${REDIS_PORT}'..."
-echo "Try ping Redis... "
-PONG=`redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" ping | grep PONG`
-while [ -z "${PONG}" ]; do
+echo "Waiting for Redis fully start. Host '${REDIS_HOST}', '${REDIS_PORT}'..."
+while [ "${PONG}" != "PONG" ]; do
     sleep 3
-    echo "Retry Redis ping... "
+    echo "Ping Redis... "
     PONG=`redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" ping | grep PONG`
 
     ELAPSED_TIME=$(($(date +'%s') - ${START_TIME}))
