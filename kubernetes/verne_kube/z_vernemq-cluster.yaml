@@ -43,8 +43,6 @@ spec:
       port: 1883
     - address: 0.0.0.0
       port: 1888
-    - address: 0.0.0.0
-      port: 8883
       websocket: true
     plugins: []
   serviceAccountName: vernemq-k8s
