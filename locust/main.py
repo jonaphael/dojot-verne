@@ -40,14 +40,12 @@ class ThingBehavior(TaskSet):
     @task
     def publish(self):
         """Publishes a message to MQTT broker."""
-        self.client.publishing()
-
-    def on_start(self):
-        time.sleep(5)
+        if self.client.is_connected:
+            self.client.publishing()
 
     def on_stop(self):
         # Saving the log messages in a file
-        self.client.save_log_list()
+        self.client.log.save_log_list()
 
 
 class Client(MqttLocust):

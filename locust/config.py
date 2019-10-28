@@ -9,10 +9,10 @@ config = {
     },
 
     'locust': {
-        'task_min_time':    int(os.environ.get("TASK_MIN_TIME", 29500)),
-        'task_max_time':    int(os.environ.get("TASK_MAX_TIME", 30000)),
-        'log_dir':          os.environ.get("LOCUST_LOG_DIR", "/log"),
-        'log_file':         os.environ.get("LOCUST_LOG_FILE", "client.log"),
+        'task_min_time':        int(os.environ.get("TASK_MIN_TIME", 29500)),
+        'task_max_time':        int(os.environ.get("TASK_MAX_TIME", 30000)),
+        'log_dir':              os.environ.get("LOCUST_LOG_DIR", "/log"),
+        'log_message_limit':    int(os.environ.get("LOCUST_LOG_MESSAGE_LIMIT", 1000)),
         'redis': {
             'port':       int(os.environ.get("REDIS_PORT", 6379)),
             'host':       os.environ.get("REDIS_HOST", "127.0.0.1"),
