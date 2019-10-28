@@ -35,11 +35,31 @@ services:
       DOCKER_VERNEMQ_LISTENER__SSL__CRLFILE: /vernemq/cert/ca.crl
 
   ejbca_simple:
-    image: mprevide/ejbca:sec
+    depends_on: 
+      - postgres_ejbca
+    image: mprevide/ejbca
     ports:
       - 5583:5583
     hostname: localhost
     restart: always
+    environment:
+      DATABASE_JDBC_URL: "jdbc:postgresql://postgres_ejbca/ejbca_db"
+      DATABASE_USER: "youruser"
+      DATABASE_PASSWORD: "yourpassword"
+      LOG_LEVEL_APP: "ERROR"
+      LOG_LEVEL_SERVER_SUBSYSTEMS: "ERROR"
+      LOG_LEVEL_APP_WS_TRANSACTIONS: "ERROR"
+      LOG_LEVEL_SERVER: "ERROR"
+      LOG_LEVEL_APP_OCSP_TRANSACTIONS: "ERROR"
+
+  postgres_ejbca:
+    image: library/postgres
+    restart: always
+    environment: 
+      POSTGRES_USER: "youruser"
+      POSTGRES_PASSWORD: "yourpassword"
+      POSTGRES_DB: "ejbca_db"
+
 
   webhook:
     image: mprevide/vernewebhook:sec
