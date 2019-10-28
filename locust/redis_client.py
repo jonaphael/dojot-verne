@@ -38,3 +38,27 @@ class RedisClient():
         except Exception as e:
             logging.error(str(e.with_traceback()))
 
+    def map_device_ids(self) -> None:
+        """Maps device IDs from certificate database in Redis to sequential keys in mapping database.
+
+        The certificates database stores the certificates and private keys  by using a Hash Map.
+        When testing with Locust, we will read the already created certificates from Redis database,
+        but since we are using Hash Maps, the retrieval is not trivial because we need to know the
+        device ID.
+
+        The solution is to create another database sequentially mapping the device IDs (i.e., the key
+        will be an integer from 0 to the number of devices and the value is the device ID), so we can
+        retrieve them safely."""
+
+        try:
+            logging.info("Beginning database mapping...")
+
+            keys = self.certificates.keys()
+            for i in range(len(keys)):
+                self.mapped.set(i+1, keys[i])
+
+        except Exception as e:
+            logging.error(str(e.with_traceback()))
+
+        else:
+            logging.info("Finished database mapping.")
