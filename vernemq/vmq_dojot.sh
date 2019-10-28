@@ -64,11 +64,6 @@ _connectEJBCA()
   sleep 5
 }
 
-_removeUnused()
-{
-  rm ${certDir}/tempfile.crt
-}
-
 ##Generate key par (private and public key)
 _generateKeyPair()
 {
@@ -120,14 +115,14 @@ _cronTabCRL()
 {
     #make the script executable
     chmod +x ${BASE_DIR}/scripts_tls/retrieveCRL.sh
-    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" > /etc/crontabs/root
+    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> /etc/crontabs/root
 }
 
 _cronTabExpiration()
 {
     #make the script executable
     chmod +x ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh
-    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" > /etc/crontabs/root
+    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> /etc/crontabs/root
 }
 
 ##Generate private key and sign certificate crt
@@ -147,7 +142,7 @@ _startCronService()
 
 main()
 {
-  
+
   if [ "${USE_STATIC_CERTS}" = "n" ]
   then
     ## remove static cert dir
@@ -173,8 +168,6 @@ main()
 
     _startCronService
 
-    ## remove unused certs
-    _removeUnused
   else
     echo "Using static certificates... checking if exists.."
     if [ -d "${BASE_DIR}/$CERT_DIRECTORY" ];

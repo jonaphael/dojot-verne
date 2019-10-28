@@ -1,7 +1,7 @@
 version: '3'
 services:
   vmq-dojot:
-    image: mprevide/verne:sec
+    image: mprevide/verne
     ports:
       - 1883:1883
       - 8883:8883
@@ -13,17 +13,17 @@ services:
       HOSTNAME: "broker"
       CRL_UPDATE_TIME: "* * * * *" #every 10 min "*/10 * * * *"
       CHECK_EXPIRATION_TIME:  "* * * * *" #every day "0 1 * * *"
-      CHECKEND_EXPIRATION_SEC: '86400' #24h
+      CHECKEND_EXPIRATION_SEC: '60' #24h 86400
       DOCKER_VERNEMQ_LOG__CONSOLE: "both"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "debug"
-      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
-      #DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "on"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__HOOK: "on_register"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__ENDPOINT: "http://webhook:4000/reg"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__HOOK: "on_publish"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__ENDPOINT: "http://webhook:4000/pub"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__HOOK: "on_subscribe"
-      #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__ENDPOINT: "http://webhook:4000/sub"
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "off"
+      DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "on"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__HOOK: "auth_on_register"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__ENDPOINT: "http://webhook-verne:4000/reg"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__HOOK: "auth_on_publish"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__ENDPOINT: "http://webhook-verne:4000/pub"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__HOOK: "auth_on_subscribe"
+      DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__ENDPOINT: "http://webhook-verne:4000/sub"
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_UNSUBSCRIBE__HOOK: "on_unsubscribe"
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_UNSUBSCRIBE__ENDPOINT: "http://webhook:4000/unsub"
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_DELIVER__HOOK: "on_deliver"
@@ -43,8 +43,8 @@ services:
     hostname: localhost
     restart: always
 
-  webhook:
-    image: mprevide/vernewebhook:sec
+  webhook-verne:
+    image: mprevide/webhook_verne
     restart: always
     environment:
       VERNE_WEBHOOKS_PORT: "4000"

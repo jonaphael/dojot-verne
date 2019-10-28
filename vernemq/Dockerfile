@@ -4,9 +4,8 @@ USER root
 
 COPY command.sh /
 
-
 COPY scripts_tls/ /vernemq/scripts_tls
-COPY vmq_dojot /vernemq/vmq_dojot.sh
+COPY vmq_dojot.sh /vernemq/vmq_dojot.sh
 COPY cert/ /vernemq/cert/
 
 COPY vmq.acl etc/vmq.acl
