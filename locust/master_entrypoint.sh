@@ -12,6 +12,9 @@ DOJOT_MQTT_PORT=${DOJOT_MQTT_PORT:-"1883"}
 REDIS_HOST=${REDIS_HOST:-"127.0.0.1"}
 REDIS_PORT=${REDIS_PORT:-"6379"}
 REDIS_PASSWD=${REDIS_PASSWD:-""}
+# Databases
+REDIS_CERTIFICATES_DB=${REDIS_CERTIFICATES_DB:-"0"}
+REDIS_MAPPED_DB=${REDIS_MAPPED_DB:-"1"}
 
 #Environment
 DOJOT_ENV=${DOJOT_ENV:-"n"}
@@ -94,7 +97,7 @@ then
     echo "... Setup accomplished."
 else
     echo "Reading from backup."
-    echo "SET device_count 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
+    echo "SET device_count 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" -n ${REDIS_MAPPED_DB} &> /dev/null
 fi
 
 
