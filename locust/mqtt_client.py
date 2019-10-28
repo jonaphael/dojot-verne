@@ -76,6 +76,7 @@ class MQTT_Client:
 
         # Setting up TLS
         self.mqttc.tls_set(ca_cert_file, cert_file, key_file)
+        # TODO: investigate the problem when the insecure TLS mode is False
         self.mqttc.tls_insecure_set(True)
 
         self.mqttc.username_pw_set(self.username, '')

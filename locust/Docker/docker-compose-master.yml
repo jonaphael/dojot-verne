@@ -10,6 +10,7 @@ services:
       DOJOT_USER: "admin"
       DOJOT_PASSWD: "admin"
       DOJOT_MQTT_HOST: "10.50.11.227"
+      # TODO: differentiate DOJOT_MQTT_PORT and DOJOT_MQTTS_PORT variables
       DOJOT_MQTT_PORT: "30011"
       DOJOT_MQTT_TIMEOUT: "120"
       LOCUST_LOG_DIR: "logs"
