@@ -5,7 +5,8 @@ from utils import Utils
 
 config = {
     'app': {
-        'debug': Utils.str_to_bool(os.environ.get("DEBUG_MODE", "False")),
+        'debug':        Utils.str_to_bool(os.environ.get("DEBUG_MODE", "False")),
+        'log_in_file':  Utils.str_to_bool(os.environ.get("LOG_IN_FILE", "False")),
     },
 
     'locust': {
