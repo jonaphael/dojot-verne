@@ -12,6 +12,7 @@ import random
 import threading
 from queue import Queue
 from log_controller import LogController
+import ssl
 
 from utils import Utils
 from config import config
@@ -46,28 +47,37 @@ class DisconnectError(Exception):
 
 class MQTT_Client:
 
-    def __init__(self, device_id: str, client_dir: str, run_id: str):
+    def __init__(self, device_id: str, run_id: str):
         """MQTT client constructor.
 
         Args:
             device_id (string): device identifier
-            client_dir (string): directory to export data from the client
             run_id (string): client run identifier
         """
 
         self.device_id = device_id
-        self.client_dir = client_dir
         self.run_id = run_id
+
+        # Certification files
+        cert_dir = config['locust']['redis']['cert_dir']
+        ca_cert_file = cert_dir + config['locust']['redis']['ca_cert_file']
+        cert_file = cert_dir + Utils.get_certificate_file(device_id)
+        key_file = cert_dir + Utils.get_private_key_file(device_id)
 
         self.username = '{0}:{1}'.format(TENANT, device_id)
         self.topic = "{0}/attrs".format(self.username)
 
-        self.log = LogController(self.client_dir)
+        self.log = LogController(self.run_id)
 
         self.is_connected = False
 
         # Configuring MQTT client
         self.mqttc = mqtt.Client(client_id=device_id)
+
+        # Setting up TLS
+        self.mqttc.tls_set(ca_cert_file, cert_file, key_file)
+        self.mqttc.tls_insecure_set(True)
+
         self.mqttc.username_pw_set(self.username, '')
 
         # Registering MQTT client callbacks
@@ -205,6 +215,7 @@ class MQTT_Client:
         if total_time > float(message['timed_out']):
             if config['app']['debug']:
                 logging.error("subscribe timed out, response time: {0}".format(total_time))
+            self.log.append_log("subscribe timed out, response time: {0}".format(total_time))
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_SUB,
