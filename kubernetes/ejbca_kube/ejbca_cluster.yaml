@@ -15,4 +15,4 @@ spec:
       hostname: localhost
       containers:
       - name: ejbca-simple
-        image: muhamedavila/simple_ejbca_dojot
+        image: mprevide/ejbca

@@ -5,19 +5,29 @@ metadata:
     vernemq: k8s
   name: k8s
 spec:
-  baseImage: muhamedavila/vmq_dojot
+  baseImage: mprevide/verne
   env:
     - name: STATIC_CERT
-      value: "y"
+      value: "n"
     - name: K8S_ENV
       value: "y"
     - name: CERT_EJBCA_API_BROKER
       value: "ejbca-simple"
     - name: CERT_EJBCA_API_PORT
       value: "5583"
+    - name: CRL_UPDATE_TIME
+      value: "* * * * *" #every 10 min "*/10 * * * *"
+    - name: CHECK_EXPIRATION_TIME
+      value: "* * * * *" #every 10 min "*/10 * * * *"
+    - name: CHECKEND_EXPIRATION_SEC
+      value: "60" #24h  86400
+    - name: DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL
+      value: "debug"
+    - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
+      value: "off"
     ## BASE-64 config
     - name: VERNEMQ_CONF
-      value: "bWV0YWRhdGFfcGx1Z2luID0gdm1xX3N3YwpsaXN0ZW5lci52bXEuY2x1c3RlcmluZyA9ICRNWV9QT0RfSVA6NDQwNTMKbGlzdGVuZXIuc3NsLmRlZmF1bHQgPSAwLjAuMC4wOjg4ODMKbGlzdGVuZXIuc3NsLmNhZmlsZSA9IC92ZXJuZW1xL2NlcnQvY2EuY3J0Cmxpc3RlbmVyLnNzbC5jcmxmaWxlID0gL3Zlcm5lbXEvY2VydC9jYS5jcmwKbGlzdGVuZXIuc3NsLmNlcnRmaWxlID0gL3Zlcm5lbXEvY2VydC8kSE9TVE5BTUUuY3J0Cmxpc3RlbmVyLnNzbC5rZXlmaWxlID0gL3Zlcm5lbXEvY2VydC8kSE9TVE5BTUUua2V5Cmxpc3RlbmVyLmh0dHAuZGVmYXVsdCA9IDAuMC4wLjA6ODg4OApwbHVnaW5zLnZtcV9wYXNzd2QgPSBvZmYKcGx1Z2lucy52bXFfYWNsID0gb2ZmCnBsdWdpbnMudm1xX2s4cy5wYXRoID0gL3Zlcm5lbXEvcGx1Z2lucy9fYnVpbGQvZGVmYXVsdApwbHVnaW5zLnZtcV9rOHMgPSBvbgpsZXZlbGRiLm1heGltdW1fbWVtb3J5LnBlcmNlbnQgPSAyMApsb2cuY29uc29sZSA9IGNvbnNvbGUKcGx1Z2lucy52bXFfd2ViaG9va3M9b24Kdm1xX3dlYmhvb2tzLmRvam90X3B1Ymxpc2guaG9vayA9IG9uX3B1Ymxpc2gKdm1xX3dlYmhvb2tzLmRvam90X3B1Ymxpc2guZW5kcG9pbnQgPSBodHRwOi8vd2ViaG9vay12ZXJuZTo0MDAwL3B1YgpsaXN0ZW5lci5tYXhfY29ubmVjdGlvbnMgPSAxMDAwMDAKbGlzdGVuZXIubnJfb2ZfYWNjZXB0b3JzID0gMTAwCm1heF9pbmZsaWdodF9tZXNzYWdlcyA9IDIwMDAKbWF4X29ubGluZV9tZXNzYWdlcyA9IDEwMDAw"
+      value: "bWV0YWRhdGFfcGx1Z2luID0gdm1xX3N3YwpsaXN0ZW5lci52bXEuY2x1c3RlcmluZyA9ICRNWV9QT0RfSVA6NDQwNTMKbGlzdGVuZXIuc3NsLmRlZmF1bHQgPSAwLjAuMC4wOjg4ODMKbGlzdGVuZXIuc3NsLmNhZmlsZSA9IC92ZXJuZW1xL2NlcnQvY2EuY3J0Cmxpc3RlbmVyLnNzbC5jcmxmaWxlID0gL3Zlcm5lbXEvY2VydC9jYS5jcmwKbGlzdGVuZXIuc3NsLmNlcnRmaWxlID0gL3Zlcm5lbXEvY2VydC8kSE9TVE5BTUUuY3J0Cmxpc3RlbmVyLnNzbC5rZXlmaWxlID0gL3Zlcm5lbXEvY2VydC8kSE9TVE5BTUUua2V5Cmxpc3RlbmVyLnNzbC51c2VfaWRlbnRpdHlfYXNfdXNlcm5hbWUgPSBvZmYKbGlzdGVuZXIuc3NsLnJlcXVpcmVfY2VydGlmaWNhdGUgPSBvbgpsaXN0ZW5lci5odHRwLmRlZmF1bHQgPSAwLjAuMC4wOjg4ODgKcGx1Z2lucy52bXFfcGFzc3dkID0gb2ZmCnBsdWdpbnMudm1xX2FjbCA9IG9mZgpwbHVnaW5zLnZtcV9rOHMucGF0aCA9IC92ZXJuZW1xL3BsdWdpbnMvX2J1aWxkL2RlZmF1bHQKcGx1Z2lucy52bXFfazhzID0gb24KbGV2ZWxkYi5tYXhpbXVtX21lbW9yeS5wZXJjZW50ID0gMjAKbG9nLmNvbnNvbGUgPSBjb25zb2xlCnBsdWdpbnMudm1xX3dlYmhvb2tzPW9uCnZtcV93ZWJob29rcy5kb2pvdF9wdWJsaXNoLmhvb2sgPSBhdXRoX29uX3B1Ymxpc2gKdm1xX3dlYmhvb2tzLmRvam90X3B1Ymxpc2guZW5kcG9pbnQgPSBodHRwOi8vd2ViaG9vay12ZXJuZTo0MDAwL3B1Ygp2bXFfd2ViaG9va3MuZG9qb3RfcmVnaXN0ZXIuaG9vayA9IGF1dGhfb25fcmVnaXN0ZXIKdm1xX3dlYmhvb2tzLmRvam90X3JlZ2lzdGVyLmVuZHBvaW50ID0gaHR0cDovL3dlYmhvb2stdmVybmU6NDAwMC9yZWcKdm1xX3dlYmhvb2tzLmRvam90X3N1YnNjcmliZS5ob29rID0gYXV0aF9vbl9zdWJzY3JpYmUKdm1xX3dlYmhvb2tzLmRvam90X3N1YnNjcmliZS5lbmRwb2ludCA9IGh0dHA6Ly93ZWJob29rLXZlcm5lOjQwMDAvc3ViCmxpc3RlbmVyLm1heF9jb25uZWN0aW9ucyA9IDEwMDAwMApsaXN0ZW5lci5ucl9vZl9hY2NlcHRvcnMgPSAxMDAKbWF4X2luZmxpZ2h0X21lc3NhZ2VzID0gMjAwMAptYXhfb25saW5lX21lc3NhZ2VzID0gMTAwMDA="
   config:
     configs:
     - name: allow_register_during_netsplit
@@ -33,8 +43,11 @@ spec:
       port: 1883
     - address: 0.0.0.0
       port: 1888
+    - address: 0.0.0.0
+      port: 8883
       websocket: true
     plugins: []
   serviceAccountName: vernemq-k8s
   size: 1
   version: 1.9.0
+  tag: latest
