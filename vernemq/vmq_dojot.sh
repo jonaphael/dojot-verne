@@ -67,14 +67,12 @@ _connectEJBCA()
 ##Generate key par (private and public key)
 _generateKeyPair()
 {
-    chmod +x ${BASE_DIR}/scripts_tls/generateKeyPair.sh
     sh ${BASE_DIR}/scripts_tls/generateKeyPair.sh
 }
 
 ##Create CSR (cert wih some infos and sign with private key )
 _createCSR()
 {
-    chmod +x ${BASE_DIR}/scripts_tls/createCSR.sh
     sh ${BASE_DIR}/scripts_tls/createCSR.sh
 }
 
@@ -91,38 +89,29 @@ _createEntity()
 ##sign csr in ejbca
 _signCert()
 {
-    chmod +x ${BASE_DIR}/scripts_tls/signCert.sh
     sh ${BASE_DIR}/scripts_tls/signCert.sh
 }
 
 ##Get from PKI the CA certificate and return in PEM format
 _retrieveCACertificate()
 {
-    chmod +x ${BASE_DIR}/scripts_tls/retrieveCACertificate.sh
     sh ${BASE_DIR}/scripts_tls/retrieveCACertificate.sh
 }
 
 ##Get from PKI the CRL certificate
 _retrieveCRLCertificate()
 {
-    #execute
-    chmod +x ${BASE_DIR}/scripts_tls/retrieveCRL.sh
     sh ${BASE_DIR}/scripts_tls/retrieveCRL.sh
-
 }
 
 _cronTabCRL()
 {
-    #make the script executable
-    chmod +x ${BASE_DIR}/scripts_tls/retrieveCRL.sh
-    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> /etc/crontabs/root
+    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> ${BASE_DIR}/crontab.tab
 }
 
 _cronTabExpiration()
 {
-    #make the script executable
-    chmod +x ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh
-    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> /etc/crontabs/root
+    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> ${BASE_DIR}/crontab.tab
 }
 
 ##Generate private key and sign certificate crt
@@ -137,7 +126,7 @@ _generateCertificates()
 
 _startCronService()
 {
-    crond -b -l 0 -L /var/log/cron.log
+   supercronic  ${BASE_DIR}/crontab.tab &
 }
 
 main()
@@ -159,6 +148,9 @@ main()
 
     ## retrieve crl
     _retrieveCRLCertificate
+
+    ## create cron file
+    touch ${BASE_DIR}/crontab.tab
 
     ## create cron tab to update CRL
     _cronTabCRL
