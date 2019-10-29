@@ -18,7 +18,14 @@ echo "Getting jwt token ..."
 JWT=$(curl --silent -X POST ${DOJOT_URL}/auth \
 -H "Content-Type:application/json" \
 -d "{\"username\": \"${DOJOT_USER}\", \"passwd\" : \"${DOJOT_PASSWD}\"}" | jq '.jwt' | tr -d '"')
-echo "... Got jwt token ${JWT}."
+
+if [ -z "$JWT" ];then
+    echo "--- There's no token! ---"
+    exit 1
+else 
+    echo "... Got jwt token ${JWT}."
+fi
+
 
 # Delete all device IDs
 #echo "Deleting all devices ..."
@@ -51,9 +58,15 @@ echo "... Got jwt token ${JWT}."
 #  fi
 #done
 echo "Deleting all devices ..."
-$(curl --silent -X DELETE ${DOJOT_URL}/device \
--H "Authorization: Bearer ${JWT}" &> /dev/null)
-echo "... All devices deleted"
+if [$(curl -X DELETE ${DOJOT_URL}/device \
+-H "Authorization: Bearer ${JWT}" &> /dev/null) -ne 0]
+then
+    echo "Could not complete request."
+    exit 1
+else
+    echo "... All devices deleted"
+fi
+
 
 # Delete all template IDs
 #echo "Deleting all templates... "
@@ -84,11 +97,21 @@ echo "... All devices deleted"
 #  fi
 #done
 echo "Deleting all templated ..."
-$(curl --silent -X DELETE ${DOJOT_URL}/template \
--H "Authorization: Bearer ${JWT}" &> /dev/null)
-echo "... All templates deleted."
+if [$(curl --silent -X DELETE ${DOJOT_URL}/template \
+-H "Authorization: Bearer ${JWT}" &> /dev/null) -ne 0]
+then
+    echo "Could not complete request."
+    exit 1
+else
+    echo "... All templates deleted."
+fi
 
 # Flush redis
 echo "Deleting redis data ..."
-echo "FLUSHALL" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
-echo "... Redis data deleted."
+#echo "FLUSHALL" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null
+if [ redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" &> /dev/null -ne 0 ]
+then
+    echo "Could not delete Redis data."
+else
+    echo "... Redis data deleted."
+fi

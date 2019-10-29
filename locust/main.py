@@ -5,9 +5,16 @@ import uuid
 
 from locust import Locust, task, TaskSet, events
 
+from utils import Utils
 from config import config
 from mqtt_client import MQTT_Client
 from redis_client import RedisClient
+
+
+if Utils.is_master() and config['locust']['redis']['map_device_ids']:
+    db = RedisClient()
+    db.connect()
+    db.map_device_ids()
 
 
 class MqttLocust(Locust):
@@ -23,13 +30,8 @@ class MqttLocust(Locust):
 
         # UUID to identify the client run
         run_id = uuid.uuid4()
-        # The directory named 'run_id' will be used to store all files related to the client's run
-        client_dir = "{0}/{1}/".format(config['locust']['log_dir'], run_id)
 
-        # Since the UUID is unique, we do not check whether the directory exists or not
-        os.makedirs(client_dir)
-
-        self.client = MQTT_Client(device_id, client_dir, run_id)
+        self.client = MQTT_Client(device_id, run_id)
         self.client.connect()
 
 
@@ -40,14 +42,12 @@ class ThingBehavior(TaskSet):
     @task
     def publish(self):
         """Publishes a message to MQTT broker."""
-        self.client.publishing()
-
-    def on_start(self):
-        time.sleep(5)
+        if self.client.is_connected:
+            self.client.publishing()
 
     def on_stop(self):
         # Saving the log messages in a file
-        self.client.save_log_list()
+        self.client.log.save_log_list()
 
 
 class Client(MqttLocust):
