@@ -148,7 +148,7 @@ spec:
         - name: KAFKA_OPTS
           value: "-Dlogging.level=INFO"
         volumeMounts:
-        - name: zkp-pv-storage
+        - name: kafka-pv-storage
           mountPath: /var/lib/kafka
         readinessProbe:
           exec:
@@ -160,6 +160,6 @@ spec:
         runAsUser: 1000
         fsGroup: 1000
       volumes:
-        - name: zkp-pv-storage
+        - name: kafka-pv-storage
           persistentVolumeClaim:
-            claimName: zkp-pv-claim
+            claimName: kafka-pv-claim
