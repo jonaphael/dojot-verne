@@ -15,7 +15,7 @@
   </void>
   <void method="put">
    <string>validity</string>
-   <long>1</long>  <!-- Days  -->
+   <long>2</long>  <!-- Days  -->
   </void>
 
   <!-- Normally the validity period of issued certificates are controlled
