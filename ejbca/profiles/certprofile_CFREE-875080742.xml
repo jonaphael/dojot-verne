@@ -15,15 +15,18 @@
   </void>
   <void method="put">
    <string>validity</string>
-   <long>730</long>
+   <long>1</long>
   </void>
+
+  <!-- Normally the validity period of issued certificates are controlled 
+  by the certificate profile. If you enable 'Allow validity override' 
+  in the certificate profile, and the CMP initialization- or certification 
+  request contains a validity time in the CRMF request template, 
+  this validity period will be used. -->
   <void method="put">
    <string>allowvalidityoverride</string>
    <boolean>false</boolean>
   </void>
-
-  <!--TODO: WE NEED TO CHECK THE IMPACT OF THIS..
-      THOSE CHANGES IS ONLY FOR NOW-->
 
   <void method="put">
 <!--  Issued certificates are stored in the database to be able to provide them upon request or provide revocation information. Certificate storage can also be turned off in the CA settings. Setting either setting to false will lead to certificates not being stored, not even meta information-->
@@ -32,10 +35,17 @@
   </void>
 
   <void method="put">
-<!--  Allows meta information about certificates to be stored but will omit storing the actual certificate data (base64Cert) to the database. Meta information about the certificate includes revocation status, expiration information, fingerprint, etc.-->
-<!--  The Store Certificate Data setting has no effect if Use Certificate Storage is disabled.-->
-<!--  Disabling Store Certificate Data prevents features that depend on the actual certificate data being present from working. This setting is by default enabled and should not be modified unless understood well.-->
-<!--  Disabling Store Certificate Data also disables most OCSP extensions for affected certificates, since these are commonly dependent on the certificate being present in the VA.-->
+<!--  Allows meta information about certificates to be stored but will 
+omit storing the actual certificate data (base64Cert) to the database. 
+Meta information about the certificate includes revocation status, 
+expiration information, fingerprint, etc.-->
+<!--  The Store Certificate Data setting has no effect if Use 
+Certificate Storage is disabled. Disabling Store Certificate Data prevents 
+features that depend on the actual certificate data being present from working. This setting is 
+by default enabled and should not be modified unless understood well.-->
+<!--  Disabling Store Certificate Data also disables most OCSP extensions for affected certificates, 
+since these are commonly dependent on the certificate being present in the VA.-->
+
    <string>storecertificatedata</string>
    <boolean>false</boolean>
   </void>
@@ -45,9 +55,6 @@
 <!--   <string>usecertificaterequesthistory</string>-->
 <!--   <boolean>false</boolean>-->
 <!--  </void>-->
-
-  <!--TODO: WE NEED TO CHECK THE IMPACT OF THIS..
-      THOSE CHANGES IS ONLY FOR NOW-->
 
   <void method="put">
    <string>allowextensionoverride</string>
