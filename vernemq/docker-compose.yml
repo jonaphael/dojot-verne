@@ -38,7 +38,7 @@ services:
       DOCKER_VERNEMQ_LISTENER__SSL__CRLFILE: /vernemq/cert/ca.crl
 
   ejbca_simple:
-    image: mprevide/ejbca:sec
+    image: mprevide/ejbca
     ports:
       - 5583:5583
     hostname: localhost
