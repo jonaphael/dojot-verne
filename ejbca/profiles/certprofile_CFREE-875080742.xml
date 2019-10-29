@@ -23,7 +23,7 @@
   in the certificate profile, and the CMP initialization- or certification
   request contains a validity time in the CRMF request template,
   this validity period will be used. -->
-     
+
   <void method="put">
    <string>allowvalidityoverride</string>
    <boolean>true</boolean>

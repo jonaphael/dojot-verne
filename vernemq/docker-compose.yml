@@ -12,9 +12,9 @@ services:
       K8S_ENV: "n"
       HOSTNAME: "broker"
       CERT_DNS: "192.168.96.1"
-      CRL_UPDATE_TIME: "* * * * *" #every 10 min "*/10 * * * *"
-      CHECK_EXPIRATION_TIME:  "* * * * *" #every day "0 1 * * *"
-      CHECKEND_EXPIRATION_SEC: '60' #24h 86400
+      CRL_UPDATE_TIME: "*/30 * * * *" #every 30 min
+      CHECK_EXPIRATION_TIME:  "*/30 * * * *" #every 30 min
+      CHECKEND_EXPIRATION_SEC: '43200' #12h
       DOCKER_VERNEMQ_LOG__CONSOLE: "both"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "debug"
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "off"

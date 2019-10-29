@@ -16,13 +16,11 @@ spec:
     - name: CERT_EJBCA_API_PORT
       value: "5583"
     - name: CRL_UPDATE_TIME
-      value: "* * * * *" #every 10 min "*/10 * * * *"
+      value: "*/30 * * * *" #every 30 min
     - name: CHECK_EXPIRATION_TIME
-      value: "* * * * *" #every 10 min "*/10 * * * *"
+      value: "*/30 * * * *" #every 30 min
     - name: CHECKEND_EXPIRATION_SEC
-      value: "60" #24h  86400
-    - name: CHECKEND_EXPIRATION_SEC
-      value: "60" #24h  86400
+      value: "43200" #12h 
     - name: CERT_DNS
       value: "10.50.11.235"
     ## BASE-64 config
