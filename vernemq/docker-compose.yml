@@ -11,6 +11,7 @@ services:
       STATIC_CERT: "n"
       K8S_ENV: "n"
       HOSTNAME: "broker"
+      CERT_DNS: "192.168.96.1"
       CRL_UPDATE_TIME: "* * * * *" #every 10 min "*/10 * * * *"
       CHECK_EXPIRATION_TIME:  "* * * * *" #every day "0 1 * * *"
       CHECKEND_EXPIRATION_SEC: '60' #24h 86400
