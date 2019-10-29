@@ -1,5 +1,6 @@
 from locust import events
 import paho.mqtt.client as mqtt
+import sys
 
 class Utils():
     """Project Utils class."""
@@ -91,3 +92,19 @@ class Utils():
         if error == mqtt.MQTT_ERR_QUEUE_SIZE:
             return "MQTT_ERR_QUEUE_SIZE"
         return "{0}\n".format(error)
+
+    @staticmethod
+    def is_master() -> bool:
+        return "--master" in sys.argv
+
+    @staticmethod
+    def is_slave() -> bool:
+        return "--slave" in sys.argv
+
+    @staticmethod
+    def get_private_key_file(device_id: str) -> str:
+        return "{0}.key".format(device_id)
+
+    @staticmethod
+    def get_certificate_file(device_id: str) -> str:
+        return "{0}.crt".format(device_id)

@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: webhook-verne
-  replicas: 2
+  replicas: 1
   template: #templates for the pods
     metadata:
       labels:

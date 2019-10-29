@@ -18,7 +18,7 @@ services:
       DOCKER_VERNEMQ_LOG__CONSOLE: "both"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "debug"
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "off"
-      DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "on"
+      DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "off"
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__HOOK: "auth_on_register"
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_REGISTER__ENDPOINT: "http://webhook-verne:4000/reg"
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__HOOK: "auth_on_publish"
@@ -39,10 +39,30 @@ services:
 
   ejbca_simple:
     image: mprevide/ejbca
+    depends_on:
+      - postgres_ejbca
     ports:
       - 5583:5583
     hostname: localhost
     restart: always
+    environment:
+      DATABASE_JDBC_URL: "jdbc:postgresql://postgres_ejbca/ejbca_db"
+      DATABASE_USER: "youruser"
+      DATABASE_PASSWORD: "yourpassword"
+      LOG_LEVEL_APP: "ERROR"
+      LOG_LEVEL_SERVER_SUBSYSTEMS: "ERROR"
+      LOG_LEVEL_APP_WS_TRANSACTIONS: "ERROR"
+      LOG_LEVEL_SERVER: "ERROR"
+      LOG_LEVEL_APP_OCSP_TRANSACTIONS: "ERROR"
+
+  postgres_ejbca:
+    image: library/postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "youruser"
+      POSTGRES_PASSWORD: "yourpassword"
+      POSTGRES_DB: "ejbca_db"
+
 
   webhook-verne:
     image: mprevide/webhook_verne
