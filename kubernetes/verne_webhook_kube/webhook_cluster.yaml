@@ -15,4 +15,4 @@ spec:
     spec:
       containers:
       - name: webhook-verne
-        image: eduardogmisiuk/verne_webhooks
+        image: eduardogmisiuk/verne_webhooks:secure
