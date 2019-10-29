@@ -7,7 +7,7 @@
   </void>
   <void method="put">
    <string>type</string>
-   <int>1</int>
+   <int>1</int>  
   </void>
   <void method="put">
    <string>certversion</string>
@@ -15,7 +15,7 @@
   </void>
   <void method="put">
    <string>validity</string>
-   <long>1</long>
+   <long>1</long>  <!-- Days  -->
   </void>
 
   <!-- Normally the validity period of issued certificates are controlled
