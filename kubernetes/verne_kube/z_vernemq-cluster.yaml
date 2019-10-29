@@ -47,5 +47,4 @@ spec:
     plugins: []
   serviceAccountName: vernemq-k8s
   size: 1
-  version: 1.9.0
   tag: latest
