@@ -14,6 +14,6 @@ then
     echo "Certificate Chain - Verification OK"
 else
     echo "Certificate Chain - Verification failed"
-    rm -rf ${certDir}
+   
     exit 2
 fi
