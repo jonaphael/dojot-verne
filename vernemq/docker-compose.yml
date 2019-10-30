@@ -7,7 +7,7 @@ services:
       - 8883:8883
     environment:
       CERT_EJBCA_API_BROKER: "ejbca_simple"
-      CERT_EJBCA_URL: "5583"
+      CERT_EJBCA_API_PORT: "5583"
       STATIC_CERT: "n"
       K8S_ENV: "n"
       HOSTNAME: "broker"

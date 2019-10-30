@@ -5,7 +5,7 @@
 ### Expected environment variables, example:
 : '
 export CERT_EJBCA_API_BROKER='ejbca_simple'
-export CERT_EJBCA_URL='5583'
+export CERT_EJBCA_API_PORT='5583'
 export STATIC_CERT='n'
 export K8S_ENV='n'
 export HOSTNAME='vernemq-k8s-0'
