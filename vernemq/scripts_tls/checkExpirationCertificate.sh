@@ -27,6 +27,8 @@ else
   echo "(or is invalid/not found)"
   echo "Renew:"
   . ${BASE_DIR}/scripts_tls/retrieveCACertificate.sh
+
+  . ${BASE_DIR}/scripts_tls/checkCertificateChain.sh
 fi
 
 
