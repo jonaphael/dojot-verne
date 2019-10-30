@@ -1,4 +1,4 @@
-import dojot from "@dojot/dojot-module";
+import dojot from "@jonaphael/dojot-module";
 import { logger } from "@dojot/dojot-module-logger";
 import mqtt from "mqtt";
 import config from "./config";
@@ -50,8 +50,8 @@ class App {
    * @param tenant message tenant
    * @param message payload
    */
-  private kafkaOnMessage(tenant: string, message: any) {
-    const topic = `${tenant}:${message.metadata.thingId}/config`;
+  private kafkaOnMessage(_tenant: string, message: any, extraInfo: any) {
+    const topic = `${extraInfo.key.toString()}/config`;
     this.publishMessage(topic, message);
   }
 
