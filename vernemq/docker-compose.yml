@@ -33,10 +33,10 @@ services:
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT: "0.0.0.0:8883"
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__USE_IDENTITY_AS_USERNAME: "off"
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__REQUIRE_CERTIFICATE: "on"
-      DOCKER_VERNEMQ_LISTENER__SSL__CAFILE: /vernemq/cert/ca.crt
-      DOCKER_VERNEMQ_LISTENER__SSL__CERTFILE: /vernemq/cert/broker.crt
-      DOCKER_VERNEMQ_LISTENER__SSL__KEYFILE: /vernemq/cert/broker.key
-      DOCKER_VERNEMQ_LISTENER__SSL__CRLFILE: /vernemq/cert/ca.crl
+      DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__CAFILE: /vernemq/cert/ca.crt
+      DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__CERTFILE: /vernemq/cert/broker.crt
+      DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__KEYFILE: /vernemq/cert/broker.key
+      DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__CRLFILE: /vernemq/cert/ca.crl
 
   ejbca_simple:
     image: mprevide/ejbca
