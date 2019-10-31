@@ -1,0 +1,8 @@
+---
+# Define the default value for the variables of the iot agent mosca service
+
+dojot_iotagent_mosca_version: "{{ dojot_version }}"
+
+dojot_insecure_mqtt: false
+
+dojot_kafka_port: 9092

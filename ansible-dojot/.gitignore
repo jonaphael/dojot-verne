@@ -1,0 +1,11 @@
+# Jetbrains files
+.idea/
+
+# Pipenv files
+Pipfile*
+
+# Ansible retry files
+*.retry
+
+up
+down

@@ -1,0 +1,30 @@
+# Set the dojot deployment namesapce
+dojot_namespace: dojot
+
+dojot_version: v0.4.0
+
+dojot_domain_name: localhost
+
+# Set kubernetes RBAC
+dojot_kubernetes_rbac: true
+
+# Set dojot configurations for Zookeeper
+dojot_zk_persistent_volumes: false
+
+# Set dojot configuration for postgreSQL
+dojot_psql_persistent_volumes: false
+
+# Set dojot configuration for mongoDB
+dojot_mongodb_persistent_volumes: false
+
+# Set Kafka configuration for dojot
+dojot_kafka_persistent_volumes: false
+
+# Set auth configuration
+dojot_auth_email_enabled: false
+
+# Allow the usage of insecure mqtt
+dojot_insecure_mqtt: true
+
+# Set dojot docnfiguration for EJBCA
+dojot_ejbca_persistent_volumes: false
