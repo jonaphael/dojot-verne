@@ -7,13 +7,13 @@ The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq
 
 Key                      | Purpose                                                       | Default Value  | Accepted values
 -----------------------  | --------------------------------------------------------------| -------------- |-------------------------
-CERT_EJBCA_API_BROKER    | Level of debug                                                | "ejbca_simple" | IP or DNSs
+CERT_EJBCA_API_BROKER    | Level of debug                                                | "localhost"    | IP or DNSs
 CERT_EJBCA_API_PORT      | Ejbca service port                                            | "5583"         | port values
 STATIC_CERT              | Use static certs                                              | "n"            | y or n 
 K8S_ENV                  | K8s environment                                               | "n"            | y or n 
 HOSTNAME                 | Name to container                                             | "broker"       | string
 BASE_DIR                 | Path base to tls files                                        | "/vernemq"     | path
-CERT_DNS                 | Server hostname                                               | "localhost"    | hostname
+CERT_DNS                 | Server hostname (THIS DNS/ADDR MUST BE EQUAL TO KUBERNETES ADDR (OR PROXY/LB)) | "localhost"    | hostname
 CHECK_EXPIRATION_TIME    | Checks if the certificates expires every define time by cron  | "*/30 * * * *" | cron schedule expressions
 CRL_UPDATE_TIME          | Update CRL certificate every define time by cron               | "*/30 * * * *" | cron schedule expressions
 CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200          | seconds
