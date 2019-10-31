@@ -15,7 +15,7 @@ HOSTNAME                 | Name to container                                    
 BASE_DIR                 | Path base to tls files                                        | "/vernemq"     | path
 CERT_DNS                 | Server hostname                                               | "localhost"    | hostname
 CHECK_EXPIRATION_TIME    | Checks if the certificates expires every define time by cron  | "*/30 * * * *" | cron schedule expressions
-CRL_UPDATE_TIME          | Update CRL certificate every define time by cro               | "*/30 * * * *" | cron schedule expressions
+CRL_UPDATE_TIME          | Update CRL certificate every define time by cron               | "*/30 * * * *" | cron schedule expressions
 CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200          | seconds
 
 
