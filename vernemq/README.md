@@ -7,7 +7,7 @@ The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq
 
 Key                      | Purpose                                                       | Default Value  | Accepted values
 -----------------------  | --------------------------------------------------------------| -------------- |-------------------------
-CERT_EJBCA_API_BROKER    | Level of debug                                                | "ejbca_simple" | IP or DNSs
+CERT_EJBCA_API_BROKER    | Level of debug                                                | "localhost"    | IP or DNSs
 CERT_EJBCA_API_PORT      | Ejbca service port                                            | "5583"         | port values
 STATIC_CERT              | Use static certs                                              | "n"            | y or n 
 K8S_ENV                  | K8s environment                                               | "n"            | y or n 
