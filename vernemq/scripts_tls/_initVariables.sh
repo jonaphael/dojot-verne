@@ -4,27 +4,27 @@
 ### Required Packages: openssl, curl, jq
 ### Expected environment variables, example:
 : '
-export CERT_EJBCA_API_BROKER='ejbca_simple'
+export CERT_EJBCA_API_BROKER='localhost'
 export CERT_EJBCA_API_PORT='5583'
 export STATIC_CERT='n'
 export K8S_ENV='n'
-export HOSTNAME='vernemq-k8s-0'
-export CRL_UPDATE_TIME='0 */2 * * *'
+export HOSTNAME='broker'
+export CRL_UPDATE_TIME='*/30 * * * *'
 export BASE_DIR='/vernemq'
-export CHECKEND_EXPIRATION_SEC='86400'
-export CHECK_EXPIRATION_TIME='0 1 * * *'
+export CHECKEND_EXPIRATION_SEC='43200'
+export CHECK_EXPIRATION_TIME='*/30 * * * *'
 '
 #########################################################
 
 BASE_DIR=${BASE_DIR:-"/vernemq"}
-
-CERT_CNAME="${HOSTNAME:-"vernemq"}"
-CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"ejbca_simple"}
+HOSTNAME="${HOSTNAME:-"broker"}"
+CERT_CNAME="${HOSTNAME:-"broker"}"
+CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"localhost"}
 CERT_EJBCA_API_PORT=${CERT_EJBCA_API_PORT:-"5583"}
 
-export CHECKEND_EXPIRATION_SEC="${CHECKEND_EXPIRATION_SEC:-86400}" #24h
+export CHECKEND_EXPIRATION_SEC="${CHECKEND_EXPIRATION_SEC:-43200}" #12h
 export CERT_EJBCA_URL="http://${CERT_EJBCA_API_BROKER}"
-export CERT_DNS="${CERT_DNS:-${HOSTNAME}}"
+export CERT_DNS="${CERT_DNS:-"localhost"}"
 export CERT_CA_FILE='ca.crt'
 export CERT_CRL_FILE='ca.crl'
 export CERT_CERT_FILE="$HOSTNAME.crt"
@@ -38,7 +38,7 @@ export CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
 export CHECK_EXPIRATION_TIME="${CHECK_EXPIRATION_TIME:-"0 1 * * *"}"
 
 
-export IS_K8S_ENV=${K8S_ENV:-"y"}
+export IS_K8S_ENV=${K8S_ENV:-"n"}
 export certCAName=$CERT_CANAME
 export certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
 export certCname=$CERT_CNAME
