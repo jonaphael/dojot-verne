@@ -33,6 +33,15 @@
   roles:
     - role: databases/postgresql
 
+# Deploy postgreSQL to the environment
+# TODO: Add possibility of using an external postgres by setting DB config variables
+# TODO: Support a HA cluster
+- hosts: dojot-k8s[0]
+  any_errors_fatal: true
+  tags: dojot-psql-ejbca
+  roles:
+    - role: databases/postgres-ejbca
+
 # # Deploy mongoDB to the environment
 # # TODO: Add possibility of using an external mongodb by setting DB config variables
 # # TODO: Support a HA cluster
@@ -78,6 +87,7 @@
     - role: auth
     - role: data-broker
     - role: vernemq-webhook
+    - role: ejbca-node
     # - role: device-manager
     # - role: ejbca-rest
     # - role: history
