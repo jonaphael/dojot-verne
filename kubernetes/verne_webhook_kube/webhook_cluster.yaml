@@ -15,4 +15,7 @@ spec:
     spec:
       containers:
       - name: webhook-verne
-        image: eduardogmisiuk/verne_webhooks:secure
+        image: mprevide/webhook_verne
+        env:
+        - name: VERNE_WEBHOOKS_LOG_LEVEL
+          value: "debug"

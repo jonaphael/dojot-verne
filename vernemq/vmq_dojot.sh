@@ -5,57 +5,37 @@
 ### Expected environment variables, example:
 : '
 export CERT_EJBCA_API_BROKER='ejbca_simple'
-export CERT_EJBCA_URL='5583'
+export CERT_EJBCA_API_PORT='5583'
 export STATIC_CERT='n'
 export K8S_ENV='n'
 export HOSTNAME='vernemq-k8s-0'
 export CRL_UPDATE_TIME='0 */2 * * *'
+export BASE_DIR='/vernemq'
+export CHECKEND_EXPIRATION_SEC='86400'
+export CHECK_EXPIRATION_TIME='0 1 * * *'
 '
 #########################################################
-CERT_CNAME="${HOSTNAME:-"vernemq"}"
-CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"ejbca_simple"}
-CERT_EJBCA_API_PORT=${CERT_EJBCA_API_PORT:-"5583"}
-CERT_EJBCA_URL="http://${CERT_EJBCA_API_BROKER}"
-CERT_DNS="$HOSTNAME"
-CERT_CA_FILE='ca.crt'
-CERT_CRL_FILE='ca.crl'
-CERT_CERT_FILE="$HOSTNAME.crt"
-CERT_KEY_FILE="$HOSTNAME.key"
-CERT_CSR_FILE="$HOSTNAME.csr"
-CERT_CANAME='IOTmidCA'
-IS_K8S_ENV=${K8S_ENV:-"y"}
-#Read up on cron patterns here (http://crontab.org/)
-#By default will be updated every 2 hours
-CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
 
-certCAName=$CERT_CANAME
-certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
-certCname=$CERT_CNAME
-certDns=$CERT_DNS
-certCaFile=$CERT_CA_FILE
-certCertFile=$CERT_CERT_FILE
-certKeyFile=$CERT_KEY_FILE
-certCsrFile=$CERT_CSR_FILE
-certCrlFile=$CERT_CRL_FILE
 
-USE_STATIC_CERTS=${STATIC_CERT:-"n"}
-CERT_DIRECTORY="cert"
+########################################################
 
-keyLength=2048
-password="dojot"
+BASE_DIR=${BASE_DIR:-"/vernemq"}
+
+. ${BASE_DIR}/scripts_tls/_initVariables.sh
+
 
 _removeCRTDir()
 {
-  if [ -d "$CERT_DIRECTORY" ];
+  if [ -d "$certDir" ];
   then
-    rm -rf cert
+    rm -rf ${certDir}
   fi
 }
 
 _createCRTDir()
 {
-  mkdir cert
-  cd cert
+  mkdir ${certDir}
+  cd ${certDir}
 }
 
 _connectEJBCA()
@@ -84,40 +64,16 @@ _connectEJBCA()
   sleep 5
 }
 
-_removeUnused()
-{
-  rm tempfile.crt
-  rm "$HOSTNAME.csr"
-}
-
-_saveFormattedCRT()
-{
-  nameFile=$1
-  rawCRT=$2
-
-  echo "Saving CRT ${nameFile}"
-
-  (echo  "-----BEGIN CERTIFICATE-----"
-  echo ${rawCRT}
-  echo "-----END CERTIFICATE-----"  ) > tempfile.crt
-
-  openssl x509 -inform pem -in tempfile.crt -out ${nameFile}
-
-}
 ##Generate key par (private and public key)
 _generateKeyPair()
 {
-  echo "Generating KeyPar in ${certKeyFile}"
-  openssl genrsa -out  ${certKeyFile} ${keyLength}
-  chmod +x ${certKeyFile}
+    sh ${BASE_DIR}/scripts_tls/generateKeyPair.sh
 }
 
 ##Create CSR (cert wih some infos and sign with private key )
 _createCSR()
 {
-  echo "Create CSR for ${certCname}"
-  openssl req -new  -sha256 -out ${certCsrFile} -key ${certKeyFile} \
-            --subj "/CN=${certCname}"
+    sh ${BASE_DIR}/scripts_tls/createCSR.sh
 }
 
 ##create entity in ejbca
@@ -133,46 +89,31 @@ _createEntity()
 ##sign csr in ejbca
 _signCert()
 {
-    echo "Signing cert for entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 "
-    csrContent=`cat  ${certCsrFile}  | sed '1,1d;$ d' | tr -d '\r\n'`
-
-    signCertCa=$(curl --silent -X POST ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 \
-    -H "Content-Type:application/json" \
-    -H "Accept:application/json" \
-    -d  "{
-    \"passwd\": \"${password}\",
-    \"certificate\": \"${csrContent}\"
-    }" | jq '.status.data' -r)
-
-    _saveFormattedCRT "${certCertFile}" "${signCertCa}"
+    sh ${BASE_DIR}/scripts_tls/signCert.sh
 }
 
 ##Get from PKI the CA certificate and return in PEM format
 _retrieveCACertificate()
 {
-    echo "Retrieve cert for  ${certCAName} CA : ${certEjbcaApiUrl}/ca/${certCAName}"
-    certCa=$(curl --silent -X GET ${certEjbcaApiUrl}/ca/${certCAName} \
-    -H "Content-Type:application/json" \
-    -H "Accept:application/json" | jq '.certificate' -r )
-
-    _saveFormattedCRT "${certCaFile}" "${certCa}"
+    sh ${BASE_DIR}/scripts_tls/retrieveCACertificate.sh
 }
 
 ##Get from PKI the CRL certificate
 _retrieveCRLCertificate()
 {
-    #execute
-    chmod +x /vernemq/_retrieveCRLCertificate.sh
-    sh /vernemq/_retrieveCRLCertificate.sh
-
+    sh ${BASE_DIR}/scripts_tls/retrieveCRL.sh
 }
 
 _cronTabCRL()
 {
-    #make the script executable
-    chmod +x /vernemq/_retrieveCRLCertificate.sh
-    echo "$CRL_UPDATE_TIME    /vernemq/_retrieveCRLCertificate.sh" > /etc/crontabs/root
+    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> ${BASE_DIR}/crontab.tab
 }
+
+_cronTabExpiration()
+{
+    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> ${BASE_DIR}/crontab.tab
+}
+
 ##Generate private key and sign certificate crt
 _generateCertificates()
 {
@@ -185,11 +126,12 @@ _generateCertificates()
 
 _startCronService()
 {
-    crond -b -l 0 -L /var/log/cron.log
+   supercronic  ${BASE_DIR}/crontab.tab &
 }
 
 main()
 {
+
   if [ "${USE_STATIC_CERTS}" = "n" ]
   then
     ## remove static cert dir
@@ -207,19 +149,29 @@ main()
     ## retrieve crl
     _retrieveCRLCertificate
 
+
+    #verifies certificate chains.
+    . ${BASE_DIR}/scripts_tls/checkCertificateChain.sh
+
+
+    ## create cron file
+    touch ${BASE_DIR}/crontab.tab
+
     ## create cron tab to update CRL
     _cronTabCRL
 
+    ## create cron tab to check Expiration
+    _cronTabExpiration
+
     _startCronService
 
-    ## remove unused certs
-    _removeUnused
+
   else
     echo "Using static certificates... checking if exists.."
-    if [ -d "$CERT_DIRECTORY" ];
+    if [ -d "${BASE_DIR}/$CERT_DIRECTORY" ];
     then
       echo "checking if certs is correctly installed.."
-      if [ -e "cert/$HOSTNAME.crt" -a -e "cert/ca.crt" ]
+      if [ -e "${BASE_DIR}/cert/$HOSTNAME.crt" -a -e "${BASE_DIR}/cert/ca.crt" ]
       then
         echo "All ok!"
       else

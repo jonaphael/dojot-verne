@@ -24,11 +24,16 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
     }
     else {
       const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
-      
+
       if (messenger) {
         messenger.publish(config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(payload));
       }
     }
+    logger.debug("auth_on_publish - /pub", TAG);
+    logger.debug("auth_on_publish - /pub - topic: "+req.body.topic , TAG);
+    logger.debug("auth_on_publish - /pub - payload: "+req.body.payload , TAG);
+    logger.debug("auth_on_publish - /pub - username: "+req.body.username , TAG);
+
     res.status(200).send({ "result": "ok" });
   });
 
@@ -36,6 +41,9 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
    * Endpoint for webhook auth_on_register
    */
   app.post("/reg", (_req: express.Request, res: express.Response) => {
+
+    logger.debug("auth_on_register - /reg", TAG);
+
     res.status(200).send({ "result": "ok" });
   });
 
@@ -43,6 +51,9 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
    * Endpoint for webhook auth_on_subscribe
    */
   app.post("/sub", (_req: express.Request, res: express.Response) => {
+
+    logger.debug("auth_on_subscribe - /sub", TAG);
+
     res.status(200).send({ "result": "ok" });
   });
 };
