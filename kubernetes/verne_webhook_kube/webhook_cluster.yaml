@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-verne
+spec:
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: webhook-verne
+  replicas: 1
+  template: #templates for the pods
+    metadata:
+      labels:
+        app: webhook-verne
+    spec:
+      containers:
+      - name: webhook-verne
+        image: mprevide/webhook_verne
+        env:
+        - name: VERNE_WEBHOOKS_LOG_LEVEL
+          value: "debug"

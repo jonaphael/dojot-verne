@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-verne
+spec:
+  type: ClusterIP 
+  selector:
+    app: webhook-verne
+  ports:
+  - name: webhook-verne
+    port: 4000

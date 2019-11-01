@@ -1,7 +1,8 @@
 import { logger } from "@dojot/dojot-module-logger";
 import express from "express";
-import util from "util";
 import ProjectUtils from "../utils/utils";
+import { Messenger } from "@dojot/dojot-module";
+import config from "../src/config"
 
 const TAG = { filename: "verneRoute" };
 
@@ -9,36 +10,51 @@ const TAG = { filename: "verneRoute" };
  * VerneMQ webhooks routes creation function.
  * @param app Express application to be used
  */
-const verneRoute = (app: express.Application) => {
+const verneRoute = (app: express.Application, messenger: Messenger) => {
   /**
-   * Endpoint for webhook on_publish
+   * Endpoint for webhook auth_on_publish
    */
   app.post("/pub", (req: express.Request, res: express.Response) => {
-    logger.debug("Received request in /pub", TAG);
-    logger.debug(`Request body:\n${util.inspect(req.body)}`, TAG);
 
-    const configTopic = /\/config.*/;
+    const configTopic = /.+\/config/;
 
     // Verifying whether the message is a configuration one
     if (configTopic.test(req.body.topic)) {
       logger.debug("Message is from /config topic. Discarding!", TAG);
-
-      res.status(200).send({});
-      return;
     }
+    else {
+      const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
 
-    // Verifying the validity of the topic
-    if (!ProjectUtils.validateTopic(req.body.username, req.body.topic)) {
-      logger.debug(`Invalid message from username ${req.body.username} to topic ${req.body.topic}. Discarding!`, TAG);
-
-      res.status(400).send({ message: "Invalid topic: username validation has errored" });
-      return;
+      if (messenger) {
+        messenger.publish(config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(payload));
+      }
     }
+    logger.debug("auth_on_publish - /pub", TAG);
+    logger.debug("auth_on_publish - /pub - topic: "+req.body.topic , TAG);
+    logger.debug("auth_on_publish - /pub - payload: "+req.body.payload , TAG);
+    logger.debug("auth_on_publish - /pub - username: "+req.body.username , TAG);
 
-    const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
-    logger.debug(`Created payload:\n${util.inspect(payload)}`, TAG);
+    res.status(200).send({ "result": "ok" });
+  });
 
-    res.status(200).send({});
+  /**
+   * Endpoint for webhook auth_on_register
+   */
+  app.post("/reg", (_req: express.Request, res: express.Response) => {
+
+    logger.debug("auth_on_register - /reg", TAG);
+
+    res.status(200).send({ "result": "ok" });
+  });
+
+  /**
+   * Endpoint for webhook auth_on_subscribe
+   */
+  app.post("/sub", (_req: express.Request, res: express.Response) => {
+
+    logger.debug("auth_on_subscribe - /sub", TAG);
+
+    res.status(200).send({ "result": "ok" });
   });
 };
 

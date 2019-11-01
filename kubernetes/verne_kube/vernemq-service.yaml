@@ -39,5 +39,8 @@ spec:
     - name: mqtt
       port: 1883
       nodePort: 30010
+    - name: mqtts
+      port: 8883
+      nodePort: 30011
   
   type: NodePort
