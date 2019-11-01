@@ -28,3 +28,5 @@ dojot_insecure_mqtt: true
 
 # Set dojot docnfiguration for EJBCA
 dojot_ejbca_persistent_volumes: false
+
+dojot_storage_class_name: "local-storage"
