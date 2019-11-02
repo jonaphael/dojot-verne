@@ -1,7 +1,3 @@
-const vernemq = {
-  port: process.env.VERNE_WEBHOOKS_PORT || 4000,
-};
-
 const messenger = {
   auth: {
     connectionRetries: 5,
@@ -59,4 +55,4 @@ const mqtt = {
   port: Number(process.env.DOJOT_MQTT_PORT) || 30010,
 };
 
-export default { messenger, mqtt, vernemq };
+export default { messenger, mqtt};
