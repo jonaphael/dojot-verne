@@ -17,3 +17,20 @@ spec:
       containers:
       - name: mqtt-client
         image: eduardogmisiuk/mqtt_client
+        env:
+        - name: AUTH_URL
+          value: "http://auth:5000"
+        - name: DATA_BROKER_URL
+          value: "http://data-broker"
+        - name: KAFKA_HOSTS
+          value: "kafka-server:9092"
+        - name: DOJOT_MQTT_HOST
+          value: "vernemq-k8s"
+        - name: DOJOT_MQTT_PORT
+          value: "30010"
+        - name: CERT_DNS
+          value: "mqtt-client"
+        - name: CERT_EJBCA_API_BROKER
+          value: "ejbca-simple"
+        - name: CERT_EJBCA_API_PORT
+          value: "5583"

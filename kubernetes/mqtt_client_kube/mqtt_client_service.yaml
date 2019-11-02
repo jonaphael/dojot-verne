@@ -8,5 +8,5 @@ spec:
   selector:
     app: mqtt-client
   ports:
-  - name: webhook-verne
-    port: 4001
+  - name: mqtt-client-port
+    port: 8883
