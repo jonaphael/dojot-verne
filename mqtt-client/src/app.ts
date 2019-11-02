@@ -2,18 +2,38 @@ import dojot from "@jonaphael/dojot-module";
 import { logger } from "@dojot/dojot-module-logger";
 import mqtt from "mqtt";
 import config from "./config";
+import fs from "fs";
 
 const TAG = { filename: "MqttClientApp" };
+const hostname = process.env.HOSTNAME;
 
 class App {
   private messenger: dojot.Messenger | null;
   private mqttc: mqtt.Client | null;
   private isConnected: boolean;
+  private key: BufferSource;
+  private clientCrt: BufferSource;
+  private caCrt: BufferSource;
+  private options: object;
 
   constructor() {
+    this.key = fs.readFileSync(`/opt/mqtt_client/cert/${hostname}.key`);
+    this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${hostname}.crt`);
+    this.caCrt = fs.readFileSync('/opt/mqtt_client/crt/ca.crt');
     this.messenger = null;
     this.mqttc = null;
     this.isConnected = false;
+
+    this.options = {
+      host: `tls://${config.mqtt.host}`,
+      port: config.mqtt.port,
+      protocol: 'mqtts',
+      ca: this.caCrt,
+      key: this.key,
+      cert: this.clientCrt,
+      keepAlive: 120,
+      rejectUnauthorized: true
+    };
   }
 
   public initApp() {
@@ -35,7 +55,7 @@ class App {
   }
 
   private initMqtt() {
-    this.mqttc = mqtt.connect(`mqtt://${config.mqtt.host}:${config.mqtt.port}`);
+    this.mqttc = mqtt.connect(this.options);
 
     const mqttOnConnectBind = this.mqttOnConnect.bind(this);
     const mqttOnDisconnectBind = this.mqttOnDisconnect.bind(this);

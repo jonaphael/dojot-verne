@@ -9,7 +9,10 @@ RUN apk --no-cache add \
       cyrus-sasl-dev \
       openssl-dev \
       make \
-      python
+      python \
+      openssl \
+      curl \
+      jq
 
 WORKDIR /opt/mqtt_client
 
