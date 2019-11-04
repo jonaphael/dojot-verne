@@ -6,7 +6,7 @@ import { Server } from "http";
 import morgan from "morgan";
 import verneRoute from "../routes/verneRoute";
 import config from "./config";
-import { Messenger } from "@dojot/dojot-module"
+import { Messenger } from "@jonaphael/dojot-module"
 
 const TAG = { filename: "app" };
 
