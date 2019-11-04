@@ -1,7 +1,7 @@
 import { logger } from "@dojot/dojot-module-logger";
 import express from "express";
 import ProjectUtils from "../utils/utils";
-import { Messenger } from "@dojot/dojot-module";
+import { Messenger } from "@jonaphael/dojot-module";
 import config from "../src/config"
 
 const TAG = { filename: "verneRoute" };
@@ -26,7 +26,7 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
       const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
 
       if (messenger) {
-        messenger.publish(config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(payload));
+        messenger.publish(config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(payload), payload.metadata.thingId);
       }
     }
     logger.debug("auth_on_publish - /pub", TAG);
