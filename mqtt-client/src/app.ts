@@ -81,8 +81,7 @@ class App {
       const data = JSON.parse(message);
       this.publishMessage(`${data.metadata.thingId}/config`, message);
     } catch (error) {
-      console.log(error);
-      console.log(message);
+      logger.error(`Error parsing Kafka message: ${error}`, TAG);
     }
   }
 
