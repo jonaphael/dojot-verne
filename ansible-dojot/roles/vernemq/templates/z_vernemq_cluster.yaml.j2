@@ -7,6 +7,15 @@ metadata:
   namespace: {{ dojot_namespace }}
 spec:
   baseImage: mprevide/verne
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: NotIn
+            values:
+            - verne-kafka
   env:
     - name: STATIC_CERT
       value: "n"
