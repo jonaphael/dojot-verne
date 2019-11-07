@@ -19,7 +19,4 @@ WORKDIR /opt/mqtt_client
 COPY . .
 RUN npm install
 RUN npm run-script build
-
-RUN apk add --no-cache tini
-
 ENTRYPOINT ["./entrypoint.sh"]
