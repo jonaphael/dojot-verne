@@ -19,20 +19,20 @@ class App {
   constructor() {
     this.key = fs.readFileSync(`/opt/mqtt_client/cert/${hostname}.key`);
     this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${hostname}.crt`);
-    this.caCrt = fs.readFileSync('/opt/mqtt_client/crt/ca.crt');
+    this.caCrt = fs.readFileSync('/opt/mqtt_client/cert/ca.crt');
     this.messenger = null;
     this.mqttc = null;
     this.isConnected = false;
 
     this.options = {
-      host: `tls://${config.mqtt.host}`,
+      host: config.mqtt.host,
       port: config.mqtt.port,
       protocol: 'mqtts',
       ca: this.caCrt,
       key: this.key,
       cert: this.clientCrt,
       keepAlive: 120,
-      rejectUnauthorized: true
+      rejectUnauthorized: false
     };
   }
 
