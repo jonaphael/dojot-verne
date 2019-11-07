@@ -6,6 +6,7 @@ import fs from "fs";
 
 const TAG = { filename: "MqttClientApp" };
 const hostname = process.env.HOSTNAME;
+const util = require("util");
 
 class App {
   private messenger: dojot.Messenger | null;
@@ -37,6 +38,10 @@ class App {
   }
 
   public initApp() {
+
+    /* set log level */
+    logger.setLevel(config.app.mqtt_log_level);
+
     this.messenger = new dojot.Messenger("mqtt-client", config.messenger);
 
     this.messenger!.init().then(() => {
@@ -71,8 +76,14 @@ class App {
    * @param message payload
    */
   private kafkaOnMessage(_tenant: string, message: any, extraInfo: any) {
-    const topic = `${extraInfo.key.toString()}/config`;
-    this.publishMessage(topic, message);
+    logger.debug(`The extra info is ${util.inspect(extraInfo, {depth: null})}`, TAG);
+    try {
+      const data = JSON.parse(message);
+      this.publishMessage(`${data.metadata.thingId}/config`, message);
+    } catch (error) {
+      console.log(error);
+      console.log(message);
+    }
   }
 
   /* MQTT Events */
@@ -91,7 +102,10 @@ class App {
 
   private publishMessage(topic: string, message: any) {
     if (this.isConnected) {
+      logger.debug(`Publishing on topic ${topic}`, TAG);
       this.mqttc!.publish(topic, message);
+    } else {
+      logger.error(`Client not connected`, TAG);
     }
   }
 }

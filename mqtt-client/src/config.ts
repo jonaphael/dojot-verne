@@ -1,3 +1,7 @@
+const app = {
+  mqtt_log_level: process.env.MQTT_CLIENT_LOG_LEVEL || "info"
+}
+
 const messenger = {
   auth: {
     connectionRetries: 5,
@@ -55,4 +59,4 @@ const mqtt = {
   port: Number(process.env.DOJOT_MQTT_PORT) || 30010,
 };
 
-export default { messenger, mqtt};
+export default { app, messenger, mqtt};
