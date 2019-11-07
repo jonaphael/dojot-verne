@@ -21,7 +21,11 @@ spec:
         - name: AUTH_URL
           value: "http://auth:5000"
         - name: DATA_BROKER_URL
-          value: "data-broker:80"
+          value: "http://data-broker"
+        - name: DATA_BROKER_DNS
+          value: "data-broker"
+        - name: DATA_BROKER_PORT
+          value: "80"
         - name: KAFKA_HOSTS
           value: "kafka-server:9092"
         - name: DOJOT_MQTT_HOST
