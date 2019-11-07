@@ -14,6 +14,7 @@ export BASE_DIR='/opt/mqtt_client'
 
 #######################################################
 
+CERT_DIRECTORY="cert"
 BASE_DIR=${BASE_DIR:-"/opt/mqtt_client"}
 
 . ${BASE_DIR}/security/initVariables.sh
@@ -102,6 +103,24 @@ _generateCertificates()
     _signCert
 }
 
+_checkingCerts()
+{
+    if [ -d "${BASE_DIR}/$CERT_DIRECTORY" ];
+    then
+        echo "checking if certs is correctly installed.."
+        if [ -e "${BASE_DIR}/$CERT_DIRECTORY/$HOSTNAME.crt" -a -e "${BASE_DIR}/$CERT_DIRECTORY/ca.crt" ]
+        then
+            echo "All ok!"
+        else
+            echo "Certs are not correctly installed.. closing application.."
+            exit 3
+        fi
+    else
+        echo "certs dir not exists, closing application.."
+        exit 3
+    fi
+}
+
 main()
 {
 
@@ -116,6 +135,9 @@ main()
 
     ## retrieve to host
     _retrieveCACertificate
+
+    ## checking certificate existance
+    _checkingCerts
 }
 
 ########################
