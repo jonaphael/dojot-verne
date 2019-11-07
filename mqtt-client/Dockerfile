@@ -22,6 +22,4 @@ RUN npm run-script build
 
 RUN apk add --no-cache tini
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
-CMD ["npm", "run", "run-client"]
+ENTRYPOINT ["./entrypoint.sh"]
