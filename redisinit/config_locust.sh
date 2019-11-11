@@ -30,6 +30,7 @@ sshpass -p $HOSTS_PASSWORD ssh cpqd@$MASTER_HOST -t 'cd /home/cpqd/dojot-verne/l
 echo
 
 echo "Sending certificates and keys to Locust master..."
+sshpass -p $HOSTS_PASSWORD ssh cpqd@$MASTER_HOST -t 'rm -rf /home/cpqd/dojot-verne/locust/cert'
 sshpass -p $HOSTS_PASSWORD scp cert.tar.gz cpqd@$MASTER_HOST:/home/cpqd/dojot-verne/locust
 sshpass -p $HOSTS_PASSWORD ssh cpqd@$MASTER_HOST -t 'cd /home/cpqd/dojot-verne/locust/ ; tar -xzf cert.tar.gz'
 echo
@@ -40,7 +41,7 @@ do
   echo "Configuring slave $host"
 
   echo "Removing cert dir..."
-  sshpass -p $HOSTS_PASSWORD ssh cpqd@$host -t 'rm -r /home/cpqd/dojot-verne/locust/cert'
+  sshpass -p $HOSTS_PASSWORD ssh cpqd@$host -t 'rm -rf /home/cpqd/dojot-verne/locust/cert'
   echo
 
   echo "Removing TAR file..."
