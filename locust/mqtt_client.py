@@ -66,6 +66,7 @@ class MQTT_Client:
 
         self.username = '{0}:{1}'.format(TENANT, device_id)
         self.topic = "{0}/attrs".format(self.username)
+        self.sub_topic = "{0}/config".format(self.username)
 
         self.log = LogController(self.run_id)
 
@@ -112,7 +113,7 @@ class MQTT_Client:
     def publishing(self) -> None:
         """Handles the publishing of messages to MQTT host."""
 
-        payload = { 'int': 1 }
+        payload = { "timestamp": time.time() }
         start_time = time.time()
 
         try:
@@ -146,20 +147,17 @@ class MQTT_Client:
                 exception=err_msg,
             )
 
-    def subscribing(self, topic: str=None) -> None:
+    def subscribing(self) -> None:
         """Handles the subscription in MQTT topics.
 
         Args:
             topic (string): topic to subscribe
         """
 
-        if topic is None:
-            topic = self.topic
-
         start_time = time.time()
 
         try:
-            err, mid = self.mqttc.subscribe((topic, config['mqtt']['qos']))
+            err, mid = self.mqttc.subscribe((self.sub_topic, config['mqtt']['qos']))
 
             if err:
                 raise ValueError(err)
@@ -167,7 +165,7 @@ class MQTT_Client:
             self.submmap[mid] = {
                 'name': MESSAGE_TYPE_SUB,
                 'qos': config['mqtt']['qos'],
-                'topic': topic,
+                'topic': self.sub_topic,
                 'payload': "",
                 'start_time': start_time,
                 'timed_out': config['mqtt']['sub_timeout'],
