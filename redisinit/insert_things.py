@@ -27,12 +27,12 @@ def register_thing(name):
             logging.info("Execution time: {} secs by Thread {} with batch {}".format(diff, name, i))
 
         thing_id = str(uuid.uuid4().hex)
-        obj = Thing.Create_Thing(thing_id)   
-        #r.hmset(thing_id,obj)  
-        pipe.hmset(thing_id,obj)  
-    pipe.execute() 
+        obj = Thing.Create_Thing("admin:" + thing_id)
+        #r.hmset(thing_id,obj)
+        pipe.hmset(thing_id,obj)
+    pipe.execute()
     end = time.time()
-    
+
     logging.info(f"Thread {name} finishing (s)" + str(end - start))
 
 if __name__ == "__main__":
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     concurrent.futures.wait(myfuturelist)
     end = time.time()
-    #pipe.execute() 
+    #pipe.execute()
     logging.info(f"Total inserts " + str(NUM_OF_INSERT_BY_THREAD * NUM_OF_THREAD)+ " in (s) " + str(end - start) + " thr: " + str(NUM_OF_THREAD) + " loop: "+ str(NUM_OF_INSERT_BY_THREAD) )
 
 
@@ -60,8 +60,8 @@ if __name__ == "__main__":
 # sudo docker run --name my-redis-container -d redis
 # docker inspect my-redis-container
 # ip:6379
-# docker container exec --user="root" -it  my-redis-container /bin/bash 
+# docker container exec --user="root" -it  my-redis-container /bin/bash
 # redis-cli
-# keys * 
-# hmget 0143bc0d7fdb4a3399c2dc8a33d52995 thing_certificate 
-# hmget 0dcab854443243c38bf5406bd7ee03de private_key 
+# keys *
+# hmget 0143bc0d7fdb4a3399c2dc8a33d52995 thing_certificate
+# hmget 0dcab854443243c38bf5406bd7ee03de private_key
