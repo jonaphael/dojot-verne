@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: dojot_prom
+  name: dojot_prom
+  namespace: {{ dojot_namespace }}
+spec:
+  endpoints:
+  - interval: 2s
+    port: http
+  selector:
+    matchLabels:
+      name: dojot_prom
