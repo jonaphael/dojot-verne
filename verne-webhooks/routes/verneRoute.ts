@@ -1,8 +1,8 @@
 import { logger } from "@dojot/dojot-module-logger";
-import express from "express";
-import ProjectUtils from "../utils/utils";
 import { Messenger } from "@jonaphael/dojot-module";
+import express from "express";
 import config from "../src/config"
+import ProjectUtils from "../utils/utils";
 
 const TAG = { filename: "verneRoute" };
 
@@ -23,10 +23,15 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
       logger.debug("Message is from /config topic. Discarding!", TAG);
     }
     else {
-      const payload = ProjectUtils.setPayload(req.body.payload, req.body.username);
+      // Converting base64 payload to JSON
+      const jsonPayload = JSON.parse(Buffer.from(req.body.payload, "base64").toString());
+      const payload = ProjectUtils.setPayload(jsonPayload, req.body.username);
 
       if (messenger) {
-        messenger.publish(config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(payload), payload.metadata.thingId);
+        messenger.publish(
+          config.messenger.kafka.dojot.subjects.verne,
+          "admin",
+          JSON.stringify(payload), payload.metadata.thingId);
       }
     }
     logger.debug("auth_on_publish - /pub", TAG);
@@ -34,7 +39,7 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
     logger.debug("auth_on_publish - /pub - payload: "+req.body.payload , TAG);
     logger.debug("auth_on_publish - /pub - username: "+req.body.username , TAG);
 
-    res.status(200).send({ "result": "ok" });
+    res.status(200).send({ result: "ok" });
   });
 
   /**
@@ -44,7 +49,7 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
 
     logger.debug("auth_on_register - /reg", TAG);
 
-    res.status(200).send({ "result": "ok" });
+    res.status(200).send({ result: "ok" });
   });
 
   /**
@@ -54,7 +59,7 @@ const verneRoute = (app: express.Application, messenger: Messenger) => {
 
     logger.debug("auth_on_subscribe - /sub", TAG);
 
-    res.status(200).send({ "result": "ok" });
+    res.status(200).send({ result: "ok" });
   });
 };
 
