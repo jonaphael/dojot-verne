@@ -1,5 +1,5 @@
-!/bin/sh
+#!/bin/sh
 
-set -ex
+# set -ex
 
 npm run run-client

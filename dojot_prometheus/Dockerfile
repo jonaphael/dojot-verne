@@ -10,7 +10,12 @@ RUN apk update && apk add --no-cache g++ \
     musl-dev \
     ca-certificates \
     openssl-dev \
-    libc6-compat krb5-dev  zlib-dev zeromq-dev gcc git
+    libc6-compat \ 
+    krb5-dev  \ 
+    zlib-dev \ 
+    zeromq-dev \  
+    gcc \ 
+    git \
 
 COPY package.json .
 COPY package-lock.json .
