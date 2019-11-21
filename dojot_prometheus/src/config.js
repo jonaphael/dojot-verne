@@ -1,6 +1,6 @@
 const app = {
     prometheus_log_level: process.env.PROMETHEUS_CLIENT_LOG_LEVEL || "info"
-}
+};
 
 const messenger = {
     auth: {
@@ -36,7 +36,7 @@ const messenger = {
     },
     kafka: {
         consumer: {
-            "group.id": "vernemq-group",
+            "group.id": "prom-group",
             "metadata.broker.list": process.env.KAFKA_HOSTS || "kafka-server:9092",
         },
         dojot: {
@@ -54,7 +54,6 @@ const messenger = {
     },
 };
 
-
 const prom = {
     port: Number(process.env.PROMETHEUS_PORT) || 3000,
 };
@@ -63,4 +62,4 @@ module.exports = {
     app,
     messenger,
     prom
-}
+};

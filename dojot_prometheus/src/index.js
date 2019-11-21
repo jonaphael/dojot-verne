@@ -1,4 +1,3 @@
-const app = require("./app");
+const promApp = require("./app");
 
-const promApp = new app.App();
-promApp.initApp();
+promApp.init();
