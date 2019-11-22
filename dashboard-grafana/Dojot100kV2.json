@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 14,
-  "iteration": 1574361386157,
+  "iteration": 1574444672330,
   "links": [],
   "panels": [
     {
@@ -410,11 +410,13 @@
         "x": 0,
         "y": 29
       },
+      "hideTimeOverride": false,
       "id": 3,
+      "interval": "1s",
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": false,
+        "current": true,
         "hideEmpty": true,
         "hideZero": true,
         "max": true,
@@ -503,6 +505,7 @@
         "y": 37
       },
       "id": 42,
+      "interval": "1s",
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1503,7 +1506,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "prometheus",
-      "fill": 1,
+      "fill": 0,
       "gridPos": {
         "h": 9,
         "w": 24,
@@ -1511,6 +1514,7 @@
         "y": 45
       },
       "id": 43,
+      "interval": "1s",
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1590,7 +1594,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "prometheus",
-      "fill": 1,
+      "fill": 0,
       "gridPos": {
         "h": 5,
         "w": 24,
@@ -1598,6 +1602,7 @@
         "y": 54
       },
       "id": 2,
+      "interval": "1s",
       "legend": {
         "alignAsTable": true,
         "avg": true,
@@ -1605,7 +1610,7 @@
         "hideEmpty": true,
         "hideZero": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
         "total": false,
         "values": true
@@ -1740,7 +1745,7 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-2h",
     "to": "now"
   },
   "timepicker": {
@@ -1764,5 +1769,5 @@
   "timezone": "browser",
   "title": "Dojot - 100k",
   "uid": "VLTC7nbWk",
-  "version": 13
+  "version": 3
 }
