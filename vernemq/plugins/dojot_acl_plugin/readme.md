@@ -2,8 +2,8 @@
 
 This plugin enable the ACL for dojot. The important files are:
 
-- src/dojot_kafka_plugin.erl 
-- src/dojot_kafka_plugin.app.src
+- src/dojot_acl.erl 
+- src/dojot_acl.app.src
 
 This plugin use Erlang OTP.
 
@@ -15,7 +15,7 @@ same one VerneMQ is compiled for, typically > 17). To compile do:
 
 Then enable the plugin using:
 
-    vmq-admin plugin enable --name dojot_kafka_plugin --path <PathToYourPlugin>/dojot_kafka_plugin/_build/default
+    vmq-admin plugin enable --name dojot_acl_plugin --path <PathToYourPlugin>/dojot_acl_plugin/_build/default
 
 Depending on how VerneMQ is started you might need ``sudo`` rights to access ``vmq-admin``.
 Moreover the ``<PathToYourPlugin>`` should be accessible by VerneMQ (file permissions).
