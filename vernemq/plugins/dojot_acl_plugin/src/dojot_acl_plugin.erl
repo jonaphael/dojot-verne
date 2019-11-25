@@ -53,12 +53,14 @@ auth_on_publish(UserName, {_MountPoint, _ClientId} = SubscriberId, QoS, Topic, P
     end.
 
 auth_on_subscribe(UserName, ClientId, [{_Topic, _QoS}|_] = Topics) ->
-    Result  = dojot_acl:config_auth(UserName, _Topic),
+    Result  = dojot_acl:config_auth(UserName, Topics),
 
     case Result of
         % the topic match with config
         ok ->
             ok;
         error ->
+            %%The vernemq has a bug... even if this clause is activated, the verne return ok to the main app
+            error_logger:info_msg("auth_on_subscribe: ~p ~p ~p", [UserName, ClientId, Topics]),
             {error, notMatch}
     end.

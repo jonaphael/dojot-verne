@@ -7,36 +7,34 @@
 ]).
 
 check_topic(Username, Topic) ->
-
+    ConfigTopic = <<"config">>,
     % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
-    [PaternOne|PaternTwo] = binary:split(Topic, <<"/">>, [global]),
+    [PaternOne|PaternTwo] = Topic,
 
-    if
-        PaternOne == Username ->
-            % here we check if topic is config
-            if
-                PaternTwo == <<"config">> ->
-                    ok;
-                true ->
-                    next
-            end;
-        true ->
+    [RestTopic| _] = PaternTwo,
+
+    case {PaternOne, RestTopic} of
+        {Username, ConfigTopic} ->
+            ok;
+        {Username, _} ->
+            next;
+        {_, _} ->
             error
     end.
 
 config_auth(Username, Topic) ->
-    % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
-    [PaternOne|PaternTwo] = binary:split(Topic, <<"/">>, [global]),
+    ConfigTopic = <<"config">>,
 
-    if
-        PaternOne == Username ->
-            % here we check if topic is config
-            if
-                PaternTwo =:= <<"config">> ->
-                    error;
-                true ->
-                    ok
-            end;
-        true ->
+    % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
+    [Data|_] = Topic,
+    {Data2, _} = Data,
+    [PaternOne|PaternTwo] = Data2,
+    [RestTopic| _] = PaternTwo,
+
+    case {PaternOne, RestTopic} of
+        {Username, ConfigTopic} ->
+            ok;
+        {_, _} ->
+            error_logger:info_msg("testtt: ~p ~p", [PaternOne, RestTopic]),
             error
     end.

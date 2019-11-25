@@ -7,7 +7,7 @@
                   kernel,
                   stdlib
                  ]},
-  {mod, { dojot_acl_plugin, []}},
+  {mod, { dojot_acl_plugin_app, []}},
   {env, [
          %% this tells VerneMQ to look in the file 'vernemq_demo_plugin'
          %% for the plugin hook functions. The format is:
