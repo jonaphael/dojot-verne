@@ -5,6 +5,15 @@ metadata:
   name: ejbca-simple
   namespace: {{ dojot_namespace }}
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: NotIn
+            values:
+            - verne-kafka
   selector:
     matchLabels:
       app: ejbca-simple

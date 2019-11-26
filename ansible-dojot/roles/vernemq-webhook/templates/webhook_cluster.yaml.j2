@@ -14,8 +14,17 @@ spec:
       labels:
         app: webhook-verne
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - verne-kafka
       containers:
       - name: webhook-verne
-        image: jonaphael/vernemq-webhook
+        image: eduardogmisiuk/verne_webhooks
         command: ["/bin/bash"]
         args: ["entryPoint.sh"]
