@@ -15,25 +15,20 @@ class KafkaMessenger {
         this.messeger = new Messenger('client-messenger', this.config.messenger)
     }
 
-    init() {
+    init(mqttClient) {
         this.messeger.init()
             .then( () => {
                 this.messeger.createChannel(this.config.messenger.kafka.dojot.subjects.verne, "w");
                 logger.info(`Kafka Messenger initialized successfully`, TAG);
-                this.initialized = true;
+                mqttClient.subscribe(this.config.mqtt.subscribeTopic);
             })
             .catch( error => {
                 logger.error(`Error initializing messenger ${error}`, TAG);
-                return false;
             })
     }
 
     sendMessage(mesage, key = null, partition = null) {
-        if (this.initialized)
-            this.messeger.publish(this.config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(mesage), key, partition);
-        else {
-            logger.error(`Messenger not initialized descarting message ...`);
-        }
+        this.messeger.publish(this.config.messenger.kafka.dojot.subjects.verne, "admin", JSON.stringify(mesage), key, partition);
     }
 
 }

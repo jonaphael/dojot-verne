@@ -4,28 +4,23 @@ const Utils = require('./utils/utils')
 const util = require('util')
 const { logger } = require('@dojot/dojot-module-logger')
 const TAG = { filename: "mqtt-client"}
+const KafkaMessenger = require('./kafkaMessenger')
 
 class MQTTClient {
 
-    constructor(config, kafkaMessenger) {
+    constructor(config) {
 
         this.config = config || defaultConfig;        
         this.isConnected = false;
-        this.kafkaMessenger = kafkaMessenger;
+        this.kafkaMessenger = null;
 
         /* set log level */
         logger.setLevel(this.config.app.mqtt_log_level);
     }
     
     init() {
-
-        if (this.isConnected) {
-            logger.info(`Client is already connected`, TAG);
-            return;
-        }
-
         const mqttOptions = {
-            username: `oibb`,
+            username: `${process.env.HOSTNAME}`,
             clientId: `${process.env.HOSTNAME}`,
             host: this.config.mqtt.host,
             port: this.config.mqtt.port,
@@ -46,7 +41,8 @@ class MQTTClient {
     _onConnect() {
         this.isConnected = true;
         logger.info(`Client Connected successfully!`, TAG)
-        this.mqttc.subscribe(this.config.mqtt.subscribeTopic);
+        this.kafkaMessenger = new KafkaMessenger(this.config);
+        this.kafkaMessenger.init(this.mqttc);
     }
 
     _onDisconnect() {
