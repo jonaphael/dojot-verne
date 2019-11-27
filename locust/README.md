@@ -146,6 +146,33 @@ The used topics are:
 - **Publish**: tenant:deviceid/attrs
 - **Subscribe**: tenant:deviceid/config
 
+# Machine specifications for tests
+
+To achieve 100.000 connections with ~3,333 RPS (Requests Per Second), we used distributed Locust
+in 4 virtual machines in a cluster. Their configuration were:
+
+Cluster info:
+- Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz
+- 62GB RAM DDR4 2,666 MHz
+- 2TB 7.2K RPM HDD
+
+VM1 and VM2 (each):
+- 9 CPUs
+- 14GB RAM
+- 50GB HDD
+
+VM3 and VM4 (each):
+- 9 CPUs
+- 14GB RAM
+- 30GB HDD
+
+In total:
+- 36 CPUs
+- 56GB RAM
+- 160GB HDD
+
+Each machine ran 9 slaves, with the VM1 running the master too.
+
 # **Issues and help**
 
 If you found a problem or need help, leave an issue in the main [Dojot repository](https://github.com/dojot/dojot) and we will help you!
