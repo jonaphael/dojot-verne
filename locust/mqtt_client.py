@@ -148,11 +148,7 @@ class MQTT_Client:
             )
 
     def subscribing(self) -> None:
-        """Handles the subscription in MQTT topics.
-
-        Args:
-            topic (string): topic to subscribe
-        """
+        """Handles the subscription in MQTT topics."""
 
         start_time = time.time()
 
