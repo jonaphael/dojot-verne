@@ -131,7 +131,9 @@ graphical interface
 - The Slave node is responsible for making the communication with the server, sending
 and receiving messages from Dojot
 
-<img align="center" src="https://github.com/eduardogmisiuk/dojot-verne/blob/update_documentation/locust/docs/diagrams/Locust.png">
+<p align="center">
+  <img src="https://github.com/eduardogmisiuk/dojot-verne/blob/update_documentation/locust/docs/diagrams/Locust.png">
+</p>
 
 The main idea behind Locust is to call **Locust tasks** from time to time to execute tests.
 These tasks are run in the slaves only. In our case, we have only one task, responsible for
