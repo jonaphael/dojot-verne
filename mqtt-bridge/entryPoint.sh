@@ -30,6 +30,13 @@ while [ -z "${RESPONSE}" ]; do
     sleep 2
     RESPONSE=`nc -zvv ${data_broker[0]} ${data_broker[1]} 2>&1 | grep open`
 done
+
+echo "Trying to authenticate with CA.."
+
+/opt/mqtt_client/security/ejbca_client.sh
+
+echo "Authenticated!"
+
 echo "All hosts Up"
 npm run start
 

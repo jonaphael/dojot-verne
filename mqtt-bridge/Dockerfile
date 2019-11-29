@@ -9,8 +9,7 @@ RUN apk add --no-cache g++ \
         lz4-dev \
         musl-dev \
         ca-certificates \
-        openssl-dev \
-        tini 
+        openssl-dev
 
 RUN apk add --no-cache --virtual .build-deps gcc zlib-dev libc-dev bsd-compat-headers py-setuptools bash
 
@@ -20,4 +19,4 @@ COPY package-lock.json .
 RUN npm install
 COPY . .
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./entryPoint.sh"]
