@@ -26,6 +26,7 @@ class App {
     this.isConnected = false;
 
     this.options = {
+      username: hostname,
       host: config.mqtt.host,
       port: config.mqtt.port,
       protocol: 'mqtts',
@@ -79,7 +80,7 @@ class App {
     logger.debug(`The extra info is ${util.inspect(extraInfo, {depth: null})}`, TAG);
     try {
       const data = JSON.parse(message);
-      this.publishMessage(`${data.metadata.thingId}/config`, message);
+      this.publishMessage(`${extraInfo.key}/config`, JSON.stringify(data.attrs));
     } catch (error) {
       logger.error(`Error parsing Kafka message: ${error}`, TAG);
     }

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: dojot_prom
+  name: dojot_prom
+spec:
+  selector:
+    matchLabels:
+      app: dojot_prom
+  replicas: 1
+  template: #templates for the pods
+    metadata:
+      labels:
+        app: dojot_prom
+    spec:
+      containers:
+      - name: dojot_prom
+        image: muhamedavila/dojot_prom_client
+        env:
+        - name: PROMETHEUS_PORT
+          value: "3005"

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dojot_prom
+  name: dojot_prom
+  namespace: {{ dojot_namespace }}
+spec:
+  ports:
+  - name: http
+    port: 3005
+    targetPort: http
+  selector:
+    app: dojot_prom
