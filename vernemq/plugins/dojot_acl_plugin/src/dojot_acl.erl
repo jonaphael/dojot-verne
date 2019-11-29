@@ -33,7 +33,7 @@ check_topic(Username, Topic) ->
 config_auth(Username, Topic) ->
     ConfigTopic = <<"config">>,
 
-    % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
+    % Topic must be equal: username/config and username must be equal: tenant:deviceid
     [Data|_] = Topic,
     {Data2, _} = Data,
     [PaternOne|PaternTwo] = Data2,
