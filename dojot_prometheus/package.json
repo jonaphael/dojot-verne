@@ -1,0 +1,24 @@
+{
+  "name": "dojot_prometheus",
+  "version": "1.0.0",
+  "description": "service to collect data from dojot and expose to prometheus",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run-client": "node src/index.js"
+  },
+  "keywords": [
+    "prometheus",
+    "dojot"
+  ],
+  "author": "Muhamed Avila",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@dojot/dojot-module-logger": "0.0.1-alpha.5",
+    "@jonaphael/dojot-module": "0.0.3",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "prom-client": "^11.5.3",
+    "simple-statistics": "^7.0.5"
+  }
+}
