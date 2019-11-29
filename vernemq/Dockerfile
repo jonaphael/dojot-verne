@@ -18,6 +18,8 @@ COPY scripts_tls/ /vernemq/scripts_tls
 COPY vmq_dojot.sh /vernemq/vmq_dojot.sh
 COPY cert/ /vernemq/cert/
 
+COPY plugins/dojot_acl_plugin/_build /vernemq/dojot_acl_plugin/
+
 RUN chmod 777  /vernemq/vmq_dojot.sh
 RUN chmod 777 -R  /vernemq/scripts_tls
 RUN chmod 777 -R  /vernemq/cert/
