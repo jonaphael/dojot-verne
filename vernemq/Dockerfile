@@ -1,4 +1,4 @@
-FROM vernemq/vernemq:alpine-latest
+FROM vernemq/vernemq:1.10.0-alpine
 
 USER root
 
@@ -17,8 +17,6 @@ COPY command.sh /
 COPY scripts_tls/ /vernemq/scripts_tls
 COPY vmq_dojot.sh /vernemq/vmq_dojot.sh
 COPY cert/ /vernemq/cert/
-
-COPY vmq.acl etc/vmq.acl
 
 RUN chmod 777  /vernemq/vmq_dojot.sh
 RUN chmod 777 -R  /vernemq/scripts_tls
