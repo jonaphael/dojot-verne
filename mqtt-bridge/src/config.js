@@ -57,8 +57,8 @@ const app = {
   const mqtt = {
     host: process.env.DOJOT_MQTT_HOST || "vernemq-k8s",
     port: parseInt(process.env.DOJOT_MQTT_PORT) || 1883,
-    keepalive: 120,
-    subscribeTopic: `#`,
+    keepalive: 60,
+    subscribeTopic: `\$share/group/+/attrs`,
     subscribeQos: 0
   };
   
