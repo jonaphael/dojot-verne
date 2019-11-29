@@ -86,7 +86,7 @@
     - role: apigw
     - role: auth
     - role: data-broker
-    - role: vernemq-webhook
+    - role: mqtt-bridge
     - role: ejbca-node
     # - role: device-manager
     # - role: ejbca-rest
