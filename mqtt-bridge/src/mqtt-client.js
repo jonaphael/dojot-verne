@@ -20,8 +20,8 @@ class MQTTClient {
 
     init() {
         const mqttOptions = {
-            username: `${process.env.HOSTNAME}`,
-            clientId: `${process.env.HOSTNAME}`,
+            username: this.config.mqtt.mqttHost,
+            clientId: this.config.mqtt.mqttHost,
             host: this.config.mqtt.host,
             port: this.config.mqtt.port,
             keepAlive: this.config.mqtt.keepAlive
