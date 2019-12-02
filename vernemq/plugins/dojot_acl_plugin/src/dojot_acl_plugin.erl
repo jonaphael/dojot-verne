@@ -13,14 +13,19 @@ auth_on_register({_IpAddr, _Port} = Peer, {_MountPoint, _ClientId} = SubscriberI
 
 auth_on_publish(UserName, {_MountPoint, _ClientId} = SubscriberId, QoS, Topic, Payload, IsRetain) ->
     Result  = dojot_acl:check_topic(UserName, Topic),
-
+    Chained = erlang:list_to_binary([os:getenv("ACL_CHAIN")]),
     case Result of
         % the topic match with config
         ok ->
             ok;
         % the topic match is not config
         next ->
-            next;
+            case Chained of
+                <<"y">> ->
+                    next;
+                <<"n">> ->
+                    ok
+            end;
         % Username don't match
         error ->
             {error, notMatch}

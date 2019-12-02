@@ -33,15 +33,24 @@ check_topic(Username, Topic) ->
 config_auth(Username, Topic) ->
     ConfigTopic = <<"config">>,
 
+    %if the subscribed service is the mqtt-bridge, we can auth to subscribe to every topic
+    ResponseMatch = binary:match(Username, <<"mqtt-bridge-">>),
+
+
     % Topic must be equal: username/config and username must be equal: tenant:deviceid
     [Data|_] = Topic,
     {Data2, _} = Data,
     [PaternOne|PaternTwo] = Data2,
     [RestTopic| _] = PaternTwo,
 
-    case {PaternOne, RestTopic} of
-        {Username, ConfigTopic} ->
-            ok;
-        {_, _} ->
-            error
+    case ResponseMatch of
+        nomatch ->
+            case {PaternOne, RestTopic} of
+                {Username, ConfigTopic} ->
+                    ok;
+                {_, _} ->
+                    error
+            end;
+        _ ->
+            ok
     end.
