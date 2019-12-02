@@ -17,6 +17,7 @@ CERT_DNS                 | Server hostname (THIS DNS/ADDR MUST BE EQUAL TO KUBER
 CHECK_EXPIRATION_TIME    | Checks if the certificates expires every define time by cron  | "*/30 * * * *" | cron schedule expressions
 CRL_UPDATE_TIME          | Update CRL certificate every define time by cron               | "*/30 * * * *" | cron schedule expressions
 CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200          | seconds
+ACL_CHAIN  | Plugin ACL - Use "y" if there's other plugin | "n"          | y or n
 
 
 ### **VerneMQ Configuration**

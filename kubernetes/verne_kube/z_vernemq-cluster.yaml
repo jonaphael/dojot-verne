@@ -7,6 +7,8 @@ metadata:
 spec:
   baseImage: mprevide/verne
   env:
+    - name: ACL_CHAIN
+      value: "n"
     - name: STATIC_CERT
       value: "n"
     - name: K8S_ENV
