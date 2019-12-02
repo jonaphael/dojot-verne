@@ -2,8 +2,10 @@
 
 # set -ex
 
+DATA_BROKER="${DATA_BROKER_DNS}:${DATA_BROKER_PORT}"
+
 VERNE_WEBHOOK_KAFKA_HOSTS=${KAFKA_HOSTS:-"kafka-server:9092"}
-VERNE_WEBHOOK_DATA_BROKER_HOST=${DATA_BROKER_URL:-"data-broker:80"}
+VERNE_WEBHOOK_DATA_BROKER_HOST=${DATA_BROKER:-"data-broker:80"}
 
 # check if kafka is up
 kafka_hosts=$(echo $VERNE_WEBHOOK_KAFKA_HOSTS | tr "," "\n")
