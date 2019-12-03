@@ -1,4 +1,4 @@
-FROM vernemq/vernemq:alpine-latest
+FROM vernemq/vernemq:1.10.0-alpine
 
 USER root
 
