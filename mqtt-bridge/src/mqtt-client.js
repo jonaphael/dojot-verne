@@ -51,8 +51,12 @@ class MQTTClient {
     _onConnect() {
         this.isConnected = true;
         logger.info(`Client Connected successfully!`, TAG)
-        this.kafkaMessenger = new KafkaMessenger(this.config);
-        this.kafkaMessenger.init(this.mqttc);
+
+        if (this.kafkaMessenger == null) {
+            this.kafkaMessenger = new KafkaMessenger(this.config);
+            this.kafkaMessenger.init(this.mqttc);
+        }
+
     }
 
     _onDisconnect() {
