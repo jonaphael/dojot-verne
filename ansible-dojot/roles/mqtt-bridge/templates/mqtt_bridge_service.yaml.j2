@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: webhook-verne
+  name: mqtt_bridge-verne
   namespace: {{ dojot_namespace }}
 spec:
   type: ClusterIP 
   selector:
-    app: webhook-verne
+    app: mqtt_bridge-verne
   ports:
-  - name: webhook-verne
+  - name: mqtt_bridge-verne
     port: 4000

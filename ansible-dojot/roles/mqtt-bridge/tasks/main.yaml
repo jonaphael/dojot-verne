@@ -1,6 +1,6 @@
 ## This role is responsible for deploying Kong for dojot
 
-- name: dojot - verneMQ webhook Objects
+- name: dojot - verneMQ mqtt_bridge Objects
   k8s:
     kubeconfig: "{{ dojot_kubeconfig_file_path | default(omit) }}"
     state: present
@@ -10,5 +10,5 @@
   retries: 30
   delay: 10
   loop:
-  - "{{ lookup('template', 'webhook_cluster.yaml.j2') | from_yaml }}"
-  - "{{ lookup('template', 'webhook_service.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'mqtt_bridge_cluster.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'mqtt_bridge_service.yaml.j2') | from_yaml }}"

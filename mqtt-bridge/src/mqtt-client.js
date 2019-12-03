@@ -5,6 +5,7 @@ const util = require('util')
 const { logger } = require('@dojot/dojot-module-logger')
 const TAG = { filename: "mqtt-client" }
 const KafkaMessenger = require('./kafkaMessenger')
+const fs = require('fs');
 
 class MQTTClient {
 
@@ -13,6 +14,10 @@ class MQTTClient {
         this.config = config || defaultConfig;
         this.isConnected = false;
         this.kafkaMessenger = null;
+
+        this.key = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.key`);
+        this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.crt`);
+        this.caCrt = fs.readFileSync('/opt/mqtt_client/cert/ca.crt');
 
         /* set log level */
         logger.setLevel(this.config.app.mqtt_log_level);
@@ -24,7 +29,12 @@ class MQTTClient {
             clientId: this.config.mqtt.mqttHost,
             host: this.config.mqtt.host,
             port: this.config.mqtt.port,
-            keepAlive: this.config.mqtt.keepAlive
+            protocol: 'mqtts',
+            ca: this.caCrt,
+            key: this.key,
+            cert: this.clientCrt,
+            keepAlive: this.config.mqtt.keepAlive,
+            rejectUnauthorized: false
         }
 
         const onConnectBind = this._onConnect.bind(this);
@@ -41,8 +51,12 @@ class MQTTClient {
     _onConnect() {
         this.isConnected = true;
         logger.info(`Client Connected successfully!`, TAG)
-        this.kafkaMessenger = new KafkaMessenger(this.config);
-        this.kafkaMessenger.init(this.mqttc);
+
+        if (this.kafkaMessenger == null) {
+            this.kafkaMessenger = new KafkaMessenger(this.config);
+            this.kafkaMessenger.init(this.mqttc);
+        }
+
     }
 
     _onDisconnect() {
