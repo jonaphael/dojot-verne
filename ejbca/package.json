@@ -17,6 +17,8 @@
   "author": "Muhamed Avila",
   "license": "GPL-3.0",
   "dependencies": {
+    "@dojot/dojot-module": "0.0.1-beta.7",
+    "@dojot/dojot-module-logger": "0.0.1-alpha.5",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
@@ -37,7 +39,8 @@
       "routes/**/*.js",
       "utils/**/*.js",
       "lib/**/*.js",
-      "!src/index.js"
+      "!src/index.js",
+      "!src/config.js"
     ]
   }
 }

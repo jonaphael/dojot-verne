@@ -2,8 +2,10 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const retryConnection = require('promise-retry');
-
-let app = null;
+const { logger } = require('@dojot/dojot-module-logger');
+const TAG = { filename: "app" };
+const NodeCache = require("node-cache");
+const myCache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
 
 let server = {
     isInitialized: false,
@@ -13,8 +15,9 @@ let server = {
 
 /* EJBCA Routes */
 const ejbcaRoute = require('../routes/ejbcaRoute');
+const ejbcaUtils = require('../utils/ejbcaUtils');
 
-function initApp(clientEJBCA) {
+function initApp(clientEJBCA, messenger, dojotConfig) {
 
     server.app = express();
     server.app.use(bodyParser.json({ type: "*/*" }));
@@ -22,29 +25,35 @@ function initApp(clientEJBCA) {
 
     /* Starting the server */
     server.httpServer = server.app.listen(5583, () => {
-        console.log(`Listening on port 5583.`);
+        logger.debug('Listening on port 5583.', TAG);
         server.isInitialized = true;
     })
 
-    retryConnection((retry, number) => {
-        console.log(`Trying to connect to ejbca wsdl service.. retries: ${number}`);
+    return retryConnection((retry, number) => {
+        logger.debug(`Trying to connect to ejbca wsdl service.. retries: ${number}`, TAG);
 
         return clientEJBCA.createClient().catch(retry);
     }).then((ejbcaService) => {
 
-        /* setting route */
-        ejbcaRoute(server.app, ejbcaService);
-        return true;
+        logger.debug('Connected to wsdl service', TAG);
+
+        logger.debug("Setting EJBCA Routes..", TAG);
+        ejbcaRoute(server.app, ejbcaService, myCache);
+
+        logger.debug("Setting EJBCA Messenger", TAG);
+
+        return ejbcaUtils.createMessenger(messenger, dojotConfig, ejbcaService);
 
     }).catch(err => {
-        console.log(err.toString());
-        return false;
+        logger.error(err.toString(), TAG);
+        return Promise.reject(err);
     })
 
 }
 
 function stopApp() {
     if (server.isInitialized) {
+        logger.debug('Stoping the server.');
         server.isInitialized = false;
         server.httpServer.close();
     }
