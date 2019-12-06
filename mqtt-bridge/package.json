@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest tests/unit-tests/*.js --coverage"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +15,18 @@
     "@jonaphael/iotagent-nodejs": "0.0.3",
     "moment": "^2.24.0",
     "mqtt": "^3.0.0"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "utils/**/*.js",
+      "!src/index.js",
+      "!src/config.js"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }
