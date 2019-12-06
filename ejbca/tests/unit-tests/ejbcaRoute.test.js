@@ -12,6 +12,16 @@ app.use(bodyParser.json());
 
 jest.mock('../../utils/ejbcaUtils');
 
+/* We have to correctly mock the cache lib */
+let value = {
+    status: 1
+}
+
+let FakeCache = {
+    set: jest.fn((args1, args2, callback) => callback(null, true)),
+    get: jest.fn((args1, callback) => callback(null, value))
+}
+
 /* Fake soap client => template */
 let client = {
     getAvailableCAs: jest.fn(),
@@ -67,8 +77,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
     describe("Testing CA endpoints", () => {
         beforeEach(() => {
+            jest.clearAllMocks();
             jest.resetModules();
-            ejbcaRoutes(app, client);
+            ejbcaRoutes(app, client, FakeCache);
         });
 
         afterEach(() => {
@@ -94,7 +105,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                "code": 400,
+                "message": "error",
+                "moreinfo": "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -128,7 +141,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -151,7 +166,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -163,7 +180,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(404);
             expect(JSON.parse(response.text)).toEqual({
-                'response': 'No certificate found'
+                code: 404,
+                message: "No certificate found",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -184,7 +203,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -196,7 +217,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(404);
             expect(JSON.parse(response.text)).toEqual({
-                'reason error': 'Inexistent reason'
+                code: 404,
+                message: "Inexistent reason code",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -220,12 +243,14 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
         it('Should /ca/:caname/crl route return 200 status and "json" json', async () => {
-            let crl = {return: 'test'}
+            let crl = { return: 'test' }
             client.getLatestCRL = jest.fn((args, callback) => callback(null, crl));
 
             let response = await get('/ca/test/crl', null, { delta: 'true', update: 'true' });
@@ -244,7 +269,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
@@ -254,7 +281,7 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             let response = await put('/ca/test/crl');
 
-            expect(response.status).toEqual(200);
+            expect(response.status).toEqual(201);
         });
 
         it('Should /ca/:caname/crl route return 400 status and "error" json', async () => {
@@ -265,14 +292,16 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                code: 400,
+                message: "error",
+                moreinfo: "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
 
         it('Should /user route return 200 status', async () => {
 
             client.editUser = jest.fn((args, callback) => callback(null));
-
+            ejbcaUtils.updateUser = jest.fn().mockReturnValue({ 'username': 'data' });
             let error = { errors: undefined, hasError: false };
 
             ejbcaUtils.errorValidator = jest.fn(() => error);
@@ -282,7 +311,7 @@ describe("Testing EJBCA Routes functionalities", () => {
 
         })
 
-        it('Should /user route return 422 status', async () => {
+        it('Should /user route return 400 status due validation error', async () => {
 
             client.editUser = jest.fn((args, callback) => callback(null));
 
@@ -291,11 +320,11 @@ describe("Testing EJBCA Routes functionalities", () => {
             ejbcaUtils.errorValidator = jest.fn(() => error);
 
             let response = await post('/user', { 'username': "data" });
-            expect(response.status).toEqual(422);
+            expect(response.status).toEqual(400);
 
         })
 
-        it('Should /user route return 400 status', async () => {
+        it('Should /user route return 400 status due to create/edit user', async () => {
 
             client.editUser = jest.fn((args, callback) => callback('error'));
 
@@ -307,6 +336,21 @@ describe("Testing EJBCA Routes functionalities", () => {
             expect(response.status).toEqual(400);
 
         })
+
+        it('Should /user route return 500 status due to cache error', async () => {
+
+            client.editUser = jest.fn((args, callback) => callback(null));
+            FakeCache.set = jest.fn((args1, args2, callback) => callback('error', false));
+
+            let error = { errors: undefined, hasError: false };
+
+            ejbcaUtils.errorValidator = jest.fn(() => error);
+
+            let response = await post('/user', { 'username': "data" });
+            expect(response.status).toEqual(500);
+
+        })
+
 
         it('Should /user/:username route return 200 status', async () => {
 
@@ -333,6 +377,17 @@ describe("Testing EJBCA Routes functionalities", () => {
             expect(response.status).toEqual(400);
 
         })
+
+        it('Should /user/:username route return 404 status if there is no user', async () => {
+
+            client.findUser = jest.fn((args, callback) => callback(null, null));
+
+
+            let response = await get('/user/:username');
+            expect(response.status).toEqual(404);
+
+        })
+
 
         it('Should /user/:username delete route return 200 status', async () => {
 
@@ -373,11 +428,11 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             let cert = {
                 return:
-                [
-                    {
-                        certificateData: 'data'
-                    }
-                ]
+                    [
+                        {
+                            certificateData: 'data'
+                        }
+                    ]
 
 
             }
@@ -405,19 +460,24 @@ describe("Testing EJBCA Routes functionalities", () => {
         it('Should /user/:username/find delete route return 404 status', async () => {
 
             client.findCerts = jest.fn((args, callback) => callback(null, null));
-
             let response = await get('/user/:username/find', null, { valid: 'false' });
             expect(response.status).toEqual(404);
 
         })
 
-        it('Should /sign/:username/pkcs10 route return 200 status', async () => {
+        it('Should /sign/:username/pkcs10 route return 200 status witch cached client', async () => {
 
             let responseData = {
                 return: {
                     data: 'data'
                 }
             }
+
+            let valueStatus = {
+                status: 1
+            }
+
+            FakeCache.get = jest.fn((args1, callback) => callback(null, valueStatus))
 
             client.pkcs10Request = jest.fn((args, callback) => callback(null, responseData));
 
@@ -432,9 +492,22 @@ describe("Testing EJBCA Routes functionalities", () => {
 
         })
 
-        it('Should /sign/:username/pkcs10 route return 400 status', async () => {
+        it('Should /sign/:username/pkcs10 route return 200 status witch no cached client', async () => {
 
-            client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
+            let responseData = {
+                return: {
+                    data: 'data'
+                }
+            }
+
+            let valueStatus = {
+                status: 0
+            }
+
+            FakeCache.get = jest.fn((args1, callback) => callback(null, valueStatus))
+            FakeCache.set = jest.fn((args1, args2, callback) => callback(null));
+
+            client.pkcs10Request = jest.fn((args, callback) => callback(null, responseData));
 
             let error = { errors: undefined, hasError: false };
 
@@ -443,11 +516,48 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             let info = { passwd: 'data', certificate: 'data' }
             let response = await post('/sign/:username/pkcs10', info);
-            expect(response.status).toEqual(400);
+            expect(response.status).toEqual(200);
 
         })
 
-        it('Should /sign/:username/pkcs10 route return 422 status', async () => {
+        it('Should /sign/:username/pkcs10 route return 500 status due get cache error', async () => {
+            client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
+            FakeCache.get = jest.fn((args1, callback) => callback('error', null))
+
+            let error = { errors: 'undefined', hasError: false };
+
+            ejbcaUtils.errorValidator = jest.fn(() => error);
+            ejbcaUtils.findUserandReset = jest.fn(() => error);
+
+            let info = { passwd: 'data', certificate: 'data' }
+            let response = await post('/sign/:username/pkcs10', info);
+            expect(response.status).toEqual(500);
+
+        })
+
+        it('Should /sign/:username/pkcs10 route return 500 status due set cache error', async () => {
+            let valueStatus = {
+                status: 0
+            }
+
+            FakeCache.get = jest.fn((args1, callback) => callback(null, valueStatus))
+
+            client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
+            FakeCache.get = jest.fn((args1, callback) => callback(undefined, valueStatus))
+            FakeCache.set = jest.fn((args1, args2, callback) => callback('error'));
+
+            let error = { errors: 'undefined', hasError: false };
+
+            ejbcaUtils.errorValidator = jest.fn(() => error);
+            ejbcaUtils.findUserandReset = jest.fn(() => error);
+
+            let info = { passwd: 'data', certificate: 'data' }
+            let response = await post('/sign/:username/pkcs10', info);
+            expect(response.status).toEqual(500);
+
+        })
+
+        it('Should /sign/:username/pkcs10 route return 400 status due validation error', async () => {
 
             client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
 
@@ -459,13 +569,35 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             let info = { passwd: 'data', certificate: 'data' }
             let response = await post('/sign/:username/pkcs10', info);
-            expect(response.status).toEqual(422);
+            expect(response.status).toEqual(400);
 
         })
 
-        it('Should /sign/:username/pkcs10 route return 404 status', async () => {
-
+        it('Should /sign/:username/pkcs10 route return 400 status due not find user', async () => {
+            let errorValue = {
+                status: 1
+            }
             client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
+            FakeCache.get = jest.fn((args1, callback) => callback(null, errorValue))
+
+            let error = { errors: undefined, hasError: false };
+            let errorValidator = { errors: null, hasError: false };
+
+            ejbcaUtils.errorValidator = jest.fn(() => errorValidator);
+            ejbcaUtils.findUserandReset = jest.fn(() => Promise.resolve(error));
+
+            let info = { passwd: 'data', certificate: 'data' }
+            let response = await post('/sign/:username/pkcs10', info);
+            expect(response.status).toEqual(400);
+
+        })
+
+        it('Should /sign/:username/pkcs10 route return 400 status due to sign error', async () => {
+            let errorValue = {
+                status: 1
+            }
+            client.pkcs10Request = jest.fn((args, callback) => callback('error', null));
+            FakeCache.get = jest.fn((args1, callback) => callback(null, errorValue))
 
             let error = { errors: 'error', hasError: true };
             let errorValidator = { errors: null, hasError: false };
@@ -475,7 +607,7 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             let info = { passwd: 'data', certificate: 'data' }
             let response = await post('/sign/:username/pkcs10', info);
-            expect(response.status).toEqual(404);
+            expect(response.status).toEqual(400);
 
         })
 
@@ -505,7 +637,9 @@ describe("Testing EJBCA Routes functionalities", () => {
 
             expect(response.status).toEqual(400);
             expect(JSON.parse(response.text)).toEqual({
-                'soap error': 'error'
+                "code": 400,
+                "message": "error",
+                "moreinfo": "https://dojot.github.io/ejbca-rest/apiary_latest.html",
             })
         });
     })
