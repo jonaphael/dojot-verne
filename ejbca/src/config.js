@@ -59,7 +59,7 @@ const messenger = {
 
 
 const dojot = {
-    dojotEnv: process.env.DOJOT_ENV || 'n'
+    ejbcaPort: process.env.EJBCA_PORT || 5583
 }
 
 module.exports = {

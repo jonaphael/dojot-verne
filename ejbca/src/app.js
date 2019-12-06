@@ -6,6 +6,7 @@ const { logger } = require('@dojot/dojot-module-logger');
 const TAG = { filename: "app" };
 const NodeCache = require("node-cache");
 const myCache = new NodeCache({ stdTTL: 0, checkperiod: 0 });
+const config = require('./config');
 
 let server = {
     isInitialized: false,
@@ -24,8 +25,8 @@ function initApp(clientEJBCA, messenger, dojotConfig) {
     server.app.use(bodyParser.urlencoded({ extended: true }));
 
     /* Starting the server */
-    server.httpServer = server.app.listen(5583, () => {
-        logger.debug('Listening on port 5583.', TAG);
+    server.httpServer = server.app.listen(config.dojot.ejbcaPort, () => {
+        logger.debug(`Listening on port ${config.dojot.ejbcaPort}.`, TAG);
         server.isInitialized = true;
     })
 
