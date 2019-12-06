@@ -2,21 +2,20 @@ FROM node:10.16.3-alpine
 
 WORKDIR /opt/mqtt_client
 
-RUN apk --no-cache add \
+
+RUN apk add --no-cache g++ \
+      make \
       bash \
-      g++ \
-      ca-certificates \
+      python \
       lz4-dev \
       musl-dev \
-      cyrus-sasl-dev \
+      ca-certificates \
       openssl-dev \
-      make \
-      python \
+      zlib-dev \
       openssl \
       curl \
-      jq
-
-RUN apk add --no-cache --virtual .build-deps gcc zlib-dev libc-dev bsd-compat-headers py-setuptools bash
+      jq \
+      zstd
 
 COPY package.json .
 COPY package-lock.json .

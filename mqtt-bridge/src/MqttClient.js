@@ -1,6 +1,5 @@
 const mqtt = require('mqtt')
 const defaultConfig = require('./config')
-const Utils = require('./utils/utils')
 const { logger } = require('@dojot/dojot-module-logger')
 const TAG = { filename: "mqtt-client" }
 const AgentMessenger = require('./AgentMessenger')
@@ -64,16 +63,7 @@ class MQTTClient {
     }
 
     _onMessage(topic, message) {
-
-        try {
-            const jsonPayload = JSON.parse(message)
-            const generatedData = Utils.generatePayload(topic, jsonPayload)
-            const username = `${generatedData.metadata.tenant}:${generatedData.metadata.deviceid}`
-            this.agentMessenger.updateAttrs(generatedData.metadata.deviceid, generatedData.metadata.tenant, generatedData.attrs, generatedData.metadata, username);
-            logger.info(`Message published to ${username}`, TAG)
-        } catch (error) {
-            logger.error(`Error : ${error}`, TAG)
-        }
+        this.agentMessenger.sendMessage(topic, message);
     }
 
 }

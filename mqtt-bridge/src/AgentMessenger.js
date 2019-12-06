@@ -2,6 +2,7 @@ const { IoTAgent } = require("@jonaphael/iotagent-nodejs")
 const { logger } = require("@dojot/dojot-module-logger");
 const defaultConfig = require('./config')
 const TAG = { filename: "agent-messenger" };
+const Utils = require('./utils/utils')
 
 class AgentMessenger {
 
@@ -22,7 +23,6 @@ class AgentMessenger {
             logger.debug("Registering callbacks for device events...", TAG);
             this.iotagent.on("iotagent.device", "device.create", (tenant, event) => {
                 logger.debug(`Got device creation message. Tenant is ${tenant}.`, TAG);
-                logger.debug(`Data is: ${util.inspect(event)}`, TAG);
                 logger.debug("Got configure event from Device Manager", TAG);
             });
 
@@ -30,7 +30,7 @@ class AgentMessenger {
 
             //subscribe to verne
             mqttClient.subscribe(this.config.mqtt.subscribeTopic);
-    
+
             logger.debug("... callbacks for device events were registered.", TAG);
 
             // If there is any configured device, the callback associated to "device.create"
@@ -43,6 +43,18 @@ class AgentMessenger {
             process.exit();
         });
 
+    }
+
+    sendMessage(topic, message) {
+        try {
+            logger.info(`Message published`, TAG)
+            const jsonPayload = JSON.parse(message)
+            const generatedData = Utils.generatePayload(topic, jsonPayload)
+            const username = `${generatedData.metadata.tenant}:${generatedData.metadata.deviceid}`
+            this.iotagent.updateAttrs(generatedData.metadata.deviceid, generatedData.metadata.tenant, generatedData.attrs, generatedData.metadata, username);
+        } catch (error) {
+            logger.error(`Error : ${error}`, TAG)
+        }
     }
 }
 
