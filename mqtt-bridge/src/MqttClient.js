@@ -1,10 +1,9 @@
 const mqtt = require('mqtt')
 const defaultConfig = require('./config')
 const Utils = require('./utils/utils')
-const util = require('util')
 const { logger } = require('@dojot/dojot-module-logger')
 const TAG = { filename: "mqtt-client" }
-const KafkaMessenger = require('./kafkaMessenger')
+const AgentMessenger = require('./AgentMessenger')
 const fs = require('fs');
 
 class MQTTClient {
@@ -13,7 +12,7 @@ class MQTTClient {
 
         this.config = config || defaultConfig;
         this.isConnected = false;
-        this.kafkaMessenger = null;
+        this.agentMessenger = null;
 
         this.key = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.key`);
         this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.crt`);
@@ -52,9 +51,9 @@ class MQTTClient {
         this.isConnected = true;
         logger.info(`Client Connected successfully!`, TAG)
 
-        if (this.kafkaMessenger == null) {
-            this.kafkaMessenger = new KafkaMessenger(this.config);
-            this.kafkaMessenger.init(this.mqttc);
+        if (this.agentMessenger == null) {
+            this.agentMessenger = new AgentMessenger(this.config);
+            this.agentMessenger.init(this.mqttc);
         }
 
     }
@@ -69,9 +68,9 @@ class MQTTClient {
         try {
             const jsonPayload = JSON.parse(message)
             const generatedData = Utils.generatePayload(topic, jsonPayload)
-            this.kafkaMessenger.sendMessage(generatedData, `${generatedData.metadata.tenant}:${generatedData.metadata.deviceid}`)
-            logger.debug(`Message received on topic  ${util.inspect(generatedData, { depth: null })}`)
-
+            const username = `${generatedData.metadata.tenant}:${generatedData.metadata.deviceid}`
+            this.agentMessenger.updateAttrs(generatedData.metadata.deviceid, generatedData.metadata.tenant, generatedData.attrs, generatedData.metadata, username);
+            logger.info(`Message published to ${username}`, TAG)
         } catch (error) {
             logger.error(`Error : ${error}`, TAG)
         }
