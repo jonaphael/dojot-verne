@@ -1,17 +1,16 @@
 {
-  "name": "dojot_prometheus",
+  "name": "pub-kafka-prometheus",
   "version": "1.0.0",
-  "description": "service to collect data from dojot and expose to prometheus",
-  "main": "index.js",
+  "description": "Service to collect latency between publication MQTT and Kafka with Dojot and expose to prometheus",
+  "main": "src/Index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run-client": "node src/index.js"
+    "run-client": "node src/Index.js"
   },
   "keywords": [
     "prometheus",
     "dojot"
   ],
-  "author": "Muhamed Avila",
   "license": "GPL-3.0",
   "dependencies": {
     "@dojot/dojot-module-logger": "0.0.1-alpha.5",

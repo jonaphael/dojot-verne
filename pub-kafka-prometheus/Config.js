@@ -1,5 +1,5 @@
 const app = {
-    prometheus_log_level: process.env.PROMETHEUS_CLIENT_LOG_LEVEL || "info"
+    log_level: process.env.PROMETHEUS_CLIENT_LOG_LEVEL || "info",
 };
 
 const messenger = {
@@ -61,5 +61,5 @@ const prom = {
 module.exports = {
     app,
     messenger,
-    prom
+    prom,
 };
