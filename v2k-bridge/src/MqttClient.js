@@ -50,7 +50,7 @@ class MQTTClient {
         this.isConnected = true;
         logger.info(`Client Connected successfully!`, TAG)
 
-        if (this.agentMessenger == null) {
+        if (this.agentMessenger === null) {
             this.agentMessenger = new AgentMessenger(this.config);
             this.agentMessenger.init(this.mqttc);
         }

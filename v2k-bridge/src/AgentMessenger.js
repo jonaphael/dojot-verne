@@ -21,7 +21,7 @@ class AgentMessenger {
             logger.debug("... IoT agent was initialized", TAG);
 
             logger.debug("Registering callbacks for device events...", TAG);
-            this.iotagent.on("iotagent.device", "device.create", (tenant, event) => {
+            this.iotagent.on("iotagent.device", "device.create", (tenant) => {
                 logger.debug(`Got device creation message. Tenant is ${tenant}.`, TAG);
                 logger.debug("Got configure event from Device Manager", TAG);
             });
@@ -40,7 +40,6 @@ class AgentMessenger {
             logger.debug("... event generation was requested.", TAG);
         }).catch(() => {
             logger.error("An error occurred while initializing the IoTAgent. Bailing out!", TAG);
-            process.exit();
         });
 
     }

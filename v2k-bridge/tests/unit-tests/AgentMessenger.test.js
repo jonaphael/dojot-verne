@@ -63,52 +63,71 @@ describe("Testing AgentMessenger messenger", () => {
         jest.clearAllMocks();
     });
 
-    it("Should init correctly the agent messenger with config and publish data", async () => {
+    it("Should init correctly the agent messenger with config and publish data", () => {
         mockedMessenger = new AgentMessenger(mockConfig.kafkaConfig);
         expectConfigs();
 
     })
 
-    it("Should init correctly the agent messenger without config", async () => {
+    it("Should init correctly the agent messenger without config", () => {
         mockedMessenger = new AgentMessenger();
 
         expectConfigs();
     })
 
     it("Should not init correctly the agent messenger", async () => {
+        let reason = 'error';
         mockedMessenger = new AgentMessenger(mockConfig.kafkaConfig);
-        mockConfig.Messenger.init.mockReturnValue(Promise.reject('error'));
-        const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => { });
+        mockConfig.Messenger.init.mockReturnValue(Promise.reject(reason));
 
         try {
             await mockedMessenger.init(mockConfig.mqttConfig);
         } catch (error) {
-            expect(mockExit).toHaveBeenCalled();
+            expect(error).toEqual(reason);
         }
 
     })
 
-    it("Should send message after onMessage",() => {
+    it("Should send message after onMessage", () => {
         mockedMessenger = new AgentMessenger(mockConfig.kafkaConfig);
         expectConfigs();
 
         let generateDataFake = {
             metadata: {
-              tenant: 'fake',
-              deviceid: 'fake'  
+                tenant: 'fake',
+                deviceid: 'fake'
             }
         }
         utils.generatePayload = jest.fn().mockReturnValue(generateDataFake)
-        
+
         let fakeMessage = '{ "name":"John", "age":30, "city":"New York"}'
-        
+        mockedMessenger.sendMessage("test", fakeMessage);
+        expect(mockConfig.Messenger.updateAttrs).toHaveBeenCalled();
+
+    })
+
+
+    it("Should not send message after onMessage", () => {
+        mockedMessenger = new AgentMessenger(mockConfig.kafkaConfig);
+        expectConfigs();
+
+        let generateDataFake = {
+            metadata: {
+                tenant: 'fake',
+                deviceid: 'fake'
+            }
+        }
+        utils.generatePayload = jest.fn().mockReturnValue(generateDataFake)
+        let fakeMessage = 'error format'
+
         try {
             mockedMessenger.sendMessage("test", fakeMessage);
-            expect(mockConfig.Messenger.updateAttrs).toHaveBeenCalled();
-
         } catch (error) {
-            
+            expect(error).toBeDefined();
+
         }
+
+
     })
 
 })

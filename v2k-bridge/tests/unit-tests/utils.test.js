@@ -6,9 +6,9 @@ describe("Testing utils", () => {
         jest.clearAllMocks();
     });
 
-    it("Should generate correctly the payload", async () => {
-        topic = "admin:deviceid/topic";
-        payload = "data";
+    it("Should generate correctly the payload", () => {
+        let topic = "admin:deviceid/topic";
+        let payload = "data";
         const data = utils.generatePayload(topic, payload);
 
         let deviceid = data.metadata.deviceid;
