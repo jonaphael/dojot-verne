@@ -25,8 +25,8 @@ function initApp(clientEJBCA, messenger, dojotConfig) {
     server.app.use(bodyParser.urlencoded({ extended: true }));
 
     /* Starting the server */
-    server.httpServer = server.app.listen(config.dojot.ejbcaPort, () => {
-        logger.debug(`Listening on port ${config.dojot.ejbcaPort}.`, TAG);
+    server.httpServer = server.app.listen(config.ejbcaConf.ejbcaPort, () => {
+        logger.debug(`Listening on port ${config.ejbcaConf.ejbcaPort}.`, TAG);
         server.isInitialized = true;
     })
 

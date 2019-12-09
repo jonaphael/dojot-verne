@@ -1,3 +1,4 @@
+/* SOAP client config for wsdl */
 const soap = {
     wsdlAddr: process.env.EJBCA_WSDL_ADDR || 'https://localhost:8443/ejbca/ejbcaws/ejbcaws?wsdl',
     caCrt: process.env.EJBCA_CA_CRT_DIR || '/opt/p12/ca.crt',
@@ -5,18 +6,19 @@ const soap = {
     clientPass: process.env.EJBCA_PASS || 'secret'
 };
 
+/* setting config for dojot messenger module */
 const messenger = {
-    auth: {
+    auth: { /* auth service configuration */
         connectionRetries: 5,
         timeoutSleep: 5,
         url: process.env.AUTH_URL || "http://auth:5000",
     },
-    databroker: {
+    databroker: { /* databroker service configuration */
         connectionRetries: process.env.DATA_BROKER_CONN_RETRIES || 10,
         timeoutSleep: 2,
         url: process.env.DATA_BROKER_URL || "http://data-broker",
     },
-    dojot: {
+    dojot: { /* dojot internal events/management configuration */
         events: {
             tenantActionType: {
                 CREATE: "create",
@@ -37,17 +39,10 @@ const messenger = {
             tenancy: process.env.DOJOT_SUBJECT_TENANCY || "dojot.tenancy",
         },
     },
-    kafka: {
+    kafka: { /* kafka consumer/producer configuration */
         consumer: {
-            "group.id": "vernemq-group",
+            "group.id": process.env.KAFKA_GROUP_ID || "ejbca-group",
             "metadata.broker.list": process.env.KAFKA_HOSTS || "kafka-server:9092",
-        },
-        dojot: {
-            connectionRetries: 10,
-            subjects: {
-                verne: "vernemq-epic-channel",
-            },
-            timeoutSleep: 2,
         },
         producer: {
             "dr_cb": true,
@@ -58,12 +53,13 @@ const messenger = {
 };
 
 
-const dojot = {
+/*setting config to ejbca*/
+const ejbcaConf = {
     ejbcaPort: process.env.EJBCA_PORT || 5583
 }
 
 module.exports = {
     soap,
-    dojot,
+    ejbcaConf,
     messenger
 };
