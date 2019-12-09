@@ -2,7 +2,7 @@
 
 This plugin check and close staled connections for dojot. The important files are:
 
-- src/dojot_acl.erl 
+- src/clean_sess.erl 
 - src/dojot_disconnect_plugin.app.src
 
 This plugin use Erlang OTP.
