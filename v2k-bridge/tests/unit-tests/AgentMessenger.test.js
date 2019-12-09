@@ -12,7 +12,6 @@ async function expectConfigs() {
     await mockedMessenger.init(mockConfig.mqttConfig);
     expect(mockConfig.Messenger.init).toHaveBeenCalled();
     expect(mockConfig.Messenger.on).toHaveBeenCalled();
-    expect(mockConfig.Messenger.generateDeviceCreateEventForActiveDevices).toHaveBeenCalled();
     expect(mockConfig.mqttConfig.subscribe).toHaveBeenCalled();
 }
 
@@ -21,8 +20,7 @@ const mockConfig = {
     Messenger: {
         updateAttrs: jest.fn(),
         init: jest.fn(),
-        on: jest.fn((arg0, arg1, callback) => callback('tenant', 'device')),
-        generateDeviceCreateEventForActiveDevices: jest.fn()
+        on: jest.fn((arg0, arg1, callback) => callback('tenant', 'device'))
     },
 
     kafkaConfig: {
