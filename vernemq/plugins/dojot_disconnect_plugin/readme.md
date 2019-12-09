@@ -26,3 +26,5 @@ the effect of this plugin.
 
     vmq-admin plugin disable --name vmq_passwd
     vmq-admin plugin disable --name vmq_acl
+
+The environment variable ``LIFETIME_SESSION`` tells to the plugin the maximum lifetime the oppened session (pub or sub) must have. After the timeout, the plugin will disconnect the created client by his id. You MUST set this env var in your yml file (kubernetes, etc..)
