@@ -34,7 +34,7 @@ jest.mock("../../src/AgentMessenger");
 
 const MQTTClient = require("../../src/MqttClient");
 
-describe("Testing mqtt bridge client", () => {
+describe("Testing v2k bridge client", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();

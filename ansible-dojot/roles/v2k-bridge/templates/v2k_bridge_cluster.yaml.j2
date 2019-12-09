@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mqtt_bridge-verne
+  name: v2k_bridge-verne
   namespace: {{ dojot_namespace }}
 spec:
   minReadySeconds: 30
   selector:
     matchLabels:
-      app: mqtt_bridge-verne
+      app: v2k_bridge-verne
   replicas: 1
   template: #templates for the pods
     metadata:
       labels:
-        app: mqtt_bridge-verne
+        app: v2k_bridge-verne
     spec:
       affinity:
         nodeAffinity:
@@ -24,8 +24,8 @@ spec:
                 values:
                 - verne-kafka
       containers:
-      - name: mqtt_bridge-verne
-        image: muhamedavila/mqtt_bridge
+      - name: v2k_bridge-verne
+        image: muhamedavila/v2k_bridge
         env:
         - name: AUTH_URL
           value: "http://auth:5000"
