@@ -3,6 +3,8 @@ const { logger } = require("@dojot/dojot-module-logger");
 
 const TAG = { filename: 'PrometheusDojot' };
 
+// console.log(Prometheus);
+
 const { collectDefaultMetrics } = Prometheus;
 collectDefaultMetrics({ prefix: 'dojot_prom_' });
 
@@ -51,5 +53,5 @@ class PrometheusDojot {
     }
 
 }
-const prom = new PrometheusDojot;
+const prom = new PrometheusDojot();
 module.exports = prom;

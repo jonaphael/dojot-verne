@@ -23,10 +23,8 @@ class KafkaMessenger {
         this.messenger = new Messenger('dojot_prom', config.messenger);
 
         this.messenger.init().then(() => {
-            console.log("then");
             this.initKafka();
         }).catch((error) => {
-            console.log("error");
             logger.debug(`... failed to initialize the dojot-prom-metrics messenger. Error: ${error.toString()}`, TAG);
         });
 
@@ -48,8 +46,6 @@ class KafkaMessenger {
 
     kafkaOnMessage(_tenant, message, extraInfo) {
 
-        console.log("kafkaOnMessage");
-
         logger.debug(`The message is ${util.inspect(message, { depth: null })}`, TAG);
         logger.debug(`The extra info is ${util.inspect(extraInfo, { depth: null })}`, TAG);
 
@@ -63,14 +59,11 @@ class KafkaMessenger {
             const startTimeMs = this.convertSecToMs(startTimeSec);
 
             const totalTime = Number(endTimeMS) - startTimeMs;
-            //console.log(metrics);
-            console.log(totalTime);
 
             metrics.addTime(totalTime);
 
         } catch (error) {
             logger.error(`Error parsing Kafka message: ${error}`, TAG);
-            console.log("kafkaOnMessage error", error);
         }
     }
 
