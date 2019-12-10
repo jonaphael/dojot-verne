@@ -44,6 +44,13 @@ const messenger = {
             "group.id": process.env.KAFKA_GROUP_ID || "ejbca-group",
             "metadata.broker.list": process.env.KAFKA_HOSTS || "kafka-server:9092",
         },
+        dojot: {
+            connectionRetries: 10,
+            subjects: {
+                ejbca: "ejbca-channel",
+            },
+            timeoutSleep: 2,
+        },
         producer: {
             "dr_cb": true,
             "metadata.broker.list": process.env.KAFKA_HOSTS || "kafka-server:9092",

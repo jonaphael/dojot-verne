@@ -425,7 +425,7 @@ let ejbcaRoute = (app, client, myCache) => {
         // here we check if the user in cache already generated the cert
         myCache.get(username, async (err, value) => {
             if (!err) {
-                if (value != undefined && value.status == 1) {
+                if (value !== undefined && value.status === 1) {
                     try {
                         await ejbcaUtils.findUserandReset(client, username);
 
@@ -442,8 +442,12 @@ let ejbcaRoute = (app, client, myCache) => {
                     }
                 }
                 else {
-                    value.status = 1;
-                    myCache.set(username, value.status, function (cacheErr) {
+
+                    let valueSet = {
+                        "status": 1
+                    };
+
+                    myCache.set(username, valueSet, function (cacheErr) {
                         if (cacheErr) {
                             return res.status(500).json({
                                 code: 500,
