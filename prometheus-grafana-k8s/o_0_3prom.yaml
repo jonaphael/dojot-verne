@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: dojot-prom
-        image: mprevide/dojot-prom-client:sec2
+        image: mprevide/prom_test
         env:
         - name: PROMETHEUS_PORT
           value: "3055"
