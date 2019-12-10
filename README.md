@@ -19,7 +19,7 @@ For more see [here](./mqtt-bridge)
 
 The K2V-bridge service is who consume messages from kafka.
 
-For more see [here](./mqtt-bridge)
+For more see [here](./mqtt_client)
 
 
 ## MQTT Security: VerneMQ + TLS + PKI (EJBCA) + ACL 
@@ -40,7 +40,7 @@ Also a PKI includes the certificate revocation list (**CRL**), which is a list o
 
 The process of obtaining certificates for client (Fig. 2):
 
- - Creation of entity at EJBCA, usually this unique entity consisting of ***tenant***_:_***thing_id**.
+ - Creation of entity at EJBCA, usually this unique entity consisting of ***tenant***_:_***thing_id***.
 
 
 - Obtaining a public certificate for the client, which happens with the creation of the CSR based on the client key pair and  sending this CSR to obtain a public certificate.
@@ -50,7 +50,7 @@ The process of obtaining certificates for client (Fig. 2):
 
 ![cached image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sol/docs/plant_uml/mqtt/seq_sec_client)
 
-Fig. 2 - Client retrive certificates from PKI (EJBCA)
+Fig. 2 - Client retrives certificates from PKI (EJBCA)
 
 
 The process of obtaining certificates for VerneMQ instances (broker) follows the same steps as for the client, with some more (Fig. 3):
