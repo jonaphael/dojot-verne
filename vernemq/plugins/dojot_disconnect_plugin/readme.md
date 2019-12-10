@@ -13,7 +13,9 @@ same one VerneMQ is compiled for, typically > 17). To compile do:
 
     ./rebar3 compile
 
-Then enable the plugin using:
+Before generating the vernemq docker image, you MUST generate the _build with rebar3 and move the _build dir to dojot_disconnect_plugin.
+
+To enable the plugin, use:
 
     vmq-admin plugin enable --name dojot_disconnect_plugin --path <PathToYourPlugin>/dojot_disconnect_plugin/_build/default
 
@@ -27,4 +29,4 @@ the effect of this plugin.
     vmq-admin plugin disable --name vmq_passwd
     vmq-admin plugin disable --name vmq_acl
 
-The environment variable ``LIFETIME_SESSION`` tells to the plugin the maximum lifetime the oppened session (pub or sub) must have. After the timeout, the plugin will disconnect the created client by his id. You MUST set this env var in your yml file (kubernetes, etc..)
+The environment variable ``LIFETIME_SESSION`` (in miliseconds) tells to the plugin the maximum lifetime the oppened session (pub or sub) must have. After the timeout, the plugin will disconnect the created client by his id. You MUST set this env var in your yml file (kubernetes, etc..)
