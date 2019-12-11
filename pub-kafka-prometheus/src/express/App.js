@@ -2,30 +2,21 @@ const { getHTTPRouter, logger } = require('@dojot/dojot-module-logger');
 const bodyParser = require('body-parser');
 const express = require('express');
 
-const routes = require('./Routes');
 const config = require('./../../Config');
 
 const TAG = { filename: 'express/App' };
 
-
 class ExpressApp {
   constructor() {
-
     logger.debug(`Starting ExpressApp - Constructor ...`, TAG);
 
     this.isInitialized = false;
     this.httpServer = null;
-
-  }
-
-  init() {
     this.app = express();
     this.app.use(bodyParser.json({ type: '*/*' }));
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(getHTTPRouter());
-    this.app.use('/', routes);
-
-    this.initListen();
+    this.app.use('/', require('./Routes'));
   }
 
   initListen() {

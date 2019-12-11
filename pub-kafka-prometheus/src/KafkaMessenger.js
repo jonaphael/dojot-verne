@@ -9,9 +9,7 @@ const TAG = { filename: 'KafkaMessenger' };
 
 class KafkaMessenger {
     constructor() {
-
         logger.debug(`Starting Messenger - Constructor ...`, TAG);
-
         this.messenger = null;
     }
 
@@ -19,9 +17,7 @@ class KafkaMessenger {
 
         logger.info(`Init Messenger `, TAG);
         logger.debug(`Init config messenger${util.inspect(config.messenger, { depth: null })}`, TAG);
-
         this.messenger = new Messenger('dojot_prom', config.messenger);
-
         this.messenger.init().then(() => {
             this.initKafka();
         }).catch((error) => {
@@ -32,13 +28,9 @@ class KafkaMessenger {
 
     initKafka() {
 
-
         logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
-
         this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'rw');
-
         const kafkaOnMessageBind = this.kafkaOnMessage.bind(this);
-
         this.messenger.on(config.messenger.kafka.dojot.subjects.verne, 'message', kafkaOnMessageBind);
 
     }

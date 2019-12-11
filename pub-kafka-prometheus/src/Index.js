@@ -1,6 +1,6 @@
 const { logger } = require("@dojot/dojot-module-logger");
 const ExpressApp = require("./express/App");
-const KafkaMesseger = require("./KafkaMesseger");
+const KafkaMessenger = require("./KafkaMessenger");
 const config = require('../Config');
 
 const TAG = { filename: 'Index' };
@@ -8,14 +8,14 @@ const TAG = { filename: 'Index' };
 logger.setLevel(config.app.log_level);
 
 const expressApp = new ExpressApp();
-const kafkaMesseger = new KafkaMesseger();
+const kafkaMessenger = new KafkaMessenger();
 
 try {
 
     logger.info(`Starting Dojot Prometheus...`, TAG);
 
-    expressApp.init();
-    kafkaMesseger.init();
+    expressApp.initListen();
+    kafkaMessenger.init();
 
     logger.info(`... Dojot Prometheus initialized.`, TAG);
 
