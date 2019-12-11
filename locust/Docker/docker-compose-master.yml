@@ -9,7 +9,7 @@ services:
       DOJOT_URL: "http://10.202.70.102:8000"
       DOJOT_USER: "admin"
       DOJOT_PASSWD: "admin"
-      DOJOT_MQTT_HOST: "10.50.11.227"
+      DOJOT_MQTT_HOST: "10.202.45.240"
       # TODO: differentiate DOJOT_MQTT_PORT and DOJOT_MQTTS_PORT variables
       DOJOT_MQTT_PORT: "30011"
       DOJOT_MQTT_TIMEOUT: "120"
@@ -21,6 +21,7 @@ services:
       NUMBER_OF_DEVICES: "100000"
       GENERATE_IDS: "1"
       DOJOT_ENV: "n"
+      MAP_DEVICE_IDS: "False"
     command: bash master_entrypoint.sh
     volumes:
       - ..:/usr/src/app
