@@ -1,6 +1,11 @@
-from locust import events
-import paho.mqtt.client as mqtt
+"""
+Utils functions.
+"""
 import sys
+
+from decimal import Decimal
+import paho.mqtt.client as mqtt
+from locust import events
 
 class Utils():
     """Project Utils class."""
@@ -17,7 +22,7 @@ class Utils():
             int: difference between the two times (in milliseconds).
         """
 
-        return int((end - start) * 1000)
+        return int(Decimal(end - start) * 1000)
 
     @staticmethod
     def fire_locust_failure(**kwargs):
@@ -51,7 +56,7 @@ class Utils():
             bool
         """
 
-        return True if string == "True" else False
+        return string == "True"
 
     @staticmethod
     def error_message(error: int) -> str:
@@ -95,16 +100,14 @@ class Utils():
 
     @staticmethod
     def is_master() -> bool:
+        """
+        Checks if the code is being run by the Locust master.
+        """
         return "--master" in sys.argv
 
     @staticmethod
     def is_slave() -> bool:
+        """
+        Checks if the code is being run by a Locust slave.
+        """
         return "--slave" in sys.argv
-
-    @staticmethod
-    def get_private_key_file(device_id: str) -> str:
-        return "{0}.key".format(device_id)
-
-    @staticmethod
-    def get_certificate_file(device_id: str) -> str:
-        return "{0}.crt".format(device_id)
