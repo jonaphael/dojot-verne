@@ -15,23 +15,32 @@ The Dockerfile for the Locust master and slave are in the `Docker` directory.
 
 Locust behaviour and Redis configurations.
 
-Key                      | Purpose                                                             | Default Value | Valid Values   |
------------------------- | ------------------------------------------------------------------- | ------------- | -------------- |
-CA_CERT_FILE             | CA certificate file                                                 | ca.crt        | file name      |
-CERT_DIR                 | certificates and private keys directory                             | cert/         | directory name |
-DEBUG_MODE               | show debug messages                                                 | False         | True, False    |
-LOCUST_LOG_DIR           | client log directory                                                | /log          | directory name |
-LOCUST_LOG_MESSAGE_LIMIT | limit number of messages to write in log files                      | 1000          | integer        |
-LOG_IN_FILE              | write log messages in a file                                        | False         | True, False    |
-MAP_DEVICE_IDS           | maps the certificates from REDIS_CERTIFICATES_DB to REDIS_MAPPED_DB | False         | True, False    |
-REDIS_BACKUP             | use a Redis dump with IDs instead of generating new ones            | y             | y, n           |
-REDIS_CERTIFICATES_DB    | database with the certificates                                      | 0             | integer        |
-REDIS_HOST               | redis host                                                          | redis         | hostname/IP    |
-REDIS_MAPPED_DB          | database with the mapped device IDs from certificates database      | 1             | integer        |
-REDIS_PASSWD             | redis password                                                      | none          | passwords      |
-REDIS_PORT               | redis port                                                          | 6379          | 1024-65535     |
-TASK_MAX_TIME            | max time of each Locust's tasks (ms)                                | 30000         | integer        |
-TASK_MIN_TIME            | min time of each Locust's tasks (ms)                                | 29500         | integer        |
+Key                      | Purpose                                                             | Default Value         | Valid Values     |
+------------------------ | ------------------------------------------------------------------- | --------------------- | ---------------- |
+CA_CERT_FILE             | CA certificate file                                                 | ca.crt                | file name        |
+CERT_DIR                 | certificates and private keys directory                             | cert/                 | directory name   |
+DEBUG_MODE               | show debug messages                                                 | False                 | True, False      |
+DEVICES_TO_RENEW         | number of devices to renew randomly                                 | 1000                  | integer          |
+DEVICES_TO_REVOKE        | number of devices to revoke randomly                                | 1000                  | integer          |
+EJBCA_URL                | EJBCA address                                                       | http://localhost:5583 | hostname/IP:port |
+LOCUST_LOG_DIR           | client log directory                                                | /log                  | directory name   |
+LOCUST_LOG_MESSAGE_LIMIT | limit number of messages to write in log files                      | 1000                  | integer          |
+LOG_IN_FILE              | write log messages in a file                                        | False                 | True, False      |
+MAP_DEVICE_IDS           | maps the certificates from REDIS_CERTIFICATES_DB to REDIS_MAPPED_DB | False                 | True, False      |
+MAX_TIME_RECONN          | max time (in seconds) to try to reconnect to the MQTT broker        | 600                   | integer          |
+MIN_TIME_RECONN          | min time (in seconds) to try to reconnect to the MQTT broker        | 1                     | integer          |
+REDIS_BACKUP             | use a Redis dump with IDs instead of generating new ones            | y                     | y, n             |
+REDIS_CERTIFICATES_DB    | database with the certificates                                      | 0                     | integer          |
+REDIS_HOST               | redis host                                                          | redis                 | hostname/IP      |
+REDIS_MAPPED_DB          | database with the mapped device IDs from certificates database      | 1                     | integer          |
+REDIS_PASSWD             | redis password                                                      | none                  | passwords        |
+REDIS_PORT               | redis port                                                          | 6379                  | 1024-65535       |
+RENEW_DEVICES            | enable random renovation of devices                                 | False                 | True, False      |
+REVOKE_DEVICES           | enable random revocation of devices                                 | False                 | True, False      |
+TASK_MAX_TIME            | max time of each Locust's tasks (ms)                                | 30000                 | integer          |
+TASK_MIN_TIME            | min time of each Locust's tasks (ms)                                | 29500                 | integer          |
+TIME_TO_RENEW            | time to renew the cert after the client initialization              | 1000                  | integer          |
+TIME_TO_REVOKE           | time to revoke the cert after the client initialization             | 1000                  | integer          |
 
 ### **MQTT**
 
@@ -132,7 +141,7 @@ graphical interface
 and receiving messages from Dojot
 
 <p align="center">
-  <img src="https://github.com/eduardogmisiuk/dojot-verne/blob/update_documentation/locust/docs/diagrams/Locust.png">
+  <img src="./docs/diagrams/Locust.png">
 </p>
 
 The main idea behind Locust is to call **Locust tasks** from time to time to execute tests.
@@ -147,6 +156,16 @@ device - in our case, the device is a Locust client.
 The used topics are:
 - **Publish**: tenant:deviceid/attrs
 - **Subscribe**: tenant:deviceid/config
+
+## Certificate revocation and renovation
+
+It is possible to simulate the revocation and renovation of certificates using this tool.
+Be aware that in the beginning the system may not achieve the maximum connection RPS,
+due to the certificates' files being written in the system.
+To accomplish this, take a look at the following environment variables:
+
+- RENEW_DEVICES and REVOKE_DEVICES to enable the simulations
+- TIME_TO_RENEW and TIME_TO_REVOKE to control the time of renovation and revocation
 
 # Machine specifications for tests
 
