@@ -10,3 +10,7 @@ __pycache__
 .git
 .github
 .gitignore
+
+# Certificates
+db
+cert

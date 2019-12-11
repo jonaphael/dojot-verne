@@ -2,7 +2,7 @@
 # Edit at https://www.gitignore.io/?templates=node,code
 
 ### Code ###
-.vscode/*
+.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -102,3 +102,6 @@ typings/
 # End of https://www.gitignore.io/api/node,code
 
 build/
+
+# Python
+.pytest_cache
