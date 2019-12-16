@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mqtt_bridge-verne
+  name: mqtt-bridge-verne
   namespace: {{ dojot_namespace }}
 spec:
   type: ClusterIP 
   selector:
-    app: mqtt_bridge-verne
+    app: mqtt-bridge-verne
   ports:
-  - name: mqtt_bridge-verne
+  - name: mqtt-bridge-verne
     port: 4000

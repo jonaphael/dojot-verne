@@ -1,6 +1,6 @@
 ## This role is responsible for deploying Kong for dojot
 
-- name: dojot - verneMQ mqtt_bridge Objects
+- name: dojot - verneMQ mqtt-bridge Objects
   k8s:
     kubeconfig: "{{ dojot_kubeconfig_file_path | default(omit) }}"
     state: present
