@@ -2,11 +2,11 @@
 Certificate and private key related module.
 """
 import requests
+import logging
 from OpenSSL import crypto
 
 from src.ejbca.thing import Thing
 from src.config import CONFIG
-
 
 class CertClient:
     """
@@ -38,11 +38,15 @@ class CertClient:
         """
         thing_path = directory + device_id
 
-        with open(thing_path + ".key", "w") as key_file:
-            key_file.write(str(thing.private_key))
+        try:
+            with open(thing_path + ".key", "w") as key_file:
+                key_file.write(str(thing.private_key))
 
-        with open(thing_path + ".crt", "w") as key_file:
-            key_file.write(str(thing.certificate))
+            with open(thing_path + ".crt", "w") as key_file:
+                key_file.write(str(thing.certificate))
+
+        except Exception as exception:
+            print("Error: %s", exception)
 
     @staticmethod
     def new_cert(tenant: str, device_id: str) -> Thing:
@@ -90,5 +94,11 @@ class CertClient:
                 CONFIG["security"]["ejbca_ca_name"], serial_number)
 
         res = requests.get(url)
+        res_json = res.json()
 
-        return res.json()["status"]["return"]["reason"] == 0
+        if res_json["status"]:
+            return res_json["status"]["return"]["reason"] == 0
+        else:
+            logging.error("Error: 'status' not present in EJBCA certificate status checking \
+                response")
+            return False
