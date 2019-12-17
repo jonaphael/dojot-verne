@@ -11,10 +11,10 @@ if __name__ == "__main__":
     thing_id = str(uuid.uuid4().hex)
     obj = Thing.Create_Thing(thing_id)
 
-    with open("cert_things/"+thing_id+".key", "w") as keyFile:
+    with open("cert/"+thing_id+".key", "w") as keyFile:
         keyFile.write(str(obj['private_key']))
 
-    with open("cert_things/"+thing_id+".crt", "w") as crtFile:
+    with open("cert/"+thing_id+".crt", "w") as crtFile:
         crtFile.write(str(obj['thing_certificate']))
 
 
