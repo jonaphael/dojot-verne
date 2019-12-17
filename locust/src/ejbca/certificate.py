@@ -38,10 +38,15 @@ class Certificate:
         """
         Generates the private key in a string.
         """
-        bit_len = 2048
-        key = crypto.PKey()
-        key.generate_key(crypto.TYPE_RSA, bit_len)
-        return crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8")
+        try:
+            bit_len = 2048
+            key = crypto.PKey()
+            key.generate_key(crypto.TYPE_RSA, bit_len)
+            return crypto.dump_privatekey(crypto.FILETYPE_PEM, key).decode("utf-8")
+        except Exception as exception:
+            logging.error("Error while generating the private key.")
+            logging.error("Error: %s", exception)
+            return ""
 
     def generate_csr(self) -> str:
         """
