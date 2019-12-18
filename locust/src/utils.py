@@ -56,7 +56,7 @@ class Utils():
             bool
         """
 
-        return string == "True"
+        return string.lower() == "true"
 
     @staticmethod
     def error_message(error: int) -> str:
