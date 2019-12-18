@@ -35,6 +35,13 @@ mkdir cert
 
 python3 create_pem_files_from_redis.py
 
+# The return from create_pem_files_from_redis.py should not be 1 to have succeeded
+if [ $? -eq 1 ]
+then
+  echo "Error while running create_pem_files_from_redis.py"
+  exit 1
+fi
+
 ./retrieveCACertificate.sh
 
 docker exec -it $REDIS_ID redis-cli save
