@@ -2,7 +2,14 @@
 # Generates the certificates, export their files and the Redis dump.
 
 REDIS_INSTANCES=`docker ps -aqf "name=redis"`
-N_REDIS=`echo REDIS_INSTANCES | wc -l`
+N_REDIS=`docker ps -aqf "name=redis" | wc -l`
+
+# If there is no Redis instances
+if [ $N_REDIS -eq 0 ]
+then
+  echo "No Redis instance encountered!"
+  exit 1
+fi
 
 if [ $N_REDIS -gt 1 ]
 then
@@ -15,6 +22,13 @@ fi
 echo "Redis ID: $REDIS_ID"
 
 python3 insert_things.py
+
+# The return from insert_things.py should not be 1 to have succeeded
+if [ $? -eq 1 ]
+then
+  echo "Error while running insert_things.py"
+  exit 1
+fi
 
 rm -rf cert
 mkdir cert
