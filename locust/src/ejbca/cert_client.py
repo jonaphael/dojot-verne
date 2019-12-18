@@ -1,8 +1,8 @@
 """
 Certificate and private key related module.
 """
-import requests
 import logging
+import requests
 from OpenSSL import crypto
 
 from src.ejbca.thing import Thing
@@ -46,7 +46,7 @@ class CertClient:
                 key_file.write(str(thing.certificate))
 
         except Exception as exception:
-            print("Error: %s", exception)
+            logging.error("Error: %s", str(exception))
 
     @staticmethod
     def new_cert(tenant: str, device_id: str) -> Thing:
@@ -57,7 +57,7 @@ class CertClient:
         try:
             thing = Thing(tenant + ":" + device_id)
         except Exception as exception:
-            print("An error occurred: " + str(exception))
+            logging.error("Error: %s", str(exception))
 
         return thing
 

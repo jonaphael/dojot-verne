@@ -114,7 +114,7 @@ class Certificate:
                                  data=req)
 
         if response.status_code != 200:
-            print("Error createEJBCAUser")
+            logging.error("Error while creating the EJBCA user")
 
         response.connection.close()
 
@@ -142,7 +142,7 @@ class Certificate:
         if response.status_code == 200:
             self.crt["raw"] = json.loads(response.content)['status']['data']
         else:
-            print("Error signCert")
+            logging.error("Error while signing certificate")
 
         response.connection.close()
 
