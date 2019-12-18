@@ -5,17 +5,18 @@ import conf
 import logging
 import time
 from thing import Thing
+import sys
 
 NUM_OF_INSERT_BY_THREAD = 100
 NUM_OF_THREAD = 10
 BATCH_SIZE = 100
 
-#r = redis.Redis(host = conf.redis_host, port = conf.redis_port, db = 0)
-#pipe = r.pipeline()
-
 def register_thing(name):
     start = time.time()
+
     r = redis.Redis(host = conf.redis_host, port = conf.redis_port, db = 0)
+    r.ping()
+
     pipe = r.pipeline()
     start_batch_time = start
     for i in range(NUM_OF_INSERT_BY_THREAD):
@@ -28,7 +29,6 @@ def register_thing(name):
 
         thing_id = str(uuid.uuid4().hex)
         obj = Thing.Create_Thing("admin:" + thing_id)
-        #r.hmset(thing_id,obj)
         pipe.hmset(thing_id,obj)
     pipe.execute()
     end = time.time()
@@ -41,10 +41,14 @@ if __name__ == "__main__":
     start = time.time()
     pool = concurrent.futures.ThreadPoolExecutor(NUM_OF_THREAD) #ThreadPoolExecutor #ProcessPoolExecutor
     myfuturelist = [pool.submit(register_thing, x) for x in range(NUM_OF_THREAD)]
+    done, _ = concurrent.futures.wait(myfuturelist, return_when=concurrent.futures.FIRST_EXCEPTION)
 
-    concurrent.futures.wait(myfuturelist)
+    for f in done:
+        if f.exception() != None:
+            print("Error while creating the devices. Bailing out!")
+            sys.exit(1)
+
     end = time.time()
-    #pipe.execute()
     logging.info(f"Total inserts " + str(NUM_OF_INSERT_BY_THREAD * NUM_OF_THREAD)+ " in (s) " + str(end - start) + " thr: " + str(NUM_OF_THREAD) + " loop: "+ str(NUM_OF_INSERT_BY_THREAD) )
 
 
