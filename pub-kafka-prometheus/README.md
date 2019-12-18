@@ -31,7 +31,7 @@ PROMETHEUS_PORT         | Port of prometheus client                             
 
 There is a dashboard configuration for use with this service in [dashboard](./dashboard-grafana/Dojot100kV2.json).
 
-###Nodeexport
+### Node exporter
 
 #### The perf collector may not work by default on all Linux systems due to kernel configuration and security settings. To allow access, set the following sysctl parameter:
 
