@@ -65,7 +65,7 @@ describe("Testing Dojot Kafka messenger", () => {
         const startSec = timestamp / 1000;
 
         const msg = {
-            data: {
+            attrs: {
                 timestamp: startSec
             },
         };

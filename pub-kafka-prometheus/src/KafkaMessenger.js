@@ -65,13 +65,9 @@ class KafkaMessenger {
 
     extractPayload(message) {
         const messageContent = JSON.parse(message);
-        const { data } = messageContent;
+        const { attrs } = messageContent;
 
-        try {
-            return JSON.parse(Buffer.from(data, 'base64').toString('ascii'));
-        } catch (e) {
-            return data;
-        }
+        return attrs;
     }
 }
 
