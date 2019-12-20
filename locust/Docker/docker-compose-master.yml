@@ -21,7 +21,6 @@ services:
       NUMBER_OF_DEVICES: "100000"
       GENERATE_IDS: "1"
       DOJOT_ENV: "n"
-      MAP_DEVICE_IDS: "False"
     command: bash master_entrypoint.sh
     volumes:
       - ..:/usr/src/app
