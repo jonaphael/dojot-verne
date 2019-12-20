@@ -11,11 +11,6 @@ from src.mqtt_locust.mqtt_client import MQTTClient
 from src.mqtt_locust.redis_client import RedisClient
 
 
-if Utils.is_master() and CONFIG['locust']['redis']['map_device_ids']:
-    DB = RedisClient()
-    DB.map_device_ids()
-
-
 class MqttLocust(Locust):
     """Locust client using MQTT."""
 
