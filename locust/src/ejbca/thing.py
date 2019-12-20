@@ -8,7 +8,7 @@ class Thing():
             self.cert = Certificate(thing_id)
             self.id = thing_id
             self.private_key = self.cert.key["pem"]
-            self.certificate = self.cert.crt["pem"]
+            self.thing_certificate = self.cert.crt["pem"]
 
         except Exception as exception:
             logging.warning("Error: %s", str(exception))
@@ -18,3 +18,13 @@ class Thing():
         Renew a certificate.
         """
         self.cert.renew_cert()
+
+    def get_args_in_dict(self) -> dict:
+        """
+        Returns the ID, private key and certificate in a dict.
+        """
+        return {
+            "thing_id": self.id,
+            "private_key": self.private_key,
+            "thing_certificate": self.thing_certificate
+        }
