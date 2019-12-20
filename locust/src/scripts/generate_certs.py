@@ -157,14 +157,62 @@ def retrieve_ca_cert() -> None:
     with open(filename, "w") as ca_file:
         ca_file.write(certificate)
 
-def connect_to_redis() -> redis.Redis:
+def map_device_ids() -> None:
+    """
+    Maps device IDs from certificate database in Redis to sequential keys in mapping database.
+
+    The certificates database stores the certificates and private keys  by using a Hash Map.
+    When testing with Locust, we will read the already created certificates from Redis database,
+    but since we are using Hash Maps, the retrieval is not trivial because we need to know the
+    device ID.
+
+    The solution is to create another database sequentially mapping the device IDs (i.e., the
+    key will be an integer from 0 to the number of devices and the value is the device ID), so
+    we can retrieve them safely.
+    """
+    cert_db = connect_to_redis()
+    mapped_db = connect_to_redis(database=CONFIG["locust"]["redis"]["mapped_db"])
+
+    try:
+        logging.info("Beginning database mapping...")
+
+        keys = cert_db.keys()
+        for i in range(len(keys)):
+            mapped_db.set(i+1, keys[i])
+
+    except Exception as exception:
+        logging.error(str(exception))
+
+    else:
+        logging.info("Finished database mapping.")
+
+    cert_db.close()
+    mapped_db.close()
+
+def restore_db_state() -> None:
+    """
+    Restores the values of variables in the Redis database.
+    """
+    redis_conn = connect_to_redis(CONFIG["locust"]["redis"]["mapped_db"])
+
+    redis_conn.set("devices_to_revoke", 0)
+    redis_conn.set("devices_to_renew", 0)
+    redis_conn.set("device_count", 0)
+
+    redis_conn.close()
+
+def connect_to_redis(database=CONFIG["locust"]["redis"]["certificates_db"]) -> redis.Redis:
     """
     Connects to Redis.
+
+    Args:
+        database: the database to be connected.
     """
     try:
         redis_conn = redis.Redis(
             host=CONFIG["locust"]["redis"]["host"],
-            port=CONFIG["locust"]["redis"]["port"]
+            port=CONFIG["locust"]["redis"]["port"],
+            db=database
         )
         redis_conn.ping()
         return redis_conn
@@ -216,6 +264,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False
     )
+    PARSER.add_argument(
+        "--map",
+        help="activates the mapping of device IDs in Redis",
+        action="store_true",
+        default=False
+    )
 
     MEGROUP = PARSER.add_mutually_exclusive_group()
     MEGROUP.add_argument(
@@ -231,6 +285,19 @@ if __name__ == "__main__":
         type=str,
         nargs="+"
     )
+    MEGROUP.add_argument(
+        "--onlymap",
+        help="applies only the mapping of device IDs in Redis",
+        action="store_true",
+        default=False
+    )
+    MEGROUP.add_argument(
+        "--restoredb",
+        help="restore the Redis database to a fresh state,\
+              without removing the certificates",
+        action="store_true",
+        default=False
+    )
     ARGS = PARSER.parse_args()
 
     logging.basicConfig(
@@ -245,17 +312,26 @@ if __name__ == "__main__":
 
     if ARGS.cert is not None:
         if ARGS.threads > ARGS.cert:
-            logging.error("The number of certificates to be generated must be greather than \
-the number of threads!")
+            logging.error("The number of certificates must be greather than the number of threads!")
             sys.exit(1)
 
+        # Begins the certificate generation
         generate_random_certs()
+        # Exports the certificates' files
+        export_certs()
+        # Retrieving the CA certificate
+        retrieve_ca_cert()
 
     if ARGS.ids is not None:
         # Begins the certificate generation
         generate_certs(ARGS.ids)
+        # Exports the certificates' files
+        export_certs()
+        # Retrieving the CA certificate
+        retrieve_ca_cert()
 
-    # Exports the certificates' files
-    export_certs()
-    # Retrieving the CA certificate
-    retrieve_ca_cert()
+    if ARGS.map or ARGS.onlymap:
+        map_device_ids()
+
+    if ARGS.restoredb:
+        restore_db_state()
