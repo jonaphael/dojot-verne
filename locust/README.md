@@ -301,7 +301,7 @@ To accomplish this, take a look at the following environment variables:
 
 # **Machine specifications for tests**
 
-To achieve 100.000 connections with ~3,333 RPS (Requests Per Second), we used distributed Locust
+To achieve 100.000 connections with ~3333 RPS (Requests Per Second), we used distributed Locust
 in 4 virtual machines in a cluster. Their configuration were:
 
 Cluster info:
