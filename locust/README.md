@@ -8,7 +8,7 @@ from/to Dojot.
 All the commands in this guide are meant to be executed in the `locust` directory, a.k.a the directory this README
 is on, unless otherwise told.
 
-## Virtual environment
+## **Virtual environment**
 
 If you need to use any script from the `src/scripts` directory, the virtual environment must be activated and the project
 dependencies must be installed.
@@ -62,7 +62,6 @@ EJBCA_URL                | EJBCA address                                        
 LOCUST_LOG_DIR           | client log directory                                                | /log                  | directory name   |
 LOCUST_LOG_MESSAGE_LIMIT | limit number of messages to write in log files                      | 1000                  | integer          |
 LOG_IN_FILE              | write log messages in a file                                        | False                 | True, False      |
-MAP_DEVICE_IDS           | maps the certificates from REDIS_CERTIFICATES_DB to REDIS_MAPPED_DB | False                 | True, False      |
 MAX_TIME_RECONN          | max time (in seconds) to try to reconnect to the MQTT broker        | 600                   | integer          |
 MIN_TIME_RECONN          | min time (in seconds) to try to reconnect to the MQTT broker        | 1                     | integer          |
 REDIS_BACKUP             | use a Redis dump with IDs instead of generating new ones            | y                     | y, n             |
@@ -116,16 +115,16 @@ sudo sysctl -w net/ipv4/ip_local_port_range="1024 65535"
 
 # **How to use**
 
-## Scripts
+## **Scripts**
 
 As said before, to run the scripts you must activate the virtual environment and have installed
 its dependencies.
 
-### Generate Certificates
+### **Generate Certificates**
 
 Generates the certificates in EJBCA, sending them to a Redis instance and exporting them in files.
 
-#### Setup
+#### **Setup**
 
 To run this script, you will need a Dojot's EJBCA instance running elsewhere. You can either
 run a full Dojot or a separate EJBCA instance. You can see [here](https://dojotdocs.readthedocs.io/en/stable/)
@@ -145,7 +144,7 @@ To find the IP:
 docker inspect <name>
 ```
 
-#### How to use
+#### **How to use**
 
 To keep the configuration centered in the `src/config.py` file, you must pass some environment
 variables before running the script. This can be done in two ways: exporting the variables and
@@ -172,20 +171,23 @@ of each one, run:
 python3 -m src.scripts.generate_certs -h
 ```
 
-There are other environment variables you can pass to customize the script too:
+There are other environment variables you can pass to customize the script too. They are optional.
 
-Key          | Purpose                                 | Default Value | Valid Values   |
------------- | --------------------------------------- | ------------- | -------------- |
-CA_CERT_FILE | CA certificate file                     | ca.crt        | file name      |
-CERT_DIR     | certificates and private keys directory | cert/         | directory name |
-TENANT       | tenant that is publishing               | admin         | string         |
+Key                   | Purpose                                                        | Default Value | Valid Values   |
+--------------------- | -------------------------------------------------------------- | ------------- | -------------- |
+CA_CERT_FILE          | CA certificate file                                            | ca.crt        | file name      |
+CERT_DIR              | certificates and private keys directory                        | cert/         | directory name |
+REDIS_CERTIFICATES_DB | database with the certificates                                 | 0             | integer        |
+REDIS_MAPPED_DB       | database with the mapped device IDs from certificates database | 1             | integer        |
+TENANT                | tenant that is publishing                                      | admin         | string         |
 
-## Certificates
+
+## **Certificates**
 
 If you don't have any certificates, you should first generate them. See the
 [Generate Certificates](#generate-certificates) script for more info.
 
-### Redis dump
+### **Redis dump**
 
 After generating the certificates, you need to export the Redis dump and move it to the `db/`
 directory.
@@ -212,6 +214,8 @@ If you have a large quantity of certificates, it can be wise to disable the mapp
 up the initialization.
 
 ## **Docker-Compose**
+
+**Remember to change the environment variables to your needs before continuing.**
 
 In Locust root directory, bring up the master node:
 
@@ -253,7 +257,7 @@ Running the Locust code:
 sudo docker exec -it <CONTAINER_ID> /bin/bash -c "locust -f main.py Client"
 ```
 
-## Accessing the GUI
+## **Accessing the GUI**
 
 After the initialization of the master, you can access the graphical interface by
 typing the address to the server you are running the master followed by the Locust
@@ -285,7 +289,7 @@ The used topics are:
 - **Publish**: tenant:deviceid/attrs
 - **Subscribe**: tenant:deviceid/config
 
-## Certificate revocation and renovation
+## **Certificate revocation and renovation**
 
 It is possible to simulate the revocation and renovation of certificates using this tool.
 Be aware that in the beginning the system may not achieve the maximum connection RPS,
@@ -295,7 +299,7 @@ To accomplish this, take a look at the following environment variables:
 - RENEW_DEVICES and REVOKE_DEVICES to enable the simulations
 - TIME_TO_RENEW and TIME_TO_REVOKE to control the time of renovation and revocation
 
-# Machine specifications for tests
+# **Machine specifications for tests**
 
 To achieve 100.000 connections with ~3,333 RPS (Requests Per Second), we used distributed Locust
 in 4 virtual machines in a cluster. Their configuration were:
