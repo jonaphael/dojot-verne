@@ -2,7 +2,43 @@
 The Dojot Load Test tool is an implementation using the open-source load testing tool Locust to generate traffic
 from/to Dojot.
 
+
 # **Configuration**
+
+All the commands in this guide are meant to be executed in the `locust` directory, a.k.a the directory this README
+is on, unless otherwise told.
+
+## Virtual environment
+
+If you need to use any script from the `src/scripts` directory, the virtual environment must be activated and the project
+dependencies must be installed.
+First, make sure you have `virtualenv` installed:
+
+```shell
+pip3 install virtualenv
+```
+
+Now you need to create the environment:
+```shell
+cd ..
+python3 -m venv locust
+cd locust
+```
+
+To activate it:
+```shell
+source ./bin/activate
+```
+
+Install the packages inside the virtual environment:
+```shell
+pip3 install -r requirements.txt
+```
+
+With the environment activated, you can run the scripts. When done, deactivate the environment:
+```shell
+deativate
+```
 
 ## **Environment Variables**
 
@@ -39,6 +75,7 @@ RENEW_DEVICES            | enable random renovation of devices                  
 REVOKE_DEVICES           | enable random revocation of devices                                 | False                 | True, False      |
 TASK_MAX_TIME            | max time of each Locust's tasks (ms)                                | 30000                 | integer          |
 TASK_MIN_TIME            | min time of each Locust's tasks (ms)                                | 29500                 | integer          |
+TENANT                   | tenant that is publishing                                           | admin                 | string           |
 TIME_TO_RENEW            | time to renew the cert after the client initialization              | 1000                  | integer          |
 TIME_TO_REVOKE           | time to revoke the cert after the client initialization             | 1000                  | integer          |
 
@@ -79,21 +116,100 @@ sudo sysctl -w net/ipv4/ip_local_port_range="1024 65535"
 
 # **How to use**
 
+## Scripts
+
+As said before, to run the scripts you must activate the virtual environment and have installed
+its dependencies.
+
+### Generate Certificates
+
+Generates the certificates in EJBCA, sending them to a Redis instance and exporting them in files.
+
+#### Setup
+
+To run this script, you will need a Dojot's EJBCA instance running elsewhere. You can either
+run a full Dojot or a separate EJBCA instance. You can see [here](https://dojotdocs.readthedocs.io/en/stable/)
+for more info.
+
+When you are done, you must have a Redis instance running elsewhere too. You can accomplish
+this by either running a standalone Redis or by running the Locust master Docker Compose. The
+later is recommended, since the setup will be easier. See [here](#docker-compose) for more info.
+
+If you want to run a standalone Redis, you can do this by executing:
+```shell
+docker run --name <name> -d redis
+```
+
+To find the IP:
+```shell
+docker inspect <name>
+```
+
+#### How to use
+
+To keep the configuration centered in the `src/config.py` file, you must pass some environment
+variables before running the script. This can be done in two ways: exporting the variables and
+then running the script or passing them with the script command.
+
+The first way to run is:
+```shell
+export EJBCA_URL="http://1.1.1.1:5583"
+export REDIS_HOST="1.1.1.2"
+export REDIS_PORT="6380"
+python3 -m src.scripts.generate_certs 100
+```
+
+The second way is:
+```shell
+EJBCA_URL="http://1.1.1.1:5583" REDIS_HOST="1.1.1.2" REDIS_PORT="6380" python3 -m src.scripts.generate_certs 100
+```
+
+The two options will create 100 certificates for the tenant `admin` in each thread.
+
+You should change the IPs and ports to your needs. To see the script's options and the defaults
+of each one, run:
+```shell
+python3 -m src.scripts.generate_certs -h
+```
+
+There are other environment variables you can pass to customize the script too:
+
+Key          | Purpose                                 | Default Value | Valid Values   |
+------------ | --------------------------------------- | ------------- | -------------- |
+CA_CERT_FILE | CA certificate file                     | ca.crt        | file name      |
+CERT_DIR     | certificates and private keys directory | cert/         | directory name |
+TENANT       | tenant that is publishing               | admin         | string         |
+
 ## Certificates
 
-First of all, you will need to generate the certificates for each device. To see how to generate
-them, see the `redisinit` module. You will need to generate the `.key` and `.crt` files for each
-device, besides the CA certificate file, and move them to the `cert/` directory. You can change
-the default values for the CA certificate file and the path to the certificates by changing,
-respectively, the variables `CA_CERT_FILE` and `CERT_DIR`. These certificates **must** be in
-**each machine** that runs a slave.
+If you don't have any certificates, you should first generate them. See the
+[Generate Certificates](#generate-certificates) script for more info.
 
-After that, you need to export the Redis dump and move it to the `db/` directory. The dump
-filename must be `dump.rdb`. This dump **must** be in the machine that runs the master node.
+### Redis dump
 
-Every time you change the Redis dump file, you will need to map the certificates. This is done
-by simply setting the environment variable `MAP_DEVICE_IDS` to `True`. After the mapping has
-finished, you can disable it.
+After generating the certificates, you need to export the Redis dump and move it to the `db/`
+directory.
+
+If you generated the certificates using the Locust master, then there is no need to move the dump,
+because Redis will export it in the right place. You can skip to the next section.
+
+If you used another Redis, you should export the dump. In the machine you have the Redis instance running,
+execute:
+```shell
+docker exec -it $REDIS_CONTAINER_ID redis-cli save
+docker cp $REDIS_CONTAINER_ID:/data/dump.rdb .
+```
+
+To check the Redis container ID, you can run `docker ps`.
+
+By now, you should have the `dump.rdb` file in you current directory. You should move this to the
+`db` directory inside the `locust` directory of your Locust master node. Only the master will need it.
+
+Every time you change the Redis dump file, e.g. generated new certificates, you will need to map
+the certificates. This is done by simply setting the environment variable `MAP_DEVICE_IDS` to `True`
+in the Locust master Docker Compose file. You need to restart/start the Locust master to do the mapping.
+If you have a large quantity of certificates, it can be wise to disable the mapping after done to speed
+up the initialization.
 
 ## **Docker-Compose**
 
@@ -109,19 +225,31 @@ After the complete initialization of the master node, run the slave:
 docker-compose -f Docker/docker-compose-slave.yml up
 ```
 
-You can also scale them:
+You can also run more than one slave at once:
 
 ```shell
 docker-compose -f Docker/docker-compose-slave.yml up --scale locust-slave=10
 ```
 
+We recommend running no more slaves than the number of cores in your hardware.
+
 ## **Dockerfile**
 
-If you need to execute the containers individually, run the commands:
+If you need to execute the containers individually, you can build the image by
+yourself and then run it. This approach is not recommended.
 
+Building the image:
 ```shell
 sudo docker build -t locust-mqtt .
+```
+
+Starting the container:
+```shell
 sudo docker run -it -d -p 8089:8089 locust-mqtt
+```
+
+Running the Locust code:
+```shell
 sudo docker exec -it <CONTAINER_ID> /bin/bash -c "locust -f main.py Client"
 ```
 
@@ -129,7 +257,7 @@ sudo docker exec -it <CONTAINER_ID> /bin/bash -c "locust -f main.py Client"
 
 After the initialization of the master, you can access the graphical interface by
 typing the address to the server you are running the master followed by the Locust
-port: `localhost:8089`.
+port, e.g: `localhost:8089`.
 
 # **How it works**
 
