@@ -29,7 +29,7 @@ class KafkaMessenger {
     initKafka() {
 
         logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
-        this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'rw');
+        this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'r');
         const kafkaOnMessageBind = this.kafkaOnMessage.bind(this);
         this.messenger.on(config.messenger.kafka.dojot.subjects.verne, 'message', kafkaOnMessageBind);
 
