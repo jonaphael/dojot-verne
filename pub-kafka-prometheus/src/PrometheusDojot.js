@@ -51,5 +51,5 @@ class PrometheusDojot {
     }
 
 }
-const prom = new PrometheusDojot;
+const prom = new PrometheusDojot();
 module.exports = prom;

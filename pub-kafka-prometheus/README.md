@@ -12,7 +12,7 @@ The latency is measured with the diffence between final timestamp and start time
 
 The start timestamp in seconds must be within the  payload (publication MQTT) and data as follow:
 
-`{"data": {"timestamp": 1575978282.524759 }}`
+`{"attrs": {"timestamp": 1575978282.524759 }}`
 
 And the final timestamp in miliseconds is exposed by kafka.
 

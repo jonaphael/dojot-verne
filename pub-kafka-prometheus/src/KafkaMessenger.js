@@ -5,13 +5,11 @@ const util = require('util');
 const config = require('../Config');
 const metrics = require('./Metrics');
 
-const TAG = { filename: 'KafkaMesseger' };
+const TAG = { filename: 'KafkaMessenger' };
 
-class KafkaMesseger {
-    constructor(callback) {
-
+class KafkaMessenger {
+    constructor() {
         logger.debug(`Starting Messenger - Constructor ...`, TAG);
-
         this.messenger = null;
     }
 
@@ -19,9 +17,7 @@ class KafkaMesseger {
 
         logger.info(`Init Messenger `, TAG);
         logger.debug(`Init config messenger${util.inspect(config.messenger, { depth: null })}`, TAG);
-
         this.messenger = new Messenger('dojot_prom', config.messenger);
-
         this.messenger.init().then(() => {
             this.initKafka();
         }).catch((error) => {
@@ -31,9 +27,9 @@ class KafkaMesseger {
     }
 
     initKafka() {
-        logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
 
-        this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'rw');
+        logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
+        this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'r');
         const kafkaOnMessageBind = this.kafkaOnMessage.bind(this);
         this.messenger.on(config.messenger.kafka.dojot.subjects.verne, 'message', kafkaOnMessageBind);
 
@@ -55,6 +51,7 @@ class KafkaMesseger {
             const startTimeMs = this.convertSecToMs(startTimeSec);
 
             const totalTime = Number(endTimeMS) - startTimeMs;
+
             metrics.addTime(totalTime);
 
         } catch (error) {
@@ -68,14 +65,10 @@ class KafkaMesseger {
 
     extractPayload(message) {
         const messageContent = JSON.parse(message);
-        const { data } = messageContent;
+        const { attrs } = messageContent;
 
-        try {
-            return JSON.parse(Buffer.from(data, 'base64').toString('ascii'));
-        } catch (e) {
-            return data;
-        }
+        return attrs;
     }
 }
 
-module.exports = KafkaMesseger;
+module.exports = KafkaMessenger;

@@ -4,7 +4,8 @@
   "description": "Service to collect latency between publication MQTT and Kafka with Dojot and expose to prometheus",
   "main": "src/Index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest tests/**/*.test.js --coverage",
+    "test:watch": "jest --watch tests/**/*.test.js --coverage",
     "run-client": "node src/Index.js"
   },
   "keywords": [
@@ -19,5 +20,22 @@
     "express": "^4.17.1",
     "prom-client": "^11.5.3",
     "simple-statistics": "^7.0.5"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/Index.js",
+      "!Config.js"
+    ],
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
