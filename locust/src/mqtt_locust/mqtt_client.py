@@ -71,7 +71,7 @@ class MQTTClient:
         self.should_revoke = should_revoke
         self.should_renew = should_renew
 
-        self.tenant = CONFIG["app"]["test_tenant"]
+        self.tenant = CONFIG["app"]["tenant"]
         self.is_connected = False
         self.start_time = 0
 
