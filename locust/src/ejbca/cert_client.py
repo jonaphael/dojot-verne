@@ -43,7 +43,7 @@ class CertClient:
                 key_file.write(str(thing.private_key))
 
             with open(thing_path + ".crt", "w") as key_file:
-                key_file.write(str(thing.certificate))
+                key_file.write(str(thing.thing_certificate))
 
         except Exception as exception:
             logging.error("Error: %s", str(exception))
@@ -68,7 +68,7 @@ class CertClient:
         """
         # Loads the certificate as a X509 object
         cert: crypto.X509 = crypto.load_certificate(
-            crypto.FILETYPE_PEM, thing.certificate)
+            crypto.FILETYPE_PEM, thing.thing_certificate)
         # Retrieves the Serial Number in Hexadecimal
         serial_number = hex(cert.get_serial_number())[2:]
         # URL to revoke a certificate
@@ -85,7 +85,7 @@ class CertClient:
         """
         # Loads the certificate as a X509 object
         cert: crypto.X509 = crypto.load_certificate(
-            crypto.FILETYPE_PEM, thing.certificate)
+            crypto.FILETYPE_PEM, thing.thing_certificate)
         # Retrieves the Serial Number in Hexadecimal
         serial_number = hex(cert.get_serial_number())[2:]
         # URL to verify the certificate status
