@@ -40,7 +40,6 @@ CONFIG = {
             'mapped_db':            int(os.environ.get("REDIS_MAPPED_DB", 1)),
             'host':                 os.environ.get("REDIS_HOST", "127.0.0.1"),
             'port':                 int(os.environ.get("REDIS_PORT", 6379)),
-            'map_device_ids':       Utils.str_to_bool(os.environ.get("MAP_DEVICE_IDS", "False")),
         }
     },
 
