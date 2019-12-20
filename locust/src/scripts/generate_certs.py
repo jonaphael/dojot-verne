@@ -9,7 +9,6 @@ import time
 import uuid
 import shutil
 import sys
-import ssl
 import os
 import redis
 import requests
@@ -171,7 +170,7 @@ def connect_to_redis() -> redis.Redis:
         return redis_conn
 
     except Exception as exception:
-        logging.error("Error while connecting to Redis.")
+        logging.error("Error while connecting to Redis: %s", str(exception))
         sys.exit(1)
 
 def calculate_thread_load() -> list:
@@ -260,22 +259,3 @@ the number of threads!")
     export_certs()
     # Retrieving the CA certificate
     retrieve_ca_cert()
-
-
-#Total inserts 10000 in (s) 1161.1937227249146 thr: 1000 loop: 10 - inseridos +/- 9700
-#Total inserts 10000 in (s) 618.5327394008636 thr: 100 loop: 100
-
-
-# sudo docker run --name ejbca_simple --hostname localhost -p 5583:5583 -d muhamedavila/simple_ejbca_dojot
-# docker inspect ejbca_simple
-# http://ip:5583
-# docker logs -f ejbca_simpl
-
-# sudo docker run --name my-redis-container -d redis
-# docker inspect my-redis-container
-# ip:6379
-# docker container exec --user="root" -it  my-redis-container /bin/bash
-# redis-cli
-# keys *
-# hmget 0143bc0d7fdb4a3399c2dc8a33d52995 thing_certificate
-# hmget 0dcab854443243c38bf5406bd7ee03de private_key
