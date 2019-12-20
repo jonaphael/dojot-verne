@@ -8,7 +8,8 @@ CONFIG = {
     'app': {
         'debug':                Utils.str_to_bool(os.environ.get("DEBUG_MODE", "False")),
         'log_in_file':          Utils.str_to_bool(os.environ.get("LOG_IN_FILE", "False")),
-        'test_tenant':          os.environ.get("TEST_TENANT", "admin"),
+        'tenant':               os.environ.get("TENANT", "admin"),
+        'log_format':           "%(asctime)s [%(levelname)s]: %(message)s",
     },
 
     'security': {
@@ -16,7 +17,7 @@ CONFIG = {
         'devices_to_revoke': int(os.environ.get("DEVICES_TO_REVOKE", 100)),
         'dns_cert':          [],
         'ejbca_ca_name':     "IOTmidCA",
-        'ejbca_url':         os.environ.get("EJBCA_URL", "http://192.168.96.1:5583"),
+        'ejbca_url':         os.environ.get("EJBCA_URL", "http://localhost:5583"),
         'renew_devices':     Utils.str_to_bool(os.environ.get("RENEW_DEVICES", "False")),
         'revoke_devices':    Utils.str_to_bool(os.environ.get("REVOKE_DEVICES", "False")),
         'cert_dir':          os.environ.get("CERT_DIR", "cert/"),
