@@ -201,6 +201,14 @@ def restore_db_state() -> None:
 
     redis_conn.close()
 
+def clear_db() -> None:
+    """
+    Removes all entries in Redis databases.
+    """
+    redis_conn = connect_to_redis()
+    redis_conn.flushall()
+    redis_conn.close()
+
 def connect_to_redis(database=CONFIG["locust"]["redis"]["certificates_db"]) -> redis.Redis:
     """
     Connects to Redis.
@@ -237,7 +245,6 @@ def calculate_thread_load() -> list:
         workload[i] = workload[i] + 1
 
     return workload
-
 
 if __name__ == "__main__":
     # Building the argument parser
@@ -298,6 +305,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False
     )
+    MEGROUP.add_argument(
+        "--cleardb",
+        help="clears Redis, removing all certificates and mappings",
+        action="store_true",
+        default=False
+    )
     ARGS = PARSER.parse_args()
 
     logging.basicConfig(
@@ -335,3 +348,6 @@ if __name__ == "__main__":
 
     if ARGS.restoredb:
         restore_db_state()
+
+    if ARGS.cleardb:
+        clear_db()
