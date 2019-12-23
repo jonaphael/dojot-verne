@@ -141,7 +141,7 @@ docker run --name <name> -d redis
 
 To find the IP:
 ```shell
-docker inspect <name>
+docker inspect <id> | grep "IPAddress"
 ```
 
 #### **How to use**
