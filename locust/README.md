@@ -155,12 +155,12 @@ The first way to run is:
 export EJBCA_URL="http://1.1.1.1:5583"
 export REDIS_HOST="1.1.1.2"
 export REDIS_PORT="6380"
-python3 -m src.scripts.generate_certs 100
+python3 -m src.scripts.generate_certs --cert 100
 ```
 
 The second way is:
 ```shell
-EJBCA_URL="http://1.1.1.1:5583" REDIS_HOST="1.1.1.2" REDIS_PORT="6380" python3 -m src.scripts.generate_certs 100
+EJBCA_URL="http://1.1.1.1:5583" REDIS_HOST="1.1.1.2" REDIS_PORT="6380" python3 -m src.scripts.generate_certs --cert 100
 ```
 
 The two options will create 100 certificates for the tenant `admin` in each thread.
