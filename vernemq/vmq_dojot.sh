@@ -13,6 +13,7 @@ export CRL_UPDATE_TIME='*/30 * * * *'
 export BASE_DIR='/vernemq'
 export CHECKEND_EXPIRATION_SEC='43200'
 export CHECK_EXPIRATION_TIME='*/30 * * * *'
+export CHECK_BROKER_CERT_REVOKED_TIME='*/30 * * * *'
 '
 #########################################################
 
@@ -114,6 +115,11 @@ _cronTabExpiration()
     echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> ${BASE_DIR}/crontab.tab
 }
 
+_cronTabCheckBrokerCertRevoke()
+{
+    echo "$CHECK_BROKER_CERT_REVOKED_TIME  ${BASE_DIR}/scripts_tls/checkBrokerCertHasRevoke.sh" >> ${BASE_DIR}/crontab.tab
+}
+
 ##Generate private key and sign certificate crt
 _generateCertificates()
 {
@@ -162,6 +168,9 @@ main()
 
     ## create cron tab to check Expiration
     _cronTabExpiration
+
+    ## create cron tab to check Revoke
+    _cronTabCheckBrokerCertRevoke
 
     _startCronService
 

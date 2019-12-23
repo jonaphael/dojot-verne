@@ -14,6 +14,7 @@ services:
       CERT_DNS: "localhost"
       CRL_UPDATE_TIME: "*/30 * * * *" #every 30 min
       CHECK_EXPIRATION_TIME:  "*/30 * * * *" #every 30 min
+      CHECK_BROKER_CERT_REVOKED_TIME:  "*/30 * * * *" #every 30 min
       CHECKEND_EXPIRATION_SEC: '43200' #12h
       BASE_DIR: '/vernemq'
       DOCKER_VERNEMQ_LOG__CONSOLE: "console"
@@ -40,6 +41,7 @@ services:
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__KEYFILE: /vernemq/cert/broker.key
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__CRLFILE: /vernemq/cert/ca.crl
 
+      
   ejbca_simple:
     image: mprevide/ejbca
     depends_on:
