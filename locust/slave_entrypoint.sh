@@ -11,6 +11,19 @@ REDIS_HOST=${REDIS_HOST:-"127.0.0.1"}
 REDIS_PORT=${REDIS_PORT:-"6379"}
 REDIS_PASSWD=${REDIS_PASSWD:-""}
 
+# Certificate directories
+CERT_DIR=${CERT_DIR:-"cert/"}
+RENEW_CERT_DIR=${RENEW_CERT_DIR:-"renew/"}
+REVOKE_CERT_DIR=${REVOKE_CERT_DIR:-"revoke/"}
+
+# Removing renew and revoke cert directories
+rm -rf "${CERT_DIR}${RENEW_CERT_DIR}"
+rm -rf "${CERT_DIR}${REVOKE_CERT_DIR}"
+
+# Recreating renew and revoke cert directories
+mkdir -p "${CERT_DIR}${RENEW_CERT_DIR}"
+mkdir -p "${CERT_DIR}${REVOKE_CERT_DIR}"
+
 # Waiting for redis for at most 3 minutes
 START_TIME=$(date +'%s')
 echo "Witing for Redis fully start. Host '${REDIS_HOST}', '${REDIS_PORT}'..."
