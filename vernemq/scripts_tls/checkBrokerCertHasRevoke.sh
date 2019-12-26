@@ -14,7 +14,7 @@ if openssl verify -crl_check -CAfile ${certDir}/crl_chain.pem ${certDir}/${certC
 then
   echo "Certificate for broker is not revoked!"
 else
-  echo "Certificate for broker has revoked!"
+  echo "Certificate for broker has been revoked!"
   echo "Renew:"
   . ${BASE_DIR}/vmq_dojot.sh
 fi
