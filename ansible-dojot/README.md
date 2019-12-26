@@ -89,6 +89,12 @@ is found on the document:
 
 [Inventory Variables](docs/vars.md)
 
+## Metrics
+
+Prometheus: http(s)://clusterip:30014/
+
+Grafana: http(s)://clusterip:30033/
+
 ## License
 
 GPLv3
