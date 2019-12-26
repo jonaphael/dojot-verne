@@ -57,7 +57,10 @@ The process of obtaining certificates for VerneMQ instances (broker) follows the
 
 - At each defined time (CHECK_EXPIRATION_TIME), it's checked if the root certificate and public certificate of the VerneMQ instance will expire in the next CHECKEND_EXPIRATION_SEC seconds.
 
+- At each defined time (CHECK_BROKER_CERT_REVOKED_TIME), it's checked if the public certificate of the VerneMQ instance has revoked.
+
 - CRL updated the CRL certificate every time by setting in CRL_UPDATE_TIME
+
 
 ![cached image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sol/docs/plant_uml/mqtt/seq_sec_verne) 
 
