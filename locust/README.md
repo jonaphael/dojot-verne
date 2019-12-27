@@ -42,7 +42,7 @@ pip3 install -r requirements/dev.txt
 
 With the environment activated, you can run the scripts or tests. When done, deactivate the environment:
 ```shell
-deativate
+deactivate
 ```
 
 ## **Environment Variables**
