@@ -44,6 +44,7 @@ class MqttLocust(Locust):
         run_id = str(uuid.uuid4())
 
         self.client = MQTTClient(device_id, run_id, should_revoke, should_renew)
+        self.client.setup()
         self.client.connect()
 
 
