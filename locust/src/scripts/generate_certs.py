@@ -13,7 +13,7 @@ import os
 import redis
 import requests
 
-from src.ejbca.thing import Thing
+from src.ejbca.certificate import Thing
 from src.config import CONFIG
 
 
@@ -29,7 +29,7 @@ def generate_certs(ids: list) -> None:
     redis_conn = connect_to_redis()
 
     for device_id in ids:
-        thing = Thing(f"{ARGS.tenant}:{device_id}")
+        thing = Thing(ARGS.tenant, device_id)
         redis_conn.hmset(device_id, thing.get_args_in_dict())
 
     end_time = time.time()
@@ -82,7 +82,7 @@ def register_thing(name: str, n_certs: int) -> None:
             logging.info("Execution time: %f secs by Thread %s with batch %s", diff, name, i)
 
         thing_id = str(uuid.uuid4().hex)
-        thing = Thing(f"{CONFIG['app']['tenant']}:{thing_id}")
+        thing = Thing(CONFIG['app']['tenant'], thing_id)
         pipe.hmset(thing_id, thing.get_args_in_dict())
 
     pipe.execute()
@@ -313,10 +313,7 @@ if __name__ == "__main__":
     )
     ARGS = PARSER.parse_args()
 
-    logging.basicConfig(
-        format=CONFIG["app"]["log_format"],
-        level=logging.DEBUG,
-        datefmt="%H:%M:%S")
+    logging.basicConfig(**CONFIG["app"]["log_config"])
 
     if ARGS.remove and os.path.exists(CONFIG['security']['cert_dir']):
         logging.info("Removing certificates directory...")
