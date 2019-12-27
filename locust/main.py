@@ -63,8 +63,7 @@ class ThingBehavior(TaskSet):
         """
         Treats the client when Locust test has stopped.
         """
-        # Saving the log messages in a file
-        self.client.log.save_log_list()
+        self.client.mqttc.disconnect()
 
 
 class Client(MqttLocust):
