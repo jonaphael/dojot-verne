@@ -37,7 +37,7 @@ class AgentMessenger {
 
     sendMessage(topic, message) {
         try {
-            logger.info(`Message published`, TAG)
+            logger.debug(`Message published`, TAG)
             const jsonPayload = JSON.parse(message)
             const generatedData = Utils.generatePayload(topic, jsonPayload)
             const username = `${generatedData.metadata.tenant}:${generatedData.metadata.deviceid}`
