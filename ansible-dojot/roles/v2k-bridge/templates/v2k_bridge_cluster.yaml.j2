@@ -1,18 +1,18 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: v2k-bridge
+  name: v2k-bridge-verne
   namespace: {{ dojot_namespace }}
 spec:
-  minReadySeconds: 30
+  serviceName: "v2k-bridge-verne"
   selector:
     matchLabels:
-      app: v2k-bridge
-  replicas: 1
+      app: v2k-bridge-verne
+  replicas: 4
   template: #templates for the pods
     metadata:
       labels:
-        app: v2k-bridge
+        app: v2k-bridge-verne
     spec:
       affinity:
         nodeAffinity:
@@ -24,7 +24,7 @@ spec:
                 values:
                 - verne-kafka
       containers:
-      - name: v2k-bridge
+      - name: v2k-bridge-verne
         image: muhamedavila/v2k_bridge
         env:
         - name: AUTH_URL
@@ -47,3 +47,5 @@ spec:
           value: "ejbca-simple"
         - name: CERT_EJBCA_API_PORT
           value: "5583"
+        - name: MQTT_CLIENT_LOG_LEVEL
+          value: "info"
