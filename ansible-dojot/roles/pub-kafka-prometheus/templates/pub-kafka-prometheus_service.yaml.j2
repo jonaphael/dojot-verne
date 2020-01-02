@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pub-kafka-prometheus
+  name: pub-kafka-prometheus
+  namespace: dojot
+spec:
+  ports:
+  - name: http
+    port: 3055
+  selector:
+    app: pub-kafka-prometheus

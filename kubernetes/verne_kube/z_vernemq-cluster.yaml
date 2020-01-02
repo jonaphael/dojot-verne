@@ -21,6 +21,8 @@ spec:
       value: "*/30 * * * *" #every 30 min
     - name: CHECK_EXPIRATION_TIME
       value: "*/30 * * * *" #every 30 min
+    - name: CHECK_BROKER_CERT_REVOKED_TIME
+      value: "*/30 * * * *" #every 30 min
     - name: CHECKEND_EXPIRATION_SEC
       value: "43200" #12h 
     - name: CERT_DNS
