@@ -5,46 +5,37 @@ jest.mock('@dojot/dojot-module-logger');
 jest.mock('prom-client');
 
 
+describe('Testing Metrics', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-describe("Testing Metrics", () => {
+  it('Check instance ', () => {
+    expect(prometheusDojot.dojotLatency).toBeDefined();
+    expect(prometheusDojot.dojotLatency instanceof Prometheus.Gauge).toBeTruthy();
+  });
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+  it('Check Sets ', () => {
+    prometheusDojot.setMax(555);
+    prometheusDojot.setAvg(555);
+    prometheusDojot.setMedian(555);
+    prometheusDojot.setMin(555);
+    prometheusDojot.setStandardDeviation(555);
 
-    it("Check instance ", () => {
-        expect(prometheusDojot.dojotLatency).toBeDefined();
-        expect(prometheusDojot.dojotLatency instanceof Prometheus.Gauge).toBeTruthy()
-    });
+    expect(prometheusDojot.dojotLatency.set).toHaveBeenCalledTimes(5);
+  });
 
-    it("Check Sets ", () => {
+  it('Check has call RegisterMetrics ', () => {
+    prometheusDojot.getRegisterMetrics();
 
-        prometheusDojot.setMax(555);
-        prometheusDojot.setAvg(555);
-        prometheusDojot.setMedian(555);
-        prometheusDojot.setMin(555);
-        prometheusDojot.setStandardDeviation(555);
+    expect(Prometheus.register.metrics).toHaveBeenCalled();
+  });
 
-        expect(prometheusDojot.dojotLatency.set).toHaveBeenCalledTimes(5);
+  it('Check has call RegisterContentType ', () => {
+    Prometheus.register.contentType = '';
 
-    });
+    const contentType = prometheusDojot.getRegisterContentType();
 
-    it("Check has call RegisterMetrics ", () => {
-
-        prometheusDojot.getRegisterMetrics();
-
-        expect(Prometheus.register.metrics).toHaveBeenCalled();
-
-    });
-
-    it("Check has call RegisterContentType ", () => {
-
-        Prometheus.register.contentType = "";
-
-        const contentType = prometheusDojot.getRegisterContentType();
-
-        expect(contentType).toBeDefined();
-
-    });
-
+    expect(contentType).toBeDefined();
+  });
 });

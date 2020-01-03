@@ -1,5 +1,5 @@
 const Prometheus = require('prom-client');
-const { logger } = require("@dojot/dojot-module-logger");
+const { logger } = require('@dojot/dojot-module-logger');
 
 const TAG = { filename: 'PrometheusDojot' };
 
@@ -8,48 +8,45 @@ collectDefaultMetrics({ prefix: 'dojot_prom_' });
 
 
 class PrometheusDojot {
+  constructor() {
+    logger.debug('Init', TAG);
 
-    constructor() {
+    this.dojotLatency = new Prometheus.Gauge({
+      name: 'Dojot_Statistics',
+      help: 'Dojot statistics',
+      labelNames: ['kind', 'unit'],
+    });
+  }
 
-        logger.debug(`Init`, TAG);
+  setMax(max) {
+    this.dojotLatency.set({ kind: 'max', unit: 'ms' }, max);
+  }
 
-        this.dojotLatency = new Prometheus.Gauge({
-            name: 'Dojot_Statistics',
-            help: 'Dojot statistics',
-            labelNames: ['kind', 'unit'],
-        });
-    }
+  setMin(min) {
+    this.dojotLatency.set({ kind: 'min', unit: 'ms' }, min);
+  }
 
-    setMax(max) {
-        this.dojotLatency.set({ kind: 'max', unit: 'ms' }, max);
-    }
+  setAvg(avg) {
+    this.dojotLatency.set({ kind: 'avg', unit: 'ms' }, avg);
+  }
 
-    setMin(min) {
-        this.dojotLatency.set({ kind: 'min', unit: 'ms' }, min);
-    }
+  setMedian(median) {
+    this.dojotLatency.set({ kind: 'median', unit: 'ms' }, median);
+  }
 
-    setAvg(avg) {
-        this.dojotLatency.set({ kind: 'avg', unit: 'ms' }, avg);
-    }
+  setStandardDeviation(standardDeviation) {
+    this.dojotLatency.set({ kind: 'standardDeviation', unit: 'ms' }, standardDeviation);
+  }
 
-    setMedian(median) {
-        this.dojotLatency.set({ kind: 'median', unit: 'ms' }, median);
-    }
+  getRegisterMetrics() {
+    logger.debug('Register Metrics', TAG);
 
-    setStandardDeviation(standardDeviation) {
-        this.dojotLatency.set({ kind: 'standardDeviation', unit: 'ms' }, standardDeviation);
-    }
+    return Prometheus.register.metrics();
+  }
 
-    getRegisterMetrics() {
-        logger.debug(`Register Metrics`, TAG);
-
-        return Prometheus.register.metrics();
-    }
-
-    getRegisterContentType() {
-        return Prometheus.register.contentType;
-    }
-
+  getRegisterContentType() {
+    return Prometheus.register.contentType;
+  }
 }
 const prom = new PrometheusDojot();
 module.exports = prom;

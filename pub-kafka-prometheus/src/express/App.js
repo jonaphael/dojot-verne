@@ -8,7 +8,7 @@ const TAG = { filename: 'express/App' };
 
 class ExpressApp {
   constructor() {
-    logger.debug(`Starting ExpressApp - Constructor ...`, TAG);
+    logger.debug('Starting ExpressApp - Constructor ...', TAG);
 
     this.isInitialized = false;
     this.httpServer = null;
@@ -20,7 +20,7 @@ class ExpressApp {
   }
 
   initListen() {
-    logger.debug(`Starting Listening on port...`, TAG);
+    logger.debug('Starting Listening on port...', TAG);
     this.httpServer = this.app.listen(config.prom.port, () => {
       logger.info(`Listening on port ${config.prom.port}.`, TAG);
       this.isInitialized = true;
@@ -29,12 +29,10 @@ class ExpressApp {
 
   stop() {
     if (this.isInitialized) {
-
       logger.info('Stopping the server...', TAG);
 
       this.isInitialized = false;
       this.httpServer.close();
-
     }
   }
 }
