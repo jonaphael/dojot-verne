@@ -32,7 +32,9 @@ describe("Testing app client", () => {
 
         it("Should initApp fail", () => {
             server.initApp(null).catch(() => {
-                expect(server.server.isInitialized).toEqual(true);
+                server.server.isInitialized = true;
+                server.stopApp();
+                expect(server.server.isInitialized).toEqual(false);
             })
         })
 
@@ -46,13 +48,6 @@ describe("Testing app client", () => {
             expect(express().use).toBeCalled();
             expect(server.server.isInitialized).toEqual(true);
         })
-
-        it("Should initApp fail", () => {
-            server.server.isInitialized = true;
-            server.stopApp();
-            expect(server.server.isInitialized).toEqual(false);
-        })
-
 
     })
 });
