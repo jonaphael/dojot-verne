@@ -17,17 +17,21 @@
   "author": "Muhamed Avila",
   "license": "GPL-3.0",
   "dependencies": {
-    "@dojot/dojot-module": "0.0.1-beta.7",
     "@dojot/dojot-module-logger": "0.0.1-alpha.5",
+    "@jonaphael/dojot-module": "0.0.3",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-validator": "^6.1.1",
     "node-cache": "^4.2.1",
     "node-forge": "^0.8.5",
     "promise-retry": "^1.1.1",
+    "request": "^2.88.0",
     "soap": "^0.29.0"
   },
   "devDependencies": {
+    "eslint": "6.8.0",
+    "eslint-config-airbnb-base": "14.0.0",
+    "eslint-plugin-import": "2.19.1",
     "jest": "^24.9.0",
     "supertest": "^4.0.2"
   },
