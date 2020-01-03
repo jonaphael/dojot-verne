@@ -1,72 +1,67 @@
-const mqtt = require('mqtt')
-const defaultConfig = require('./config')
-const { logger } = require('@dojot/dojot-module-logger')
-const TAG = { filename: "mqtt-client" }
-const AgentMessenger = require('./AgentMessenger')
 const fs = require('fs');
+const mqtt = require('mqtt');
+const { logger } = require('@dojot/dojot-module-logger');
+const defaultConfig = require('./config');
+
+const TAG = { filename: 'mqtt-client' };
+const AgentMessenger = require('./AgentMessenger');
 
 class MQTTClient {
+  constructor(config) {
+    this.config = config || defaultConfig;
+    this.isConnected = false;
+    this.agentMessenger = null;
 
-    constructor(config) {
+    this.key = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.key`);
+    this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.crt`);
+    this.caCrt = fs.readFileSync('/opt/mqtt_client/cert/ca.crt');
 
-        this.config = config || defaultConfig;
-        this.isConnected = false;
-        this.agentMessenger = null;
+    /* set log level */
+    logger.setLevel(this.config.app.mqtt_log_level);
+  }
 
-        this.key = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.key`);
-        this.clientCrt = fs.readFileSync(`/opt/mqtt_client/cert/${this.config.mqtt.mqttHost}.crt`);
-        this.caCrt = fs.readFileSync('/opt/mqtt_client/cert/ca.crt');
+  init() {
+    const mqttOptions = {
+      username: this.config.mqtt.mqttHost,
+      clientId: this.config.mqtt.mqttHost,
+      host: this.config.mqtt.host,
+      port: this.config.mqtt.port,
+      protocol: 'mqtts',
+      ca: this.caCrt,
+      key: this.key,
+      cert: this.clientCrt,
+      keepAlive: this.config.mqtt.keepAlive,
+      rejectUnauthorized: false,
+    };
 
-        /* set log level */
-        logger.setLevel(this.config.app.mqtt_log_level);
+    const onConnectBind = this.onConnect.bind(this);
+    const onDisconnectBind = this.onDisconnect.bind(this);
+    const onMessageBind = this.onMessage.bind(this);
+
+    this.mqttc = mqtt.connect(mqttOptions);
+    this.mqttc.on('connect', onConnectBind);
+    this.mqttc.on('disconnect', onDisconnectBind);
+    this.mqttc.on('message', onMessageBind);
+  }
+
+  onConnect() {
+    this.isConnected = true;
+    logger.info('Client Connected successfully!', TAG);
+
+    if (this.agentMessenger === null) {
+      this.agentMessenger = new AgentMessenger(this.config);
+      this.agentMessenger.init(this.mqttc);
     }
+  }
 
-    init() {
-        const mqttOptions = {
-            username: this.config.mqtt.mqttHost,
-            clientId: this.config.mqtt.mqttHost,
-            host: this.config.mqtt.host,
-            port: this.config.mqtt.port,
-            protocol: 'mqtts',
-            ca: this.caCrt,
-            key: this.key,
-            cert: this.clientCrt,
-            keepAlive: this.config.mqtt.keepAlive,
-            rejectUnauthorized: false
-        }
+  onDisconnect() {
+    this.isConnected = false;
+    this.mqttc.reconnect();
+  }
 
-        const onConnectBind = this._onConnect.bind(this);
-        const onDisconnectBind = this._onDisconnect.bind(this);
-        const onMessageBind = this._onMessage.bind(this);
-
-        this.mqttc = mqtt.connect(mqttOptions);
-        this.mqttc.on("connect", onConnectBind);
-        this.mqttc.on("disconnect", onDisconnectBind);
-        this.mqttc.on("message", onMessageBind);
-
-    }
-
-    _onConnect() {
-        this.isConnected = true;
-        logger.info(`Client Connected successfully!`, TAG)
-
-        if (this.agentMessenger === null) {
-            this.agentMessenger = new AgentMessenger(this.config);
-            this.agentMessenger.init(this.mqttc);
-        }
-
-    }
-
-    _onDisconnect() {
-        this.isConnected = false;
-        this.mqttc.reconnect();
-    }
-
-    _onMessage(topic, message) {
-        this.agentMessenger.sendMessage(topic, message);
-    }
-
+  onMessage(topic, message) {
+    this.agentMessenger.sendMessage(topic, message);
+  }
 }
 
-
-module.exports = MQTTClient
+module.exports = MQTTClient;

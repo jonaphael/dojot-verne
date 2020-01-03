@@ -1,21 +1,20 @@
-const moment = require('moment')
+const moment = require('moment');
 
 const generatePayload = (topic, payload) => {
+  const username = topic.split('/')[0];
+  const splitUsername = username.split(':');
 
-    const username = topic.split('/')[0];
-    const splitUsername = username.split(':');
+  const tenantValue = splitUsername[0];
+  const deviceIdValue = splitUsername[1];
 
-    const tenant = splitUsername[0];
-    const deviceId = splitUsername[1];
+  return {
+    metadata: {
+      deviceid: deviceIdValue,
+      tenant: tenantValue,
+      timestamp: moment().unix(),
+    },
+    attrs: payload,
+  };
+};
 
-    return {
-        metadata: {
-            deviceid: deviceId,
-            tenant: tenant,
-            timestamp: moment().unix()
-        },
-        attrs: payload
-    }
-}
-
-module.exports = { generatePayload }
+module.exports = { generatePayload };

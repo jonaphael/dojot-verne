@@ -1,6 +1,5 @@
-const config = require('./config')
+const config = require('./config');
+const MQTTClient = require('./MqttClient');
 
-const MQTTClient = require('./MqttClient')
-const client = new MQTTClient(config)
-
-client.init()
+const client = new MQTTClient(config);
+client.init();

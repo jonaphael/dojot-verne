@@ -1,4 +1,4 @@
-## This role is responsible for deploying Kong for dojot
+## This role is responsible for deploying v2k-bridge
 - name: dojot - v2k-bridge
   k8s:
     kubeconfig: "{{ dojot_kubeconfig_file_path | default(omit) }}"
