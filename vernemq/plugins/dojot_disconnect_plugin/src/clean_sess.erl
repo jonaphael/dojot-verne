@@ -1,5 +1,7 @@
 -module(clean_sess).
--define(MAX_TIMEOUT, erlang:list_to_integer(os:getenv("LIFETIME_SESSION"))).
+
+% time defined in miliseconds (default 30 min)
+-define(MAX_TIMEOUT, erlang:list_to_integer(os:getenv("LIFETIME_SESSION", (30 * 1000 * 60)))).
 
 
 -export([
