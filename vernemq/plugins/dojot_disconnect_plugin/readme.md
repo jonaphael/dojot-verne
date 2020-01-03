@@ -1,6 +1,6 @@
 # Dojot Disconnect Plugin
 
-This plugin check and close staled connections for dojot. The important files are:
+This plugin checks and closes staled connections for dojot. The important files are:
 
 - src/clean_sess.erl 
 - src/dojot_disconnect_plugin.app.src
@@ -13,7 +13,7 @@ same one VerneMQ is compiled for, typically > 17). To compile do:
 
     ./rebar3 compile
 
-Before generating the vernemq docker image, you MUST generate the _build with rebar3 and move the _build dir to dojot_disconnect_plugin.
+Before generating the VerneMQ docker image, you MUST generate the _build with rebar3 and move the _build dir to dojot_disconnect_plugin.
 
 To enable the plugin, use:
 
@@ -29,4 +29,9 @@ the effect of this plugin.
     vmq-admin plugin disable --name vmq_passwd
     vmq-admin plugin disable --name vmq_acl
 
-The environment variable ``LIFETIME_SESSION`` (in miliseconds) tells to the plugin the maximum lifetime the oppened session (pub or sub) must have. After the timeout, the plugin will disconnect the created client by his id. You MUST set this env var in your yml file (kubernetes, etc..)
+
+## **Environment variables**
+
+Key                      | Purpose                                                       | Default Value  | Accepted values
+-----------------------  | --------------------------------------------------------------| -------------- |-------------------------
+LIFETIME_SESSION    | session lifetime                                                | 30 min    | integer (miliseconds)
