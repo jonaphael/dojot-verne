@@ -24,18 +24,4 @@ describe('Testing Metrics', () => {
 
     expect(prometheusDojot.dojotLatency.set).toHaveBeenCalledTimes(5);
   });
-
-  it('Check has call RegisterMetrics ', () => {
-    prometheusDojot.getRegisterMetrics();
-
-    expect(Prometheus.register.metrics).toHaveBeenCalled();
-  });
-
-  it('Check has call RegisterContentType ', () => {
-    Prometheus.register.contentType = '';
-
-    const contentType = prometheusDojot.getRegisterContentType();
-
-    expect(contentType).toBeDefined();
-  });
 });

@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 
 const config = require('./../../Config');
+const routes = require('./Routes');
 
 const TAG = { filename: 'express/App' };
 
@@ -16,7 +17,7 @@ class ExpressApp {
     this.app.use(bodyParser.json({ type: '*/*' }));
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(getHTTPRouter());
-    this.app.use('/', require('./Routes'));
+    this.app.use('/', routes);
   }
 
   initListen() {

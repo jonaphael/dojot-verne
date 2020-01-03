@@ -37,16 +37,6 @@ class PrometheusDojot {
   setStandardDeviation(standardDeviation) {
     this.dojotLatency.set({ kind: 'standardDeviation', unit: 'ms' }, standardDeviation);
   }
-
-  getRegisterMetrics() {
-    logger.debug('Register Metrics', TAG);
-
-    return Prometheus.register.metrics();
-  }
-
-  getRegisterContentType() {
-    return Prometheus.register.contentType;
-  }
 }
 const prom = new PrometheusDojot();
 module.exports = prom;

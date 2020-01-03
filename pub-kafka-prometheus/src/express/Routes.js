@@ -3,12 +3,13 @@ const { logger } = require('@dojot/dojot-module-logger');
 const util = require('util');
 
 const PrometheusDojot = require('../PrometheusDojot');
+const { getRegisterContentType, getRegisterMetrics } = require('../PrometheusUtils');
 const metrics = require('../Metrics');
 
 const TAG = { filename: 'express/Routes' };
 
 routes.get('/metrics', (req, res) => {
-  res.set('Content-Type', PrometheusDojot.getRegisterContentType());
+  res.set('Content-Type', getRegisterContentType());
 
   PrometheusDojot.setMax(metrics.getMax());
   PrometheusDojot.setMin(metrics.getMin());
@@ -20,7 +21,7 @@ routes.get('/metrics', (req, res) => {
 
   metrics.cleanAllTimes();
 
-  res.end(PrometheusDojot.getRegisterMetrics());
+  res.end(getRegisterMetrics());
 });
 
 module.exports = routes;

@@ -4,6 +4,10 @@ const util = require('util');
 
 const config = require('../Config');
 const metrics = require('./Metrics');
+const {
+  convertSecToMs,
+  extractPayload,
+} = require('./Utils');
 
 const TAG = { filename: 'KafkaMessenger' };
 
@@ -27,12 +31,12 @@ class KafkaMessenger {
   initKafka() {
     logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
     this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'r');
-    const kafkaOnMessageBind = this.kafkaOnMessage.bind(this);
+    const kafkaOnMessageBind = KafkaMessenger.kafkaOnMessage.bind(this);
     this.messenger.on(config.messenger.kafka.dojot.subjects.verne, 'message', kafkaOnMessageBind);
   }
 
 
-  kafkaOnMessage(_tenant, message, extraInfo) {
+  static kafkaOnMessage(_tenant, message, extraInfo) {
     logger.debug(`The message is ${util.inspect(message, { depth: null })}`, TAG);
     logger.debug(`The extra info is ${util.inspect(extraInfo, { depth: null })}`, TAG);
 
@@ -41,9 +45,9 @@ class KafkaMessenger {
       const { timestamp: endTimeMS } = extraInfo;
 
       // payload msg mqtt, within the start timestamp in sec
-      const payload = this.extractPayload(message);
+      const payload = extractPayload(message);
       const { timestamp: startTimeSec } = payload;
-      const startTimeMs = this.convertSecToMs(startTimeSec);
+      const startTimeMs = convertSecToMs(startTimeSec);
 
       const totalTime = Number(endTimeMS) - startTimeMs;
 
@@ -51,17 +55,6 @@ class KafkaMessenger {
     } catch (error) {
       logger.error(`Error parsing Kafka message: ${error}`, TAG);
     }
-  }
-
-  convertSecToMs(startTimeSec) {
-    return parseInt(Math.floor(startTimeSec * 1000), 10);
-  }
-
-  extractPayload(message) {
-    const messageContent = JSON.parse(message);
-    const { attrs } = messageContent;
-
-    return attrs;
   }
 }
 

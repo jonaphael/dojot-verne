@@ -13,10 +13,10 @@ jest.mock('../../src/Metrics', () => ({
   getAllTimes: jest.fn(() => 10000),
   cleanAllTimes: jest.fn(),
 }));
+const ExpressApp = require('../../src/express/App');
 
-describe('loading express', function () {
+describe('loading express', () => {
   it('responds to /metrics', async () => {
-    const ExpressApp = require('../../src/express/App');
     express = new ExpressApp();
     express.initListen();
 
@@ -35,7 +35,6 @@ describe('loading express', function () {
   });
 
   it('stop if not init', async () => {
-    const ExpressApp = require('../../src/express/App');
     express = new ExpressApp();
 
     expect(this.httpServer).not.toBeDefined();
