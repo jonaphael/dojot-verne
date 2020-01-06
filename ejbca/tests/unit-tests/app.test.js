@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const express = require('express');
 const fakeSoap = require('../../lib/dojot_soap');
 const server = require('../../src/app');

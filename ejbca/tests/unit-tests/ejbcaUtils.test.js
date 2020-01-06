@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 jest.mock('child_process');
 const validator = require('express-validator');
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /* Mocks */
 const fs = require('fs');
 const forge = require('node-forge');
