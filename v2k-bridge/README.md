@@ -1,5 +1,5 @@
-# **MQTT Bridge**
-The Mqtt Bridge service is the core between the communication of Vernemq broker and the Kafka broker. His basic actuation is to subscribe in "$share/group/+/attrs" topics and publish all the messages obtained to Kafka. The subscribe construction of the service is based in shared subscriptions. This construction enables the "mqtt bridges" services acts like an unique cluster. All the communication between the bridge and the vernemq broker is secure (MQTTS).
+# **V2K-bridge**
+The V2K-bridge service is the core between the communication of Vernemq broker and the Kafka broker. His basic actuation is to subscribe in "$share/group/+/attrs" topics and publish all the messages obtained to Kafka. The subscribe construction of the service is based in shared subscriptions. This construction enables the "V2K-bridges" services acts like an unique cluster. All the communication between the bridge and the vernemq broker is secure (MQTTS).
 
 
 <p align="center"> 
@@ -10,7 +10,7 @@ The Mqtt Bridge service is the core between the communication of Vernemq broker 
 
 ## **Environment Variables**
 
-Before running the kubernetes environment with the mqtt bridge service, make sure you configure the environment variables to match your needs. The variables can be configured in the .yaml file of the service.
+Before running the kubernetes environment with the V2K-bridge service, make sure you configure the environment variables to match your needs. The variables can be configured in the .yaml file of the service.
 
 Key                      | Purpose                                                             | Default Value   | Valid Values   |
 ------------------------ | ------------------------------------------------------------------- | --------------- | -------------- |

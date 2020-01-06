@@ -15,7 +15,7 @@ spec:
         app: mqtt-client
     spec:
       containers:
-      - name: mqtt-client
+      - name: v2k_bridge
         image: jonaphael/mqtt_client
         env:
         - name: AUTH_URL
