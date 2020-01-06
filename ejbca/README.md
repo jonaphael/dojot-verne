@@ -22,7 +22,7 @@ The Registration Authority (RA) is automatically created in EJBCA with the respe
 
 ## **Environment Variables**
 
-Before running the kubernetes environment with the mqtt bridge service, make sure you configure the environment variables to match your needs. The variables can be configured in the .yaml file of the service.
+The environment variables can be configured in the .yaml file of the service.
 
 Key                      | Purpose                                                             | Default Value   | Valid Values   |
 ------------------------ | ------------------------------------------------------------------- | --------------- | -------------- |
@@ -32,6 +32,7 @@ EJBCA_WSDL_ADDR                 | address for ejbca wsdl              | https://
 EJBCA_CA_CRT_DIR                 | path of EJBCA certificate              | /opt/p12/ca.crt | path |
 EJBCA_VA_P12_DIR                 | path of RA .p12 file              | /opt/p12/soap_client.p12 | path |
 EJBCA_PORT                 | port for ejbca service              | 5583 | port |
+EJBCA_API_URL               | URL for ejbca api service doc              | https://dojot.github.io/ejbca-rest/apiary_latest.html | URL |
 KAFKA_HOSTS                 | kafka host address             | kafka-server:9092 | address |
 AUTH_URL                 | Address of the auth service                                         | http://auth:5000| hostname/IP    |
 DATA_BROKER              | Address of the data broker                                          | data-broker:80  | hostname/IP    |
