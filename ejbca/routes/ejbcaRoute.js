@@ -215,7 +215,7 @@ const ejbcaRoute = (app, client, myCache) => {
 
     const args = { arg0: userData };
 
-    client.editUser(args, (err) => {
+    return client.editUser(args, (err) => {
       if (err) {
         logger.error('Error creating user', TAG);
         return res.status(400).json({
