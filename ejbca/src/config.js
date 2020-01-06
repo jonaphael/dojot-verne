@@ -63,6 +63,7 @@ const messenger = {
 /* setting config to ejbca */
 const ejbcaConf = {
   ejbcaPort: process.env.EJBCA_PORT || 5583,
+  apiURL: process.env.EJBCA_API_URL || 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
 };
 
 module.exports = {

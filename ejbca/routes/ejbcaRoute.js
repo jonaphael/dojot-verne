@@ -1,5 +1,6 @@
 const { logger } = require('@dojot/dojot-module-logger');
 const ejbcaUtils = require('../utils/ejbcaUtils');
+const config = require('../src/config');
 
 const TAG = { filename: 'ejbca_routes' };
 
@@ -16,7 +17,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('CA data retrieved.', TAG);
@@ -36,7 +37,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -64,7 +65,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -72,7 +73,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(404).json({
           code: 404,
           message: 'No certificate found',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -97,7 +98,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(404).json({
           code: 404,
           message: 'Inexistent reason code',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
     }
@@ -108,7 +109,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('Certificate revoked', TAG);
@@ -129,7 +130,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('Certificate status retrieved', TAG);
@@ -162,7 +163,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('Retrieved CRL.', TAG);
@@ -182,7 +183,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('CRL Created.', TAG);
@@ -204,7 +205,7 @@ const ejbcaRoute = (app, client, myCache) => {
       return res.status(400).json({
         code: 400,
         message: result.errors.toString(),
-        moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+        moreinfo: config.ejbcaConf.apiURL,
       });
     }
 
@@ -220,7 +221,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       const clientObj = { status: 0 };
@@ -233,7 +234,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(500).json({
           code: 500,
           message: 'Internal',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       });
     });
@@ -256,7 +257,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: error.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -264,7 +265,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(404).json({
           code: 404,
           message: 'User does not exist',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -288,7 +289,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(404).json({
           code: 404,
           message: 'Inexistent reason code',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
     }
@@ -304,7 +305,7 @@ const ejbcaRoute = (app, client, myCache) => {
       return res.status(400).json({
         code: 400,
         message: error.err.toString(),
-        moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+        moreinfo: config.ejbcaConf.apiURL,
       });
     }
     logger.debug('User deleted.', TAG);
@@ -332,7 +333,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -341,7 +342,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(404).json({
           code: 404,
           message: 'No certificate found',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
 
@@ -367,7 +368,7 @@ const ejbcaRoute = (app, client, myCache) => {
       return res.status(400).json({
         code: 400,
         message: result.errors.toString(),
-        moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+        moreinfo: config.ejbcaConf.apiURL,
       });
     }
 
@@ -390,7 +391,7 @@ const ejbcaRoute = (app, client, myCache) => {
           return res.status(400).json({
             code: 400,
             message: error.toString(),
-            moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+            moreinfo: config.ejbcaConf.apiURL,
           });
         }
 
@@ -422,7 +423,7 @@ const ejbcaRoute = (app, client, myCache) => {
             return res.status(400).json({
               code: 400,
               message: error.toString(),
-              moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+              moreinfo: config.ejbcaConf.apiURL,
             });
           }
         } else {
@@ -435,7 +436,7 @@ const ejbcaRoute = (app, client, myCache) => {
               return res.status(500).json({
                 code: 500,
                 message: 'Internal error',
-                moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+                moreinfo: config.ejbcaConf.apiURL,
               });
             }
             return pkcs10Send();
@@ -445,7 +446,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(500).json({
           code: 500,
           message: 'Internal error',
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
     });
@@ -462,7 +463,7 @@ const ejbcaRoute = (app, client, myCache) => {
         return res.status(400).json({
           code: 400,
           message: err.toString(),
-          moreinfo: 'https://dojot.github.io/ejbca-rest/apiary_latest.html',
+          moreinfo: config.ejbcaConf.apiURL,
         });
       }
       logger.debug('EJBCA version retrieved.', TAG);
