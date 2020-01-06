@@ -8,14 +8,23 @@ services:
     environment:
       # Don't forget to set the environment variables
       DEBUG_MODE: "False"
-      DOJOT_MQTT_HOST: "10.50.11.227"
+      DOJOT_MQTT_HOST: "10.202.45.240"
       # TODO: differentiate DOJOT_MQTT_PORT and DOJOT_MQTTS_PORT variables
       DOJOT_MQTT_PORT: "30011"
       DOJOT_MQTT_TIMEOUT: "120"
-      LOCUST_MASTER_HOST: "10.50.11.142"
+      LOCUST_MASTER_HOST: "10.202.13.254"
       LOCUST_LOG_DIR: "logs"
-      REDIS_HOST: "10.50.11.142"
+      REDIS_HOST: "10.202.13.254"
       REDIS_PORT: "6380"
       REDIS_PASSWD: ""
       TASK_MIN_TIME: "30000"
       TASK_MAX_TIME: "30000"
+      EJBCA_URL: "http://10.202.45.240:30020"
+
+      RENEW_DEVICES: "True"
+      DEVICES_TO_RENEW: 1000
+      TIME_TO_RENEW: 120000
+
+      REVOKE_DEVICES: "True"
+      DEVICES_TO_REVOKE: 1000
+      TIME_TO_REVOKE: 120000

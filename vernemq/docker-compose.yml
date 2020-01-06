@@ -14,9 +14,11 @@ services:
       CERT_DNS: "localhost"
       CRL_UPDATE_TIME: "*/30 * * * *" #every 30 min
       CHECK_EXPIRATION_TIME:  "*/30 * * * *" #every 30 min
+      CHECK_BROKER_CERT_REVOKED_TIME:  "*/30 * * * *" #every 30 min
       CHECKEND_EXPIRATION_SEC: '43200' #12h
       BASE_DIR: '/vernemq'
       DOCKER_VERNEMQ_LOG__CONSOLE: "console"
+      ACL_CHAIN: "n"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "info"
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "off"
       DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "on"
@@ -26,6 +28,7 @@ services:
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_PUBLISH__ENDPOINT: "http://webhook-verne:4000/pub"
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__HOOK: "auth_on_subscribe"
       DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_SUBSCRIBE__ENDPOINT: "http://webhook-verne:4000/sub"
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes" 
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_UNSUBSCRIBE__HOOK: "on_unsubscribe"
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_UNSUBSCRIBE__ENDPOINT: "http://webhook-verne:4000/unsub"
       #DOCKER_VERNEMQ_VMQ_WEBHOOKS__DOJOT_DELIVER__HOOK: "on_deliver"
@@ -38,6 +41,7 @@ services:
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__KEYFILE: /vernemq/cert/broker.key
       DOCKER_VERNEMQ_LISTENER__SSL__DEFAULT__CRLFILE: /vernemq/cert/ca.crl
 
+      
   ejbca_simple:
     image: mprevide/ejbca
     depends_on:

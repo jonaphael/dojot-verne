@@ -13,6 +13,7 @@ export CRL_UPDATE_TIME='*/30 * * * *'
 export BASE_DIR='/vernemq'
 export CHECKEND_EXPIRATION_SEC='43200'
 export CHECK_EXPIRATION_TIME='*/30 * * * *'
+export CHECK_BROKER_CERT_REVOKED_TIME='*/30 * * * *'
 '
 #########################################################
 
@@ -36,7 +37,8 @@ export CERT_CANAME='IOTmidCA'
 export CRL_UPDATE_TIME="${CRL_UPDATE_TIME:-"0 */2 * * *"}"
 #By default will be updated every day at 1 am
 export CHECK_EXPIRATION_TIME="${CHECK_EXPIRATION_TIME:-"0 1 * * *"}"
-
+#By default will be updated every 3 hours
+export CHECK_BROKER_CERT_REVOKED_TIME="${CHECK_BROKER_CERT_REVOKED_TIME:-"0 */3 * * *"}"
 
 export IS_K8S_ENV=${K8S_ENV:-"n"}
 export certCAName=$CERT_CANAME

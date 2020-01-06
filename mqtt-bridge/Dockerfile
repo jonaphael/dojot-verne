@@ -1,16 +1,20 @@
 FROM node:10.16.3-alpine
 
-WORKDIR /opt/mqtt-client
+WORKDIR /opt/mqtt_client
 
-RUN apk add --no-cache g++ \
-        make \
-        bash \
-        python \
-        lz4-dev \
-        musl-dev \
-        ca-certificates \
-        openssl-dev \
-        tini 
+RUN apk --no-cache add \
+      bash \
+      g++ \
+      ca-certificates \
+      lz4-dev \
+      musl-dev \
+      cyrus-sasl-dev \
+      openssl-dev \
+      make \
+      python \
+      openssl \
+      curl \
+      jq
 
 RUN apk add --no-cache --virtual .build-deps gcc zlib-dev libc-dev bsd-compat-headers py-setuptools bash
 
@@ -20,4 +24,4 @@ COPY package-lock.json .
 RUN npm install
 COPY . .
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./entryPoint.sh"]

@@ -96,6 +96,8 @@ then
 else
     echo "Reading from backup."
     echo "SET device_count 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" -n ${REDIS_MAPPED_DB} &> /dev/null
+    echo "SET devices_to_revoke 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" -n ${REDIS_MAPPED_DB} &> /dev/null
+    echo "SET devices_to_renew 0" | redis-cli -h ${REDIS_HOST} -p ${REDIS_PORT} -a "${REDIS_PASSWD}" -n ${REDIS_MAPPED_DB} &> /dev/null
 fi
 
 

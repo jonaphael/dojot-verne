@@ -16,6 +16,7 @@ class App {
   private clientCrt: BufferSource;
   private caCrt: BufferSource;
   private options: object;
+  public initialized: boolean;
 
   constructor() {
     this.key = fs.readFileSync(`/opt/mqtt_client/cert/${hostname}.key`);
@@ -24,6 +25,7 @@ class App {
     this.messenger = null;
     this.mqttc = null;
     this.isConnected = false;
+    this.initialized = false;
 
     this.options = {
       username: hostname,
@@ -48,9 +50,15 @@ class App {
     this.messenger!.init().then(() => {
       this.initKafka();
       this.initMqtt();
+      this.initialized = true;
     }).catch((error: any) => {
-      logger.debug(`... failed to initialize the IoT agent messenger. Error: ${error.toString()}`, TAG);
+      logger.debug(`... failed to initialize the IoT agent messenger. Error: ${error}`, TAG);
     });
+  }
+
+  public stopApp() {
+    this.initialized = false;
+    // disconnect mqtt-client and kafka producer
   }
 
   private initKafka() {
@@ -65,8 +73,8 @@ class App {
 
     const mqttOnConnectBind = this.mqttOnConnect.bind(this);
     const mqttOnDisconnectBind = this.mqttOnDisconnect.bind(this);
-    this.mqttc.on("connect", mqttOnConnectBind);
     this.mqttc.on("disconnect", mqttOnDisconnectBind);
+    this.mqttc.on("connect", mqttOnConnectBind);
   }
 
   /* Kafka Events */
@@ -100,7 +108,7 @@ class App {
 
   /* MQTT Functions */
 
-  private publishMessage(topic: string, message: any) {
+  public publishMessage(topic: string, message: any) {
     if (this.isConnected) {
       logger.debug(`Publishing on topic ${topic}`, TAG);
       this.mqttc!.publish(topic, message);
