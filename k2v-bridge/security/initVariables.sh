@@ -11,7 +11,7 @@ export BASE_DIR='/vernemq'
 '
 #########################################################
 
-BASE_DIR=${BASE_DIR:-"/opt/mqtt_client"}
+BASE_DIR=${BASE_DIR:-"/opt/k2v-bridge"}
 HOSTNAME="${HOSTNAME:-"broker"}"
 CERT_CNAME="${HOSTNAME:-"broker"}"
 CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"192.168.15.24"}

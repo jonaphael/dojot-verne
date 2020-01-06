@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR=${BASE_DIR:-"/opt/mqtt_client"}
+BASE_DIR=${BASE_DIR:-"/opt/k2v-bridge"}
 
 . ${BASE_DIR}/security/initVariables.sh
 
