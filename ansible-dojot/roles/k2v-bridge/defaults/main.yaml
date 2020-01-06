@@ -1,6 +1,6 @@
 ## This role is responsible for deploying mqtt Client for dojot epic
 
-- name: dojot - MQTT Client Objects
+- name: dojot - k2v-bridge (Kafka to verne bridge) Objects
   k8s:
     kubeconfig: "{{ dojot_kubeconfig_file_path | default(omit) }}"
     state: present
@@ -10,5 +10,5 @@
   retries: 30
   delay: 10
   loop:
-  - "{{ lookup('template', 'mqtt_client_service.yaml.j2') | from_yaml }}"
-  - "{{ lookup('template', 'mqtt_client_cluster.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'k2v_bridge_service.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'k2v_bridge_cluster.yaml.j2') | from_yaml }}"

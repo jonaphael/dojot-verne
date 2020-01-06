@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mqtt-client
+  name: k2v-bridge
   namespace: dojot
 spec:
-  serviceName: "mqtt-client"
+  serviceName: "k2v-bridge"
   selector:
     matchLabels:
-      app: mqtt-client
+      app: k2v-bridge
   replicas: 4
   template:
     metadata:
       labels:
-        app: mqtt-client
+        app: k2v-bridge
     spec:
       containers:
-      - name: mqtt-client
+      - name: k2v-bridge
         image: jonaphael/mqtt_client
         env:
         - name: AUTH_URL
@@ -31,10 +31,12 @@ spec:
         - name: DOJOT_MQTT_HOST
           value: "vernemq-k8s"
         - name: DOJOT_MQTT_PORT
-          value: "30010"
+          value: "8883"
         - name: CERT_DNS
-          value: "mqtt-client"
+          value: "k2v-bridge"
         - name: CERT_EJBCA_API_BROKER
           value: "ejbca-simple"
         - name: CERT_EJBCA_API_PORT
           value: "5583"
+        - name: MQTT_CLIENT_LOG_LEVEL
+          value: "info"

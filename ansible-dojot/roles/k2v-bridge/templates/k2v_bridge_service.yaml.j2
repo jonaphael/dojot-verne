@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mqtt-client
+  name: k2v-bridge
   namespace: dojot
 spec:
   type: ClusterIP
   selector:
-    app: mqtt-client
+    app: k2v-bridge
   ports:
-  - name: mqtt-client
+  - name: k2v-bridge
     port: 4001
