@@ -4,27 +4,28 @@ const fs = require('fs');
 const mqtt = require('mqtt');
 const util = require('util');
 const ProjectUtils = require('../utils/utils');
-const config = require('./config');
+const defaultConfig = require('./config');
 
 const TAG = { filename: 'MqttClientApp' };
 const hostname = process.env.HOSTNAME;
 
 class App {
-  constructor() {
+  constructor(config) {
     this.key = fs.readFileSync(`/opt/k2v-bridge/cert/${hostname}.key`);
     this.clientCrt = fs.readFileSync(`/opt/k2v-bridge/cert/${hostname}.crt`);
     this.caCrt = fs.readFileSync('/opt/k2v-bridge/cert/ca.crt');
     this.mqttc = null;
     this.isConnected = false;
     this.iotagent = null;
+    this.config = config || defaultConfig;
 
     this.options = {
       ca: this.caCrt,
       cert: this.clientCrt,
-      host: config.mqtt.host,
+      host: this.config.mqtt.host,
       keepAlive: 120,
       key: this.key,
-      port: config.mqtt.port,
+      port: this.config.mqtt.port,
       protocol: 'mqtts',
       rejectUnauthorized: false,
     };
@@ -32,14 +33,14 @@ class App {
 
   initApp() {
     /* set log level */
-    logger.setLevel(config.app.mqtt_log_level);
+    logger.setLevel(this.config.app.mqtt_log_level);
 
     this.initMqtt();
 
     this.iotagent = new IoTAgent();
     this.iotagent.init().then(() => {
       /* Actuation message handler */
-      if (config.app.enable_dojot === true) {
+      if (this.config.app.enable_dojot === true) {
         logger.info('Dojot is enable', TAG);
         this.iotagent.on('iotagent.device', 'device.configure', (tenant, event) => {
           logger.debug(`Got device actuation message. Tenant is ${tenant}.`, TAG);
@@ -64,7 +65,6 @@ class App {
       }
     }).catch(() => {
       logger.error('An error occurred while initializing the IoTAgent. Bailing out!', TAG);
-      process.exit();
     });
   }
 
