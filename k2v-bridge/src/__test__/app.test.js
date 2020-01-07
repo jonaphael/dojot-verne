@@ -9,8 +9,8 @@
  */
 
 
-const App = require('../app');
 const mqtt = require('mqtt');
+const App = require('../app');
 
 const fakeArg = (arg1) => ({ meta: { service: arg1 }, data: { id: arg1 } });
 
