@@ -1,7 +1,7 @@
 const toBoolean = (mode) => ((mode || false) && (mode.toString().toLowerCase().trim() === 'true' || Number(mode) > 0));
 
 const app = {
-  mqtt_log_level: process.env.MQTT_CLIENT_LOG_LEVEL || 'info',
+  mqtt_log_level: process.env.LOG_LEVEL || 'info',
   enable_dojot: toBoolean(process.env.ENABLE_DOJOT),
 };
 
