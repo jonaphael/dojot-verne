@@ -215,11 +215,11 @@ Removes a user certificate
           "moreinfo": "https://dojot.github.io/ejbca-rest/apiary_latest.html"
         }
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
           "status": 201,
-          "message": "CRL Created"
+          "message": "CRL Updated/Created"
         }
 
 ### get a CRL [GET /ca/{caname}/crl?{delta}]
@@ -256,21 +256,6 @@ to visualize the CRL
   + Body
 
             {
-                "caName": "PROTOCOL",
-                "certificateProfileName": "ENDUSER",
-                "clearPwd": true,
-                "email": "device21@noemail.com",
-                "endEntityProfileName" : "EMPTY",
-                "extendedInformation": {
-                            "name": "somekey",
-                            "value": "somevalue"
-                        },
-                "keyRecoverable": true,
-                "password": "pwd12",
-                "sendNotification": false,
-                "status": 10,
-                "subjectDN": "CN=device21",
-                "tokenType": "USERGENERATED",
                 "username" : "device21"
             }
 
@@ -360,6 +345,25 @@ to visualize the CRL
 
 ### Revoke all cerificates from a user [DELETE /user/{username}?{reason,delete}]
 
+
+The revokation reason that can be used in this endpoint are:
+
+```
+reasons: {
+  AACOMPROMISE: 10,
+  AFFILIATIONCHANGED: 3,
+  CACOMPROMISE: 2,
+  CERTIFICATEHOLD: 6,
+  CESSATIONOFOPERATION: 5,
+  KEYCOMPROMISE: 1,
+  PRIVILEGESWITHDRAWN: 9,
+  REMOVEFROMCRL: 8,
+  SUPERSEDED: 4,
+  UNSPECIFIED: 0,
+  NOTREVOKED: -1
+}
+```
+
 + Parameters
   + username: IOTmidCA (required, string): user username
   + reason: UNSPECIFIED (optional, enum) - one of REVOKATION_REASON enum values. default: UNSPECIFIED
@@ -432,8 +436,8 @@ to visualize the CRL
   + username: IOTmidCA (required, string): user username
 
 + Request (application/json)
-  In a csv file, generated with the command 'openssl req -new -out server.csr -key server.key'
-  The base64 certificate csv is between the tags '-----BEGIN CERTIFICATE REQUEST-----' and '-----END CERTIFICATE REQUEST-----'
+  In a csr file, generated with the command 'openssl req -new -out server.csr -key server.key'
+  The base64 certificate csr is between the tags '-----BEGIN CERTIFICATE REQUEST-----' and '-----END CERTIFICATE REQUEST-----'
 
   + Body
 
