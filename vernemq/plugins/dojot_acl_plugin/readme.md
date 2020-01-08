@@ -26,3 +26,10 @@ the effect of this plugin.
 
     vmq-admin plugin disable --name vmq_passwd
     vmq-admin plugin disable --name vmq_acl
+
+## **Environment variables**
+
+Key                      | Purpose                                                       | Default Value  | Accepted values
+-----------------------  | --------------------------------------------------------------| -------------- |-------------------------
+K2VBRIDGE_SERVICE_NAME   | service name for k2v-bridge                                   | k2v-bridge     | string
+V2KBRIDGE_SERVICE_NAME   | service name for v2k-bridge                                   | v2k-bridge-verne     | string
