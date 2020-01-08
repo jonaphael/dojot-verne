@@ -17,9 +17,8 @@ const server = {
 
 /* EJBCA Routes */
 const ejbcaRoute = require('../routes/ejbcaRoute');
-const ejbcaUtils = require('../utils/ejbcaUtils');
 
-function initApp(clientEJBCA, messenger, dojotConfig) {
+function initApp(clientEJBCA) {
   server.app = express();
   server.app.use(bodyParser.json({ type: '*/*' }));
   server.app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,10 +38,6 @@ function initApp(clientEJBCA, messenger, dojotConfig) {
 
     logger.debug('Setting EJBCA Routes..', TAG);
     ejbcaRoute(server.app, ejbcaService, myCache);
-
-    logger.debug('Setting EJBCA Messenger', TAG);
-
-    return ejbcaUtils.createMessenger(messenger, dojotConfig, ejbcaService);
   }).catch((err) => {
     logger.error(err.toString(), TAG);
     return Promise.reject(err);
