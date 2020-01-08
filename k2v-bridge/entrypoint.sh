@@ -35,7 +35,7 @@ done
 
 echo "Trying to authenticate with CA.."
 
-/opt/mqtt_client/security/ejbca_client.sh
+/opt/k2v-bridge/security/ejbca_client.sh
 
 echo "Authenticated!"
 

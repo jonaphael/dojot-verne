@@ -7,7 +7,7 @@
 export CERT_EJBCA_API_BROKER='192.168.15.24'
 export CERT_EJBCA_API_PORT='5583'
 export HOSTNAME='broker'
-export BASE_DIR='/opt/mqtt_client'
+export BASE_DIR='/opt/k2v-bridge'
 '
 #########################################################
 
@@ -15,7 +15,7 @@ export BASE_DIR='/opt/mqtt_client'
 #######################################################
 
 CERT_DIRECTORY="cert"
-BASE_DIR=${BASE_DIR:-"/opt/mqtt_client"}
+BASE_DIR=${BASE_DIR:-"/opt/k2v-bridge"}
 
 . ${BASE_DIR}/security/initVariables.sh
 

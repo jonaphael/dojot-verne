@@ -93,8 +93,9 @@
     - role: apigw
     - role: auth
     - role: data-broker
-    - role: v2k-bridge
     - role: ejbca-node
+    - role: v2k-bridge
+    - role: k2v-bridge
     - role: pub-kafka-prometheus
     # - role: device-manager
     # - role: ejbca-rest
