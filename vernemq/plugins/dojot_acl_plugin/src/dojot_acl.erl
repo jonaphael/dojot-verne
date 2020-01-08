@@ -34,7 +34,7 @@ config_auth(Username, Topic) ->
     ConfigTopic = <<"config">>,
 
     %if the subscribed service is the mqtt-bridge, we can auth to subscribe to every topic
-    ResponseMatch = binary:match(Username, <<"mqtt-bridge-">>),
+    ResponseMatch = binary:match(Username, <<"v2k-bridge-verne-">>),
 
 
     % Topic must be equal: username/config and username must be equal: tenant:deviceid

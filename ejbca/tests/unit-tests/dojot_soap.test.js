@@ -9,154 +9,134 @@ jest.mock('node-forge');
 jest.mock('request');
 
 
-let dojotSoap = require('../../lib/dojot_soap');
+const dojotSoap = require('../../lib/dojot_soap');
 
 
 /* test certs file */
-let caCrt = '../test_certs/ca.crt';
+const caCrt = '../test_certs/ca.crt';
 let p12 = '../test_certs/ca.crt';
 
 function manualMocks() {
+  /* Manual mocks */
 
-    /* Manual mocks */
+  /* forge mock */
+  const bags = ['MOCKEDBAG'];
+  const oidMock = 0;
+  forge.pki.oids.certBag = oidMock;
+  forge.pki.oids.pkcs8ShroudedKeyBag = oidMock;
 
-    /* forge mock */
-    let bags = ['MOCKEDBAG'];
-    let oidMock = 0;
-    forge.pki.oids.certBag = oidMock;
-    forge.pki.oids.pkcs8ShroudedKeyBag = oidMock;
+  p12 = {
+    getBags: jest.fn(() => bags),
+  };
+  forge.pkcs12.pkcs12FromAsn1 = jest.fn().mockReturnValue(p12);
+  forge.pki.certificateToPem = jest.fn().mockReturnValue('certificate');
+  forge.pki.privateKeyToPem = jest.fn().mockReturnValue('key');
 
-    p12 = {
-        getBags: jest.fn(function () {
-            return bags;
-        })
-    }
-    forge.pkcs12.pkcs12FromAsn1 = jest.fn().mockReturnValue(p12);
-    forge.pki.certificateToPem = jest.fn().mockReturnValue('certificate');
-    forge.pki.privateKeyToPem = jest.fn().mockReturnValue('key');
-
-    /* fs mock */
-    fs.existsSync = jest.fn().mockReturnValue(true);
+  /* fs mock */
+  fs.existsSync = jest.fn().mockReturnValue(true);
 }
 
-describe("Testing Dojot soap class", () => {
+describe('Testing Dojot soap class', () => {
+  describe('Testing _createPEMfromP12', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
 
-    describe("Testing _createPEMfromP12", () => {
-        beforeEach(() => {
-            jest.resetAllMocks();
-        });
+    it('Should create with success the certs buffer', () => {
+      /* soap client */
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
 
-        it("Should create with success the certs buffer", () => {
+      manualMocks();
+      soapClient.createPEMfromP12();
 
-            /* soap client */
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      expect(soapClient.bufferedCert).toBeDefined();
+      expect(soapClient.caPem).toBeDefined();
+      expect(soapClient.myPem).toBeDefined();
+      expect(soapClient.key).toBeDefined();
+    });
 
-            manualMocks();
-            soapClient._createPEMfromP12();
+    it('Should fail read the file', () => {
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
 
-            expect(soapClient.bufferedCert).toBeDefined();
-            expect(soapClient.caPem).toBeDefined();
-            expect(soapClient.myPem).toBeDefined();
-            expect(soapClient.key).toBeDefined();
-        });
+      fs.existsSync = jest.fn().mockReturnValue(false);
+      soapClient.createPEMfromP12();
 
-        it("Should fail read the file", () => {
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      expect(soapClient.bufferedCert).toEqual(null);
+    });
 
-            fs.existsSync = jest.fn().mockReturnValue(false);
-            soapClient._createPEMfromP12();
+    it('Should certs not be defined', () => {
+      /* soap client */
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      fs.existsSync = jest.fn().mockReturnValue(true);
 
-            expect(soapClient.bufferedCert).toEqual(null);
+      /* here we dont mock the calls to our forge dependency returns undef */
+      try {
+        soapClient.createPEMfromP12();
+      } catch (error) {
+        expect(soapClient.bufferedCert).toEqual(null);
+        expect(soapClient.caPem).toEqual(null);
+        expect(soapClient.myPem).toEqual(null);
+        expect(soapClient.key).toEqual(null);
+        expect(error).toBeDefined();
+      }
+    });
+  });
 
-        })
+  describe('Testing createClient', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
 
-        it("Should certs not be defined", () => {
+    it('Should return soap string client instance', async () => {
+      soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
 
-            /* soap client */
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
-            fs.existsSync = jest.fn().mockReturnValue(true);
+      manualMocks();
 
-            /* here we dont mock the calls to our forge dependency returns undef*/
-            try {
-                soapClient._createPEMfromP12();
-            } catch (error) {
-                expect(soapClient.bufferedCert).toEqual(null);
-                expect(soapClient.caPem).toEqual(null);
-                expect(soapClient.myPem).toEqual(null);
-                expect(soapClient.key).toEqual(null);
-                expect(error).toBeDefined();
-            }
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
 
-        })
-    })
+      const result = await soapClient.createClient();
 
-    describe("Testing createClient", () => {
+      expect(result).toEqual('client');
+    });
 
-        beforeEach(() => {
-            jest.resetAllMocks();
-        });
+    it('Should return error because pem not created', async () => {
+      soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
 
-        it("Should return soap string client instance", async () => {
-            soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      let result;
+      try {
+        result = await soapClient.createClient();
+      } catch (error) {
+        expect(result).toEqual(undefined);
+      }
+    });
 
-            manualMocks();
+    it('Should return error because soap client was not created', async () => {
+      soap.createClient = jest.fn((arg1, arg2, callback) => callback('error', null));
+      manualMocks();
 
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      fs.existsSync = jest.fn().mockReturnValue(true);
 
-            let result = await soapClient.createClient();
+      try {
+        await soapClient.createClient();
+      } catch (error) {
+        expect(error).toEqual('error');
+      }
+    });
 
-            expect(result).toEqual('client');
+    it('Should not create a new buffered cert', async () => {
+      soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
 
-        })
+      manualMocks();
 
-        it("Should return error because pem not created", async () => {
-            soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
+      const soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
+      soapClient.bufferedCert = 'data';
+      soapClient.key = 'key';
+      const result = await soapClient.createClient();
 
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
-            fs.existsSync = jest.fn().mockReturnValue(true);
-            let result;
-            try {
-                result = await soapClient.createClient();
-
-            } catch (error) {
-                expect(result).toEqual(undefined);
-
-            }
-
-
-        })
-
-        it("Should return error because soap client was not created", async () => {
-            soap.createClient = jest.fn((arg1, arg2, callback) => callback('error', null));
-            manualMocks();
-
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
-            fs.existsSync = jest.fn().mockReturnValue(true);
-
-            try {
-                await soapClient.createClient();
-
-            } catch (error) {
-                expect(error).toEqual('error');
-
-            }
-
-
-        })
-
-        it("Should not create a new buffered cert", async () => {
-            soap.createClient = jest.fn((arg1, arg2, callback) => callback(null, 'client'));
-
-            manualMocks();
-
-            let soapClient = new dojotSoap.SoapClient('url', caCrt, p12, 'secret');
-            soapClient.bufferedCert = 'data';
-            soapClient.key = 'key';
-            let result = await soapClient.createClient();
-
-            expect(result).toEqual('client');
-
-
-        })
-    })
-})
+      expect(result).toEqual('client');
+    });
+  });
+});
