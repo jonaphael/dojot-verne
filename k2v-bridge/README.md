@@ -11,7 +11,7 @@ Before running the kubernetes environment with the k2v-bridge service, make sure
 
 Key                      | Purpose                                                             | Default Value   | Valid Values   |
 ------------------------ | ------------------------------------------------------------------- | --------------- | -------------- |
-MQTT_CLIENT_LOG_LEVEL    | Log level for debug                                                 | info            | string         |
+LOG_LEVEL                | Log level for debug                                                 | info            | string         |
 DATA_BROKER_CONN_RETRIES | How many time data broker tries to reconnect when fails             | 10              | integer        |
 BASE_DIR                 | Base directory where the /certs dir will be found                   | opt/mqtt_client | directory name |
 HOSTNAME                 | Hostname to be used in the certificate common name                  | broker          | hostname/IP    |

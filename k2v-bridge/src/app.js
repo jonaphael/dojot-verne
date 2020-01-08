@@ -7,17 +7,16 @@ const ProjectUtils = require('../utils/utils');
 const defaultConfig = require('./config');
 
 const TAG = { filename: 'MqttClientApp' };
-const hostname = process.env.HOSTNAME;
 
 class App {
   constructor(config) {
-    this.key = fs.readFileSync(`/opt/k2v-bridge/cert/${hostname}.key`);
-    this.clientCrt = fs.readFileSync(`/opt/k2v-bridge/cert/${hostname}.crt`);
+    this.config = config || defaultConfig;
+    this.key = fs.readFileSync(`/opt/k2v-bridge/cert/${this.config.app.hostname}.key`);
+    this.clientCrt = fs.readFileSync(`/opt/k2v-bridge/cert/${this.config.app.hostname}.crt`);
     this.caCrt = fs.readFileSync('/opt/k2v-bridge/cert/ca.crt');
     this.mqttc = null;
     this.isConnected = false;
     this.iotagent = null;
-    this.config = config || defaultConfig;
 
     this.options = {
       ca: this.caCrt,
