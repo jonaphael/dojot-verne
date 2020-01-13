@@ -22,21 +22,21 @@ export CHECK_BROKER_CERT_REVOKED_TIME='*/30 * * * *'
 
 BASE_DIR=${BASE_DIR:-"/vernemq"}
 
-. ${BASE_DIR}/scripts_tls/_initVariables.sh
+. "${BASE_DIR}"/scripts_tls/_initVariables.sh
 
 
 _removeCRTDir()
 {
   if [ -d "$certDir" ];
   then
-    rm -rf ${certDir}
+    rm -rf "${certDir}"
   fi
 }
 
 _createCRTDir()
 {
-  mkdir ${certDir}
-  cd ${certDir}
+  mkdir "${certDir}"
+  cd "${certDir}" || exit
 }
 
 _connectEJBCA()
@@ -45,12 +45,12 @@ _connectEJBCA()
   START_TIME=$(date +'%s')
   echo "Waiting for dojot EJBCA Broker fully start. Host '${CERT_EJBCA_API_BROKER}', '${CERT_EJBCA_API_PORT}'..."
   echo "Try to connect to dojot EJBCA Broker ... "
-  RESPONSE=`curl --fail -s ${certEjbcaApiUrl}/ejbca/version || echo ""`
-  echo $RESPONSE
+  RESPONSE=$(curl --fail -s "${certEjbcaApiUrl}"/ejbca/version || echo "")
+  echo "$RESPONSE"
   while [ -z "${RESPONSE}" ]; do
       sleep 30
       echo "Retry to connect to dojot EJBCA broker ... "
-      RESPONSE=`curl --fail -s ${certEjbcaApiUrl}/ejbca/version || echo ""`
+      RESPONSE=$(curl --fail -s "${certEjbcaApiUrl}"/ejbca/version || echo "")
 
       ELAPSED_TIME=$(($(date +'%s') - ${START_TIME}))
       if [ ${ELAPSED_TIME} -gt 180 ]
@@ -68,20 +68,20 @@ _connectEJBCA()
 ##Generate key par (private and public key)
 _generateKeyPair()
 {
-    sh ${BASE_DIR}/scripts_tls/generateKeyPair.sh
+    sh "${BASE_DIR}"/scripts_tls/generateKeyPair.sh
 }
 
 ##Create CSR (cert wih some infos and sign with private key )
 _createCSR()
 {
-    sh ${BASE_DIR}/scripts_tls/createCSR.sh
+    sh "${BASE_DIR}"/scripts_tls/createCSR.sh
 }
 
 ##create entity in ejbca
 _createEntity()
 {
     echo "Create Entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/user"
-    CREATE_USER_CA_STATUS=$(curl --silent -X POST ${certEjbcaApiUrl}/user \
+    CREATE_USER_CA_STATUS=$(curl --silent -X POST "${certEjbcaApiUrl}"/user \
     -H "Content-Type:application/json" \
     -H "Accept:application/json" \
     -d  "{\"username\": \"${certCname}\"}")
@@ -90,34 +90,34 @@ _createEntity()
 ##sign csr in ejbca
 _signCert()
 {
-    sh ${BASE_DIR}/scripts_tls/signCert.sh
+    sh "${BASE_DIR}"/scripts_tls/signCert.sh
 }
 
 ##Get from PKI the CA certificate and return in PEM format
 _retrieveCACertificate()
 {
-    sh ${BASE_DIR}/scripts_tls/retrieveCACertificate.sh
+    sh "${BASE_DIR}"/scripts_tls/retrieveCACertificate.sh
 }
 
 ##Get from PKI the CRL certificate
 _retrieveCRLCertificate()
 {
-    sh ${BASE_DIR}/scripts_tls/retrieveCRL.sh
+    sh "${BASE_DIR}"/scripts_tls/retrieveCRL.sh
 }
 
 _cronTabCRL()
 {
-    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> ${BASE_DIR}/crontab.tab
+    echo "$CRL_UPDATE_TIME   ${BASE_DIR}/scripts_tls/retrieveCRL.sh" >> "${BASE_DIR}"/crontab.tab
 }
 
 _cronTabExpiration()
 {
-    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> ${BASE_DIR}/crontab.tab
+    echo "$CHECK_EXPIRATION_TIME  ${BASE_DIR}/scripts_tls/checkExpirationCertificate.sh" >> "${BASE_DIR}"/crontab.tab
 }
 
 _cronTabCheckBrokerCertRevoke()
 {
-    echo "$CHECK_BROKER_CERT_REVOKED_TIME  ${BASE_DIR}/scripts_tls/checkBrokerCertHasRevoke.sh" >> ${BASE_DIR}/crontab.tab
+    echo "$CHECK_BROKER_CERT_REVOKED_TIME  ${BASE_DIR}/scripts_tls/checkBrokerCertHasRevoke.sh" >> "${BASE_DIR}"/crontab.tab
 }
 
 ##Generate private key and sign certificate crt
@@ -132,7 +132,7 @@ _generateCertificates()
 
 _startCronService()
 {
-   supercronic  ${BASE_DIR}/crontab.tab &
+   supercronic  "${BASE_DIR}"/crontab.tab &
 }
 
 main()
@@ -157,11 +157,11 @@ main()
 
 
     #verifies certificate chains.
-    . ${BASE_DIR}/scripts_tls/checkCertificateChain.sh
+    . "${BASE_DIR}"/scripts_tls/checkCertificateChain.sh
 
 
     ## create cron file
-    touch ${BASE_DIR}/crontab.tab
+    touch "${BASE_DIR}"/crontab.tab
 
     ## create cron tab to update CRL
     _cronTabCRL
