@@ -1,7 +1,5 @@
 FROM vernemq/vernemq:1.10.0-alpine
 
-USER root
-
 ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.1.9/supercronic-linux-amd64 \
     SUPERCRONIC=supercronic-linux-amd64 \
     SUPERCRONIC_SHA1SUM=5ddf8ea26b56d4a7ff6faecdd8966610d5cb9d85
@@ -16,7 +14,8 @@ COPY command.sh /
 
 COPY scripts_tls/ /vernemq/scripts_tls
 COPY vmq_dojot.sh /vernemq/vmq_dojot.sh
-COPY cert/ /vernemq/cert/
+
+RUN mkdir -p /vernemq/cert/
 
 COPY plugins/dojot_acl_plugin/_build /vernemq/dojot_acl_plugin/
 COPY plugins/dojot_disconnect_plugin/_build /vernemq/dojot_disconnect_plugin

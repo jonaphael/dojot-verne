@@ -7,10 +7,11 @@ BASE_DIR=${BASE_DIR:-"/vernemq"}
 
 . "${BASE_DIR}"/scripts_tls/_initVariables.sh
 
+
 . "${BASE_DIR}"/scripts_tls/saveFormattedCRT.sh
 
 echo "Signing cert for entity ${certCname} in ${certCAName} : ${certEjbcaApiUrl}/sign/${certCname}/pkcs10 "
-csrContent=$(cat  "${certDir}"/"${certCsrFile}"  | sed '1,1d;$ d' | tr -d '\r\n')
+csrContent=$(<  "${certDir}"/"${certCsrFile}"  sed '1,1d;$ d' | tr -d '\r\n')
 
 signCertCa=$(curl --silent -X POST "${certEjbcaApiUrl}"/sign/"${certCname}"/pkcs10 \
 -H "Content-Type:application/json" \
