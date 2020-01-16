@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run the erlang container
-docker run -itd --name erlan_int1 --rm muhamedavila/erlang_dojot
+docker run -itd --name erlan_int1 --rm dojot/erlang_for_build_plugin_verne:16012020
 
 #transfer all plugins dir to container
 for i in */; 
