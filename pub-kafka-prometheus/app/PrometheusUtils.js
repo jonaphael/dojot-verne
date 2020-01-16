@@ -1,4 +1,3 @@
-
 const { logger } = require('@dojot/dojot-module-logger');
 
 const TAG = { filename: 'PrometheusUtils' };

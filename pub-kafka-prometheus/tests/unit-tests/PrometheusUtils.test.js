@@ -1,5 +1,5 @@
 const Prometheus = require('prom-client');
-const { getRegisterMetrics, getRegisterContentType } = require('../../src/PrometheusUtils');
+const { getRegisterMetrics, getRegisterContentType } = require('../../app/PrometheusUtils');
 
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('prom-client');

@@ -29,10 +29,10 @@ class KafkaMessenger {
   }
 
   initKafka() {
-    logger.info(`CreateChannel ${config.messenger.kafka.dojot.subjects.verne}`, TAG);
-    this.messenger.createChannel(config.messenger.kafka.dojot.subjects.verne, 'r');
+    logger.info(`CreateChannel ${config.messenger.dojot.subjects.deviceData}`, TAG);
+    this.messenger.createChannel(config.messenger.dojot.subjects.deviceData, 'r');
     const kafkaOnMessageBind = KafkaMessenger.kafkaOnMessage.bind(this);
-    this.messenger.on(config.messenger.kafka.dojot.subjects.verne, 'message', kafkaOnMessageBind);
+    this.messenger.on(config.messenger.dojot.subjects.deviceData, 'message', kafkaOnMessageBind);
   }
 
 
@@ -47,11 +47,12 @@ class KafkaMessenger {
       // payload msg mqtt, within the start timestamp in sec
       const payload = extractPayload(message);
       const { timestamp: startTimeSec } = payload;
-      const startTimeMs = convertSecToMs(startTimeSec);
 
-      const totalTime = Number(endTimeMS) - startTimeMs;
-
-      metrics.addTime(totalTime);
+      if (startTimeSec && endTimeMS) {
+        const startTimeMs = convertSecToMs(startTimeSec);
+        const totalTime = Number(endTimeMS) - startTimeMs;
+        metrics.addTime(totalTime);
+      }
     } catch (error) {
       logger.error(`Error parsing Kafka message: ${error}`, TAG);
     }

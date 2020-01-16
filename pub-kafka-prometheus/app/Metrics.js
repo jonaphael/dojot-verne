@@ -2,7 +2,6 @@ const ss = require('simple-statistics');
 const { logger } = require('@dojot/dojot-module-logger');
 
 const TAG = { filename: 'Metrics' };
-
 class Metrics {
   constructor() {
     logger.info('Init Metrics', TAG);

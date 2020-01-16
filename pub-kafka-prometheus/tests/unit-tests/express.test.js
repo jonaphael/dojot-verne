@@ -2,9 +2,9 @@ const request = require('supertest');
 
 let express = null;
 
-jest.mock('../../src/Metrics');
+jest.mock('../../app/Metrics');
 
-jest.mock('../../src/Metrics', () => ({
+jest.mock('../../app/Metrics', () => ({
   getMax: jest.fn(() => 1),
   getMin: jest.fn(() => 2),
   getAvg: jest.fn(() => 3),
@@ -13,7 +13,7 @@ jest.mock('../../src/Metrics', () => ({
   getAllTimes: jest.fn(() => 10000),
   cleanAllTimes: jest.fn(),
 }));
-const ExpressApp = require('../../src/express/App');
+const ExpressApp = require('../../app/express/App');
 
 describe('loading express', () => {
   it('responds to /metrics', async () => {

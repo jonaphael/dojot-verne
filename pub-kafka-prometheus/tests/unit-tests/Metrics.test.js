@@ -1,4 +1,4 @@
-const metrics = require('../../src/Metrics');
+const metrics = require('../../app/Metrics');
 
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('simple-statistics');

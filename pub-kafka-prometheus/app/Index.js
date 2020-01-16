@@ -1,7 +1,7 @@
 const { logger } = require('@dojot/dojot-module-logger');
 const ExpressApp = require('./express/App');
 const KafkaMessenger = require('./KafkaMessenger');
-const config = require('Config');
+const config = require('./Config');
 
 const TAG = { filename: 'Index' };
 
@@ -19,5 +19,5 @@ try {
   logger.info('... Dojot Prometheus initialized.', TAG);
 } catch (error) {
   logger.error(`Caught an error: ${error}`, TAG);
-  expressApp.stopApp();
+  expressApp.stop();
 }

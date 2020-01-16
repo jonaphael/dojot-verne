@@ -1,55 +1,64 @@
 const app = {
-  log_level: process.env.PROMETHEUS_CLIENT_LOG_LEVEL || 'info',
+  log_level: process.env.LOG_LEVEL || 'debug',
 };
 
 const messenger = {
-  auth: {
-    connectionRetries: 5,
-    timeoutSleep: 5,
-    url: process.env.AUTH_URL || 'http://auth:5000',
+  kafka: {
+    producer: {
+      'metadata.broker.list': process.env.KAFKA_HOSTS || 'kafka-server:9092',
+      'compression.codec': 'gzip',
+      'retry.backoff.ms': 200,
+      'message.send.max.retries': 10,
+      'socket.keepalive.enable': true,
+      'queue.buffering.max.messages': 100000,
+      'queue.buffering.max.ms': 1000,
+      'batch.num.messages': 1000000,
+      dr_cb: true,
+    },
+    consumer: {
+      'group.id': 'prom-group-3',
+      'metadata.broker.list': process.env.KAFKA_HOSTS || 'kafka-server:9092',
+    },
+    dojot: {
+      subscriptionHoldoff: Number(process.env.DOJOT_SUBSCRIPTION_HOLDOFF) || 2500,
+      timeoutSleep: 5,
+      connectionRetries: 5,
+    },
   },
   databroker: {
-    connectionRetries: process.env.DATA_BROKER_CONN_RETRIES || 10,
-    timeoutSleep: 2,
     url: process.env.DATA_BROKER_URL || 'http://data-broker',
+    timeoutSleep: 2,
+    connectionRetries: 5,
+  },
+  auth: {
+    url: process.env.AUTH_URL || 'http://auth:5000',
+    timeoutSleep: 5,
+    connectionRetries: 5,
+  },
+  deviceManager: {
+    url: process.env.DEVICE_MANAGER_URL || 'http://device-manager:5000',
+    timeoutSleep: 5,
+    connectionRetries: 3,
   },
   dojot: {
+    management: {
+      user: process.env.DOJOT_MANAGEMENT_USER || 'dojot-management',
+      tenant: process.env.DOJOT_MANAGEMENT_TENANT || 'dojot-management',
+    },
+    subjects: {
+      tenancy: process.env.DOJOT_SUBJECT_TENANCY || 'dojot.tenancy',
+      devices: process.env.DOJOT_SUBJECT_DEVICES || 'dojot.device-manager.device',
+      deviceData: process.env.DOJOT_SUBJECT_DEVICE_DATA || 'device-data',
+    },
     events: {
+      tenantEvent: {
+        NEW_TENANT: 'new-tenant',
+        DELETE_TENANT: 'delete-tenant',
+      },
       tenantActionType: {
         CREATE: 'create',
         DELETE: 'delete',
       },
-      tenantEvent: {
-        DELETE_TENANT: 'delete-tenant',
-        NEW_TENANT: 'new-tenant',
-      },
-    },
-    management: {
-      tenant: process.env.DOJOT_MANAGEMENT_USER || 'dojot-management',
-      user: process.env.DOJOT_MANAGEMENT_USER || 'dojot-management',
-    },
-    subjects: {
-      deviceData: process.env.DOJOT_SUBJECT_DEVICE_DATA || 'device-data',
-      devices: process.env.DOJOT_SUBJECT_DEVICES || 'dojot.device-manager.device',
-      tenancy: process.env.DOJOT_SUBJECT_TENANCY || 'dojot.tenancy',
-    },
-  },
-  kafka: {
-    consumer: {
-      'group.id': 'prom-group',
-      'metadata.broker.list': process.env.KAFKA_HOSTS || 'kafka-server:9092',
-    },
-    dojot: {
-      connectionRetries: 10,
-      subjects: {
-        verne: 'vernemq-epic-channel',
-      },
-      timeoutSleep: 2,
-    },
-    producer: {
-      dr_cb: true,
-      'metadata.broker.list': process.env.KAFKA_HOSTS || 'kafka-server:9092',
-      'socket.keepalive.enable': true,
     },
   },
 };

@@ -1,5 +1,5 @@
 const Prometheus = require('prom-client');
-const prometheusDojot = require('../../src/PrometheusDojot');
+const prometheusDojot = require('../../app/PrometheusDojot');
 
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('prom-client');

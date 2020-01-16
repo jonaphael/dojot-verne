@@ -24,7 +24,7 @@ Key                      | Purpose                                              
 AUTH_URL                 | Address of the auth service                                         | http://auth:5000| url    |
 DATA_BROKER_URL              | Address of the data broker                                          | http://data-broker  | url    |
 KAFKA_HOSTS              | Address of the kafka broker                                         |kafka-server:9092| hostname/IP    |
-PROMETHEUS_CLIENT_LOG_LEVEL                 | logger level                                      | info | debug, error, warning, info   |
+LOG_LEVEL                 | logger level                                      | info | debug, error, warning, info   |
 PROMETHEUS_PORT         | Port of prometheus client                                             | 3000              | integer        |
 
 ### Grafana
