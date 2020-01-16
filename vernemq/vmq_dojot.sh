@@ -139,8 +139,6 @@ _startCronService()
 main()
 {
 
-  if [ "${USE_STATIC_CERTS}" = "n" ]
-  then
     ## remove static cert dir
     _removeCRTDir
 
@@ -175,25 +173,7 @@ main()
 
     _startCronService
 
-
-  else
-    echo "Using static certificates... checking if exists.."
-    if [ -d "${BASE_DIR}/${CERT_DIRECTORY}" ];
-    then
-      echo "checking if certs is correctly installed.."
-      if [ -e "${BASE_DIR}/cert/${HOSTNAME}.crt" ] && [ -e "${BASE_DIR}/cert/ca.crt" ]
-      then
-        echo "All ok!"
-      else
-        echo "Certs are not correctly installed.. closing application.."
-        exit 3
-      fi
-    else
-      echo "certs dir not exists, closing application.."
-      exit 3
-    fi
-  fi
-  if [ "${IS_K8S_ENV}" = "n" ]
+  if [ "${isK8sEnv}" = "n" ]
   then
     start_vernemq
   fi
