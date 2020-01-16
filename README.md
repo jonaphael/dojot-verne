@@ -12,7 +12,7 @@ Fig. 1 - VerneMQ with Dojot (Whereas V2K, K2V, VerneMQ and Client  already have 
 
 ## V2K-bridge
 
-The V2K-bridge service is the core between the communication of Vernemq broker and the Kafka broker.
+The V2K-bridge service is the core between the communication of VerneMQ broker and the Kafka broker.
 
 For more see [here](./v2k-bridge)
 
@@ -194,7 +194,7 @@ export CSR_CONTENT=$(cat client.csr | sed '1,1d;$ d' | tr -d '\r\n')
 
 ##### Send CSR
 
-Send CSR to EJBCA and save that a environment variable
+Send CSR to EJBCA and save this environment variable
 
 ```console
 export CRT_ENTITY_CONTENT=$(curl --silent -X POST ${DOJOT_URL}/sign/${TENANT}:${DEVICE_ID}/pkcs10 \
