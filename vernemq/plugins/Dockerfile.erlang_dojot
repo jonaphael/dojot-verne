@@ -1,0 +1,27 @@
+ADD file ... in /
+
+CMD ["bash"]
+
+/bin/sh -c apt-get update &&
+
+/bin/sh -c set -ex; if
+
+/bin/sh -c apt-get update &&
+
+/bin/sh -c set -ex; apt-get
+
+ENV OTP_VERSION=19.3.6.13
+
+/bin/sh -c apt-get -y update
+
+/bin/sh -c set -xe &&
+
+CMD ["erl"]
+
+ENV REBAR_VERSION=2.6.4
+
+/bin/sh -c set -xe &&
+
+ENV REBAR3_VERSION=3.8.0
+
+/bin/sh -c set -xe &&
