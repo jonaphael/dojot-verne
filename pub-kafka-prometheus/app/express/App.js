@@ -2,7 +2,7 @@ const { getHTTPRouter, logger } = require('@dojot/dojot-module-logger');
 const bodyParser = require('body-parser');
 const express = require('express');
 
-const config = require('./../../Config');
+const config = require('../Config');
 const routes = require('./Routes');
 
 const TAG = { filename: 'express/App' };

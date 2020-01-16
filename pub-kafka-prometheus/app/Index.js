@@ -1,7 +1,7 @@
 const { logger } = require('@dojot/dojot-module-logger');
 const ExpressApp = require('./express/App');
 const KafkaMessenger = require('./KafkaMessenger');
-const config = require('../Config');
+const config = require('Config');
 
 const TAG = { filename: 'Index' };
 

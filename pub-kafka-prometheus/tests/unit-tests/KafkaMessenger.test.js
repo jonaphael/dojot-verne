@@ -3,7 +3,7 @@ const KafkaMessenger = require('../../src/KafkaMessenger');
 
 jest.mock('@jonaphael/dojot-module');
 jest.mock('@dojot/dojot-module-logger');
-jest.mock('../../Config.js');
+jest.mock('../../src/Config.js');
 jest.mock('../../src/Metrics');
 
 const mockMessenger = {
@@ -18,7 +18,7 @@ jest.mock('@jonaphael/dojot-module', () => ({
   Messenger: jest.fn(() => mockMessenger.Messenger),
 }));
 
-jest.mock('../../Config.js', () => ({
+jest.mock('../../src/Config.js', () => ({
   messenger: {
     kafka: {
       dojot: {

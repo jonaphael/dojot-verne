@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest tests/**/*.test.js --coverage",
     "test:watch": "jest --watch tests/**/*.test.js --coverage",
-    "run-client": "node src/Index.js"
+    "run-client": "node app/Index.js"
   },
   "keywords": [
     "prometheus",

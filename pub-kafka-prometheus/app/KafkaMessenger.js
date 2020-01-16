@@ -2,7 +2,7 @@ const { Messenger } = require('@jonaphael/dojot-module');
 const { logger } = require('@dojot/dojot-module-logger');
 const util = require('util');
 
-const config = require('../Config');
+const config = require('./Config');
 const metrics = require('./Metrics');
 const {
   convertSecToMs,
