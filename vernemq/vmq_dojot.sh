@@ -21,7 +21,7 @@
 ########################################################
 
 BASE_DIR=${BASE_DIR:-"/vernemq"}
-HOSTNAME=""
+
 
 . "${BASE_DIR}"/scripts_tls/_initVariables.sh
 
