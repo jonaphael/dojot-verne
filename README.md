@@ -44,7 +44,7 @@ The process of obtaining certificates for client (Fig. 2):
 
 - Creation of entity at EJBCA, usually this unique entity consisting of ***tenant***_:_***device_id***.
 
-- Obtaining a public certificate for the client, which happens with the creation of the CSR based on the client key pair and  sending this CSR to obtain a public certificate.
+- Obtaining a public certificate for the client, which happens with the creation of the CSR (Certificate signing request, It usually contains the public key, identifying information such as a hostname and unique identification) and sending this CSR to obtain a public certificate.
 
 - Obtaining the root certificate (public certificate of **CA**).
 
