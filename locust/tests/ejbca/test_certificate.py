@@ -8,10 +8,11 @@ from unittest.mock import MagicMock
 import requests
 from OpenSSL import crypto
 
+from src.ejbca.cert_client import CertClient
 import src.ejbca.certificate as certificate
+from src.ejbca.thing import Thing
 from src.utils import Utils
 
-# TODO
 class TestCertificate(unittest.TestCase):
     """
     Certificate class tests.
@@ -72,7 +73,7 @@ class TestCertClient(unittest.TestCase):
         """
         device_id = "testID"
         filename = device_id + ".key"
-        assert filename == certificate.CertClient.get_private_key_file(device_id)
+        assert filename == CertClient.get_private_key_file(device_id)
 
     def test_get_private_key_file_empty_id(self):
         """
@@ -80,7 +81,7 @@ class TestCertClient(unittest.TestCase):
         """
         device_id = ""
         with self.assertRaises(ValueError):
-            certificate.CertClient.get_private_key_file(device_id)
+            CertClient.get_private_key_file(device_id)
 
 
     # get_certificate_file() #
@@ -91,7 +92,7 @@ class TestCertClient(unittest.TestCase):
         """
         device_id = "testID"
         filename = device_id + ".crt"
-        assert filename == certificate.CertClient.get_certificate_file(device_id)
+        assert filename == CertClient.get_certificate_file(device_id)
 
     def test_get_certificate_file_empty_id(self):
         """
@@ -99,7 +100,7 @@ class TestCertClient(unittest.TestCase):
         """
         device_id = ""
         with self.assertRaises(ValueError):
-            certificate.CertClient.get_certificate_file(device_id)
+            CertClient.get_certificate_file(device_id)
 
 
     # create_cert_files() #
@@ -113,8 +114,8 @@ class TestCertClient(unittest.TestCase):
         os.makedirs(cert_dir, exist_ok=True)
 
         certificate.Certificate = MagicMock()
-        thing = certificate.Thing("admin", "123")
-        certificate.CertClient.create_cert_files(thing, directory=cert_dir)
+        thing = Thing("admin", "123")
+        CertClient.create_cert_files(thing, directory=cert_dir)
 
         assert os.path.exists(cert_dir + thing.device_id + ".key")
         assert os.path.exists(cert_dir + thing.thing_certificate + ".crt")
@@ -129,7 +130,7 @@ class TestCertClient(unittest.TestCase):
         """
         Should build a new Thing instance.
         """
-        thing = certificate.CertClient.new_cert("admin", "123")
+        thing = CertClient.new_cert("admin", "123")
         assert thing is not None
 
     def test_new_cert_invalid(self):
@@ -137,10 +138,10 @@ class TestCertClient(unittest.TestCase):
         Should not build a new Thing instance with invalid arguments.
         """
         with self.assertRaises(ValueError):
-            certificate.CertClient.new_cert("admin", "")
+            CertClient.new_cert("admin", "")
 
         with self.assertRaises(ValueError):
-            certificate.CertClient.new_cert("", "123")
+            CertClient.new_cert("", "123")
 
 
     # revoke_cert() #
@@ -150,7 +151,7 @@ class TestCertClient(unittest.TestCase):
         """
         requests.delete = MagicMock()
         crypto.load_certificate = MagicMock()
-        certificate.CertClient.revoke_cert(self.mock_thing)
+        CertClient.revoke_cert(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.delete.called
@@ -166,7 +167,7 @@ class TestCertClient(unittest.TestCase):
         requests.get = MagicMock(return_value=response)
         crypto.load_certificate = MagicMock()
 
-        assert certificate.CertClient.has_been_revoked(self.mock_thing)
+        assert CertClient.has_been_revoked(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.get.called
@@ -180,7 +181,7 @@ class TestCertClient(unittest.TestCase):
         requests.get = MagicMock(return_value=response)
         crypto.load_certificate = MagicMock()
 
-        assert not certificate.CertClient.has_been_revoked(self.mock_thing)
+        assert not CertClient.has_been_revoked(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.get.called
@@ -195,7 +196,7 @@ class TestCertClient(unittest.TestCase):
         requests.get = MagicMock(return_value=response)
         crypto.load_certificate = MagicMock()
 
-        assert not certificate.CertClient.has_been_revoked(self.mock_thing)
+        assert not CertClient.has_been_revoked(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.get.called
@@ -205,7 +206,7 @@ class TestCertClient(unittest.TestCase):
         requests.get.reset_mock()
         crypto.load_certificate.reset_mock()
 
-        assert not certificate.CertClient.has_been_revoked(self.mock_thing)
+        assert not CertClient.has_been_revoked(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.get.called
@@ -215,7 +216,7 @@ class TestCertClient(unittest.TestCase):
         requests.get.reset_mock()
         crypto.load_certificate.reset_mock()
 
-        assert not certificate.CertClient.has_been_revoked(self.mock_thing)
+        assert not CertClient.has_been_revoked(self.mock_thing)
 
         assert crypto.load_certificate.called
         assert requests.get.called
@@ -237,7 +238,7 @@ class TestThingConstructor(unittest.TestCase):
         device_id = "123"
         thing_id = Utils.create_thing_id(tenant, device_id)
 
-        thing = certificate.Thing(tenant, device_id)
+        thing = Thing(tenant, device_id)
 
         assert thing.tenant is not None
         assert thing.device_id is not None
@@ -260,13 +261,13 @@ class TestThingConstructor(unittest.TestCase):
         device_id = "123"
 
         with self.assertRaises(ValueError):
-            _thing = certificate.Thing(tenant, device_id)
+            _thing = Thing(tenant, device_id)
 
         tenant = "admin"
         device_id = ""
 
         with self.assertRaises(ValueError):
-            _thing = certificate.Thing(tenant, device_id)
+            _thing = Thing(tenant, device_id)
 
 
 class TestThingMethods(unittest.TestCase):
@@ -279,7 +280,7 @@ class TestThingMethods(unittest.TestCase):
     certificate.Certificate = MagicMock()
 
     def setUp(self):
-        self.thing = certificate.Thing(self.tenant, self.device_id)
+        self.thing = Thing(self.tenant, self.device_id)
 
     def tearDown(self):
         self.thing = None
@@ -288,7 +289,7 @@ class TestThingMethods(unittest.TestCase):
         """
         Should call the renew_cert from Certificate class.
         """
-        self.thing.renew_cert()
+        requests.post = MagicMock()
         assert self.thing.cert.renew_cert.called
 
     def test_get_args_in_dict(self):

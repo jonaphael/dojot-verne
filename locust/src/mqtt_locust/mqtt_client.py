@@ -9,7 +9,7 @@ import paho.mqtt.client as mqtt
 
 from src.utils import Utils
 from src.config import CONFIG
-from src.ejbca.certificate import CertClient
+from src.ejbca.cert_client import CertClient
 
 
 REQUEST_TYPE = 'mqtt'

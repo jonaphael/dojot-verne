@@ -3,11 +3,11 @@ Tests for the MQTT client class.
 """
 import unittest
 import logging
+from unittest.mock import MagicMock
 import paho.mqtt.client as paho
-from unittest.mock import MagicMock, patch
 
 import src.mqtt_locust.mqtt_client as mqtt_client
-from src.ejbca.certificate import CertClient
+from src.ejbca.cert_client import CertClient
 from src.utils import Utils
 
 class TestMQTTClientInitialization(unittest.TestCase):
