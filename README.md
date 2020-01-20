@@ -92,7 +92,7 @@ Environment variables
 Change the value of the DOJOT_URL variable from the code block below and execute:
 
 ```console
-export DOJOT_URL=http://localhost:8000
+export DOJOT_URL=http://myhost:8000
 ```
 
 
@@ -101,7 +101,7 @@ export DOJOT_URL=http://localhost:8000
 Change the value of the DOJOT_DNS variable from the code block below and execute:
 
 ```console
-export DOJOT_DNS=localhost
+export DOJOT_DNS=myhost
 ```
 
 ##### Certificate authority Name
@@ -240,3 +240,31 @@ echo "-----END CERTIFICATE-----" ) > root.crt
 #### 9. Use certificates to communicate with VerneMQ
 
 The tree files are require *client.crt*, *client.key* and *root.crt*.
+
+In this example we will use [mosquitto](https://mosquitto.org/) 
+
+- **-h**: Specify the host to connect to. Defaults to localhost. In this case: *myhost*.
+
+- **-p**: Connect to the port specified. If not given, the default of 1883 for plain MQTT or 8883 for MQTT over TLS will be used. In this case: *30011*.
+
+- **-t**: The MQTT topic on which to publish the message. See mqtt(7) for more information on MQTT topics. In this case: *admin:a1998e/attrs* to publish and *admin:a1998e/config* to subscription.
+
+- **--cafile**: Define the path to a file containing PEM encoded CA certificates that are trusted. Used to enable SSL communication. In this case: *root.crt*
+
+- **--cert**: Define the path to a file containing a PEM encoded certificate for this client, if required by the server. In this case: *client.crt*
+
+- **--key**: Define the path to a file containing a PEM encoded private key for this client, if required by the server. In this case: *client.key*
+
+- **-m**: Send a single message from the command line.
+
+Example how publish:
+
+```console
+mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"timestamp": 9999999999999999 }' --cert client.crt  --key client.key --cafile root.crt 
+```
+
+Example how subscription:
+
+```console
+mosquitto_sub -h myhost -p 30011 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt 
+```
