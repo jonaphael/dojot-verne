@@ -264,7 +264,7 @@ In this example we will use [mosquitto](https://mosquitto.org/) client.
 ```console
 mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"attr_example": 10 }' --cert client.crt  --key client.key --cafile root.crt 
 ```
-Note: In this case the message is a publish to an attribute with label attr example and a new value 10.
+Note: In this case, the message is a publish  on an attribute with the label attr_example and a new value 10.
 
 ##### Example how subscription:
 
