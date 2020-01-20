@@ -78,7 +78,7 @@ Environment variables mentioned above are more described in [here](./vernemq)
 ### **Before**
 
 - Create device in dojot and get device id and tenant.
-- Install [openssl](https://www.openssl.org/) and [jq](https://stedolan.github.io/jq/).
+- Install [openssl](https://www.openssl.org/), [jq](https://stedolan.github.io/jq/) and [cURL](https://curl.haxx.se/).
 
 Environment variables
 
