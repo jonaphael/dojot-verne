@@ -239,9 +239,11 @@ echo "-----END CERTIFICATE-----" ) > root.crt
 
 #### 9. Use certificates to communicate with VerneMQ
 
-The tree files are require *client.crt*, *client.key* and *root.crt*.
+The tree files are require: *client.crt*, *client.key* and *root.crt*. See example:
 
-In this example we will use [mosquitto](https://mosquitto.org/) 
+In this example we will use [mosquitto](https://mosquitto.org/) client.
+
+##### Some options for mosquitto_pub and mosquitto_sub
 
 - **-h**: Specify the host to connect to. Defaults to localhost. In this case: *myhost*.
 
@@ -257,14 +259,15 @@ In this example we will use [mosquitto](https://mosquitto.org/)
 
 - **-m**: Send a single message from the command line.
 
-Example how publish:
+##### Example how publish:
 
 ```console
-mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"timestamp": 9999999999999999 }' --cert client.crt  --key client.key --cafile root.crt 
+mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"attr_example": 10 }' --cert client.crt  --key client.key --cafile root.crt 
 ```
+Note: In this case the message is a publish to an attribute with label attr example and a new value 10.
 
-Example how subscription:
+##### Example how subscription:
 
 ```console
-mosquitto_sub -h myhost -p 30011 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt 
+mosquitto_sub -h myhost -p 30011 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt
 ```
