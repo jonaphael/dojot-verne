@@ -13,7 +13,7 @@ import os
 import redis
 import requests
 
-from src.ejbca.certificate import Thing
+from src.ejbca.thing import Thing
 from src.config import CONFIG
 
 
