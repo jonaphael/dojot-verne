@@ -6,7 +6,7 @@
 
 The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq/vernemq) with some features for dojot case.
 
-![cached image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/diag_mqtt)
+![image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/diag_mqtt)
 
 Fig. 1 - VerneMQ with Dojot (Whereas V2K, K2V, VerneMQ and Client  already have certificates, can occur later communications between PKI and these services. This is better explained later.)
 
@@ -48,7 +48,7 @@ The process of obtaining certificates for client (Fig. 2):
 
 - Obtaining the root certificate (public certificate of **CA**).
 
-![cached image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/seq_sec_client)
+![image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/seq_sec_client)
 
 Fig. 2 - Client retrives certificates from PKI (EJBCA)
 
@@ -62,13 +62,13 @@ The process of obtaining certificates for VerneMQ, K2V Brige and K2V-bridge (ser
 
 - CRL updated the CRL certificate every time by setting in CRL_UPDATE_TIME
 
-![cached image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/seq_sec_service)
+
+![image](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/mprevide/dojot-verne/doc_sec_user/docs/plant_uml/mqtt/seq_sec_service1)
+
 
 Fig. 3 - VerneMQ (Broker) retrive certificates from PKI (EJBCA)
 
 The TLS connection has a maximum life time, see more about [Disconnect Plugin](vernemq/plugins/dojot_disconnect_plugin) for VerneMQ.
-
-
 The TLS connection also has a timeout configurable, this is a VerneMQ configuration.
 
 Environment variables mentioned above are more described in [here](./vernemq)
