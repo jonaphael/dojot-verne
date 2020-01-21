@@ -1,5 +1,5 @@
 const app = {
-  log_level: process.env.LOG_LEVEL || 'debug',
+  log_level: process.env.LOG_LEVEL || 'info',
 };
 
 const messenger = {
