@@ -7,7 +7,7 @@ The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq
 
 Key                      | Purpose                                                       | Default Value  | Accepted values
 -----------------------  | --------------------------------------------------------------| -------------- |-------------------------
-CERT_EJBCA_API_BROKER    | Address of cluster                                            | "localhost"    | IP or DNSs
+CERT_EJBCA_API_BROKER    | Cluster address                                               | "localhost"    | IP or DNSs
 CERT_EJBCA_API_PORT      | Ejbca service port                                            | "5583"         | port values
 K8S_ENV                  | K8s environment  (yes if use with vmq-operator                | "n"            | y or n 
 HOSTNAME                 | Name to container                                             | "broker"       | string
