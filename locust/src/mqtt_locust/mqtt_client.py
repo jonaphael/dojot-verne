@@ -2,14 +2,11 @@
     Handles Paho MQTT-Client operations like publish/subscription, connection,
     loop function.
 """
-from datetime import datetime
 import logging
 import time
 import json
-from queue import Queue
 import paho.mqtt.client as mqtt
 
-from src.mqtt_locust.log_controller import LogController
 from src.utils import Utils
 from src.config import CONFIG
 from src.ejbca.cert_client import CertClient
@@ -18,7 +15,6 @@ from src.ejbca.cert_client import CertClient
 REQUEST_TYPE = 'mqtt'
 MESSAGE_TYPE_CONNECT = 'connect'
 MESSAGE_TYPE_DISCONNECT = 'disconnect'
-MESSAGE_TYPE_RECONNECT = 'reconnect'
 MESSAGE_TYPE_PUB = 'publish'
 MESSAGE_TYPE_SUB = 'subscribe'
 MESSAGE_TYPE_RECV_MESSAGE = 'recv_message'
@@ -56,61 +52,81 @@ class MQTTClient:
                  run_id: str,
                  should_revoke: bool,
                  should_renew: bool):
-        """MQTT client constructor.
+        """
+        MQTT client constructor. To get this to work, you should call setup() after instantiating
+        the class.
 
         Args:
             device_id: device identifier
             run_id: client run identifier
             should_revoke: whether this client should have its certificate revoked
             should_renew: whether this client should have its certificate renewed
-            tenant: tenant that owns the device
         """
+        Utils.validate_tenant(CONFIG["app"]["tenant"])
+        Utils.validate_device_id(device_id)
+
+        if len(run_id) < 1:
+            raise ValueError("the run ID must have at least one character")
+
+        if should_renew and should_revoke:
+            raise ValueError("only one of should_renew and should_revoke can be True")
 
         self.device_id = device_id
         self.run_id = run_id
         self.should_revoke = should_revoke
         self.should_renew = should_renew
 
-        self.tenant = CONFIG["app"]["tenant"]
         self.is_connected = False
+        self.mqttc = None
+
+        self.tenant = CONFIG["app"]["tenant"]
+        self.username = ""
+        self.topic = ""
+        self.sub_topic = ""
+
+        self.device_cert_dir = ""
+        self.new_cert = None
+
+        self.pubmmap = {}
+        self.submmap = {}
+
+        # Used to count the time between connection and revocation/renovation
         self.start_time = 0
 
-        # Creating a new certificate if the client was chosen to be revoked
+    def setup(self) -> None:
+        """
+        Initializes the required parameters.
+        """
+        logging.basicConfig(**CONFIG["app"]["log_config"])
+
+        self.username = '{0}:{1}'.format(self.tenant, self.device_id)
+        self.topic = "{0}/attrs".format(self.username)
+        self.sub_topic = "{0}/config".format(self.username)
+
         self.device_cert_dir = CONFIG["security"]["cert_dir"]
 
+        # Creating a new certificate if the client was chosen to be revoked
         if self.should_revoke:
             self.device_cert_dir = self.device_cert_dir + CONFIG["security"]["revoke_cert_dir"]
             self.new_cert = CertClient.new_cert(self.tenant, self.device_id)
-            CertClient.create_cert_files(self.device_id, self.new_cert, \
-                self.device_cert_dir)
+            CertClient.create_cert_files(self.new_cert, self.device_cert_dir)
 
         elif self.should_renew:
             self.device_cert_dir = self.device_cert_dir + CONFIG["security"]["renew_cert_dir"]
             self.new_cert = CertClient.new_cert(self.tenant, self.device_id)
-            CertClient.create_cert_files(self.device_id, self.new_cert, \
-                self.device_cert_dir)
+            CertClient.create_cert_files(self.new_cert, self.device_cert_dir)
 
-        self.pubmmap = {}
-        self.submmap = {}
-        self.recvmqueue = Queue()
+        self.configure_mqtt()
 
-        self.initialize_mqtt()
-
-    def initialize_mqtt(self) -> None:
+    def configure_mqtt(self) -> None:
         """
-        Initializes the MQTT connection.
+        Configures the MQTT connection.
         """
         # Certification files
         cert_dir = CONFIG["security"]["cert_dir"]
         ca_cert_file = cert_dir + CONFIG["security"]["ca_cert_file"]
         cert_file = self.device_cert_dir + CertClient.get_certificate_file(self.device_id)
         key_file = self.device_cert_dir + CertClient.get_private_key_file(self.device_id)
-
-        self.username = '{0}:{1}'.format(self.tenant, self.device_id)
-        self.topic = "{0}/attrs".format(self.username)
-        self.sub_topic = "{0}/config".format(self.username)
-
-        self.log = LogController(self.run_id)
 
         # Configuring MQTT client
         self.mqttc = mqtt.Client(client_id=self.device_id)
@@ -124,6 +140,8 @@ class MQTTClient:
         # Setting up TLS
         self.mqttc.tls_set(ca_cert_file, cert_file, key_file)
         # TODO: investigate the problem when the insecure TLS mode is False
+        # This problem seems to happen because the TLS implementation does not
+        # expects an IP, but a hostname
         self.mqttc.tls_insecure_set(True)
 
         # Registering MQTT client callbacks
@@ -145,7 +163,7 @@ class MQTTClient:
             self.mqttc.loop_start()
             self.start_time = time.time()
         except Exception as exception:
-            self.log.append_log(exception)
+            logging.error("Error while connecting to the broker: %s", str(exception))
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name='connect',
@@ -178,19 +196,17 @@ class MQTTClient:
                 'topic': self.topic,
                 'payload': payload,
                 'start_time': start_time,
-                'timed_out': CONFIG['mqtt']['pub_timeout'],
                 'messages': 'messages'
             }
 
         except Exception as exception:
-            timestamp = int(datetime.timestamp(datetime.now()))
-            err_msg = Utils.error_message(int(str(exception)))
-            self.log.append_log("{0}\nTime: {1} - {2}\n".format(err_msg, timestamp, str(exception)))
+            error = Utils.error_message(int(str(exception)))
+
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
                 response_time=Utils.time_delta(start_time, time.time()),
-                exception=err_msg,
+                exception=error
             )
 
     def subscribing(self) -> None:
@@ -212,22 +228,18 @@ class MQTTClient:
                 'topic': self.sub_topic,
                 'payload': "",
                 'start_time': start_time,
-                'timed_out': CONFIG['mqtt']['sub_timeout'],
                 'messages': 'messages'
             }
 
-            if CONFIG['app']['debug']:
-                logging.info("Successfully subscribed")
-
         except Exception as exception:
-            err_msg = Utils.error_message(int(str(exception)))
-            self.log.append_log(err_msg)
+            error = Utils.error_message(int(str(exception)))
+            logging.error("Error while subscribing: %s", error)
 
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_SUB,
                 response_time=Utils.time_delta(start_time, time.time()),
-                exception=err_msg
+                exception=error
             )
 
 
@@ -235,46 +247,31 @@ class MQTTClient:
     ## Callbacks ##
     ###############
 
-    def locust_on_subscribe(self, _client: mqtt.Client, _userdata, mid, _granted_qos) -> None:
+    def locust_on_subscribe(
+            self,
+            _client: mqtt.Client,
+            _userdata,
+            mid,
+            _granted_qos) -> None:
         """
         Subscription callback function.
         """
-
         end_time = time.time()
         message = self.submmap.pop(mid, None)
 
         if message is None:
-            if CONFIG['app']['debug']:
-                logging.error("subscribe message is None")
-            self.log.append_log("subscribe message is None\n")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_SUB,
                 response_time=0,
-                exception=ValueError("Subscribed message could not be found"),
-            )
-            return
-
-        total_time = float(Utils.time_delta(message['start_time'], end_time))
-
-        if total_time > float(message['timed_out']):
-            if CONFIG['app']['debug']:
-                logging.error("subscribe timed out, response time: %f", total_time)
-            self.log.append_log("subscribe timed out, response time: %f" % total_time)
-            Utils.fire_locust_failure(
-                request_type=REQUEST_TYPE,
-                name=MESSAGE_TYPE_SUB,
-                response=total_time,
-                exception=TimeoutError("subscribe timed out")
+                exception=ValueError("Subscription not found"),
             )
 
         else:
-            if CONFIG['app']['debug']:
-                logging.info("Subscription received")
             Utils.fire_locust_success(
                 request_type=REQUEST_TYPE,
                 name=message['name'],
-                response_time=total_time,
+                response_time=Utils.time_delta(message['start_time'], end_time),
                 response_length=0
             )
 
@@ -282,35 +279,31 @@ class MQTTClient:
         """
         Publishing callback function.
         """
-
         end_time = time.time()
         message = self.pubmmap.pop(mid, None)
 
         if message is None:
-            self.log.append_log("publish message is none\n")
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
                 name=MESSAGE_TYPE_PUB,
                 response_time=0,
                 exception=ValueError("Published message could not be found"),
             )
-            return
 
-        total_time = Utils.time_delta(message['start_time'], end_time)
+        else:
+            Utils.fire_locust_success(
+                request_type=REQUEST_TYPE,
+                name=message['name'],
+                response_time=Utils.time_delta(message['start_time'], end_time),
+                response_length=len(message['payload']),
+            )
 
-        Utils.fire_locust_success(
-            request_type=REQUEST_TYPE,
-            name=message['name'],
-            response_time=total_time,
-            response_length=len(message['payload']),
-        )
-
-        self.recvmqueue.put({
-            # The end_time for publish is the start_time for the subscribed clients
-            'start_time': end_time,
-        })
-
-    def locust_on_connect(self, _client: mqtt.Client, _flags_dict, _userdata, result_code) -> None:
+    def locust_on_connect(
+            self,
+            _client: mqtt.Client,
+            _flags_dict,
+            _userdata,
+            result_code: int) -> None:
         """
         Connection callback function.
         """
@@ -324,26 +317,19 @@ class MQTTClient:
                 response_length=0
             )
         else:
+            error = Utils.error_message(result_code)
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
-                name=MESSAGE_TYPE_DISCONNECT,
+                name=MESSAGE_TYPE_CONNECT,
                 response_time=0,
-                exception=DisconnectError(Utils.error_message(result_code))
+                exception=DisconnectError(error)
             )
 
-    def locust_on_disconnect(self, _client: mqtt.Client, _userdata, result_code) -> None:
+    def locust_on_disconnect(self, _client: mqtt.Client, _userdata, result_code: int) -> None:
         """
         Disconnection callback function.
         """
-        if result_code == mqtt.MQTT_ERR_SUCCESS:
-            self.is_connected = False
-            Utils.fire_locust_success(
-                request_type=REQUEST_TYPE,
-                name=MESSAGE_TYPE_DISCONNECT,
-                response_time=0,
-                response_length=0
-            )
-        else:
+        if result_code != mqtt.MQTT_ERR_SUCCESS:
             self.is_connected = False
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
@@ -354,20 +340,22 @@ class MQTTClient:
 
         self.mqttc.reconnect()
 
-
-    def locust_on_message(self, _client: mqtt.Client, _userdata, message: mqtt.MQTTMessage):
+    @staticmethod
+    def locust_on_message(_client: mqtt.Client, _userdata, message: mqtt.MQTTMessage):
         """
         Message reception callback function.
         """
-
         if message is not None:
-            saved_message = self.recvmqueue.get()
-
-            if saved_message is not None:
+            publish_time = 0.0
+            try:
+                publish_time = float(json.loads(message.payload.decode())["timestamp"])
+            except Exception as exception:
+                logging.error("Error while parsing the message payload: %s", str(exception))
+            else:
                 Utils.fire_locust_success(
                     request_type=REQUEST_TYPE,
                     name=MESSAGE_TYPE_RECV_MESSAGE,
-                    response_time=Utils.time_delta(saved_message['start_time'], time.time()),
+                    response_time=Utils.time_delta(publish_time, time.time()),
                     response_length=len(message.payload)
                 )
 
@@ -382,7 +370,6 @@ class MQTTClient:
         if self.should_renew_now():
             try:
                 self.new_cert.renew_cert()
-                # CertClient.create_cert_files(self.device_id, self.new_cert, self.device_cert_dir)
 
             except Exception as exception:
                 Utils.fire_locust_failure(

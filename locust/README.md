@@ -32,12 +32,17 @@ source ./bin/activate
 
 Install the packages inside the virtual environment:
 ```shell
-pip3 install -r requirements.txt
+pip3 install -r requirements/prod.txt
 ```
 
-With the environment activated, you can run the scripts. When done, deactivate the environment:
+If you need to run the unit tests and/or develop, you need another packages too:
 ```shell
-deativate
+pip3 install -r requirements/dev.txt
+```
+
+With the environment activated, you can run the scripts or tests. When done, deactivate the environment:
+```shell
+deactivate
 ```
 
 ## **Environment Variables**
@@ -51,32 +56,30 @@ The Dockerfile for the Locust master and slave are in the `Docker` directory.
 
 Locust behaviour and Redis configurations.
 
-Key                      | Purpose                                                             | Default Value         | Valid Values     |
------------------------- | ------------------------------------------------------------------- | --------------------- | ---------------- |
-CA_CERT_FILE             | CA certificate file                                                 | ca.crt                | file name        |
-CERT_DIR                 | certificates and private keys directory                             | cert/                 | directory name   |
-DEBUG_MODE               | show debug messages                                                 | False                 | True, False      |
-DEVICES_TO_RENEW         | number of devices to renew randomly                                 | 1000                  | integer          |
-DEVICES_TO_REVOKE        | number of devices to revoke randomly                                | 1000                  | integer          |
-EJBCA_URL                | EJBCA address                                                       | http://localhost:5583 | hostname/IP:port |
-LOCUST_LOG_DIR           | client log directory                                                | /log                  | directory name   |
-LOCUST_LOG_MESSAGE_LIMIT | limit number of messages to write in log files                      | 1000                  | integer          |
-LOG_IN_FILE              | write log messages in a file                                        | False                 | True, False      |
-MAX_TIME_RECONN          | max time (in seconds) to try to reconnect to the MQTT broker        | 600                   | integer          |
-MIN_TIME_RECONN          | min time (in seconds) to try to reconnect to the MQTT broker        | 1                     | integer          |
-REDIS_BACKUP             | use a Redis dump with IDs instead of generating new ones            | y                     | y, n             |
-REDIS_CERTIFICATES_DB    | database with the certificates                                      | 0                     | integer          |
-REDIS_HOST               | redis host                                                          | redis                 | hostname/IP      |
-REDIS_MAPPED_DB          | database with the mapped device IDs from certificates database      | 1                     | integer          |
-REDIS_PASSWD             | redis password                                                      | none                  | passwords        |
-REDIS_PORT               | redis port                                                          | 6379                  | 1024-65535       |
-RENEW_DEVICES            | enable random renovation of devices                                 | False                 | True, False      |
-REVOKE_DEVICES           | enable random revocation of devices                                 | False                 | True, False      |
-TASK_MAX_TIME            | max time of each Locust's tasks (ms)                                | 30000                 | integer          |
-TASK_MIN_TIME            | min time of each Locust's tasks (ms)                                | 29500                 | integer          |
-TENANT                   | tenant that is publishing                                           | admin                 | string           |
-TIME_TO_RENEW            | time to renew the cert after the client initialization              | 1000                  | integer          |
-TIME_TO_REVOKE           | time to revoke the cert after the client initialization             | 1000                  | integer          |
+Key                      | Purpose                                                             | Default Value         | Valid Values                                  |
+------------------------ | ------------------------------------------------------------------- | --------------------- | --------------------------------------------- |
+CA_CERT_FILE             | CA certificate file                                                 | ca.crt                | file name                                     |
+CERT_DIR                 | certificates and private keys directory                             | cert/                 | directory name                                |
+DEBUG_MODE               | show debug messages                                                 | False                 | True, False                                   |
+DEVICES_TO_RENEW         | number of devices to renew randomly                                 | 1000                  | integer                                       |
+DEVICES_TO_REVOKE        | number of devices to revoke randomly                                | 1000                  | integer                                       |
+EJBCA_URL                | EJBCA address                                                       | http://localhost:5583 | hostname/IP:port                              |
+LOG_LEVEL                | log level                                                           | info                  | notset, debug, info, warning, error, critical |
+MAX_TIME_RECONN          | max time (in seconds) to try to reconnect to the MQTT broker        | 600                   | integer                                       |
+MIN_TIME_RECONN          | min time (in seconds) to try to reconnect to the MQTT broker        | 1                     | integer                                       |
+REDIS_BACKUP             | use a Redis dump with IDs instead of generating new ones            | y                     | y, n                                          |
+REDIS_CERTIFICATES_DB    | database with the certificates                                      | 0                     | integer                                       |
+REDIS_HOST               | redis host                                                          | redis                 | hostname/IP                                   |
+REDIS_MAPPED_DB          | database with the mapped device IDs from certificates database      | 1                     | integer                                       |
+REDIS_PASSWD             | redis password                                                      | none                  | passwords                                     |
+REDIS_PORT               | redis port                                                          | 6379                  | 1024-65535                                    |
+RENEW_DEVICES            | enable random renovation of devices                                 | False                 | True, False                                   |
+REVOKE_DEVICES           | enable random revocation of devices                                 | False                 | True, False                                   |
+TASK_MAX_TIME            | max time of each Locust's tasks (ms)                                | 30000                 | integer                                       |
+TASK_MIN_TIME            | min time of each Locust's tasks (ms)                                | 29500                 | integer                                       |
+TENANT                   | tenant that is publishing                                           | admin                 | string                                        |
+TIME_TO_RENEW            | time to renew the cert after the client initialization              | 1000                  | integer                                       |
+TIME_TO_REVOKE           | time to revoke the cert after the client initialization             | 1000                  | integer                                       |
 
 ### **MQTT**
 
@@ -111,6 +114,24 @@ OS will not accomodate the required number of connections. To increase it, run:
 
 ```shell
 sudo sysctl -w net/ipv4/ip_local_port_range="1024 65535"
+```
+
+# Development
+
+## Lint
+
+There is a lint in the repository that you should follow. To check the linting state in it, run:
+```shell
+pylint src tests
+```
+
+## Unit Tests
+
+To run the tests, you need to have installed the test dependencies. If you missed this step, you can see it
+[here](#virtual-environment).
+With the dependencies properly installed, you can get the complete tests' report by running:
+```shell
+pytest --cov=. -v tests
 ```
 
 # **How to use**
@@ -180,7 +201,6 @@ CERT_DIR              | certificates and private keys directory                 
 REDIS_CERTIFICATES_DB | database with the certificates                                 | 0             | integer        |
 REDIS_MAPPED_DB       | database with the mapped device IDs from certificates database | 1             | integer        |
 TENANT                | tenant that is publishing                                      | admin         | string         |
-
 
 ## **Certificates**
 
@@ -298,6 +318,19 @@ To accomplish this, take a look at the following environment variables:
 
 - RENEW_DEVICES and REVOKE_DEVICES to enable the simulations
 - TIME_TO_RENEW and TIME_TO_REVOKE to control the time of renovation and revocation
+
+## **Locust messages**
+
+There are several messages that are displayed in Locust interface. These messages
+are:
+- connect: the client sent a connect message to the broker
+- disconnect: the client sent a disconnect message to the broker or were disconnected
+from the broker for some reason
+- publish: the client published to the broker
+- subscribe: the client sent a subscribe request to the broker
+- recv_message: the client received a message from the subscribed topic
+- renew: a certificate renovation request was sent to EJBCA
+- revoke: a certificate revocation request was sent to EJBCA
 
 # **Machine specifications for tests**
 

@@ -41,9 +41,10 @@ class MqttLocust(Locust):
                 device_id = cache.next_device_id()
 
         # UUID to identify the client run
-        run_id = uuid.uuid4()
+        run_id = str(uuid.uuid4())
 
         self.client = MQTTClient(device_id, run_id, should_revoke, should_renew)
+        self.client.setup()
         self.client.connect()
 
 
@@ -63,8 +64,7 @@ class ThingBehavior(TaskSet):
         """
         Treats the client when Locust test has stopped.
         """
-        # Saving the log messages in a file
-        self.client.log.save_log_list()
+        self.client.mqttc.disconnect()
 
 
 class Client(MqttLocust):

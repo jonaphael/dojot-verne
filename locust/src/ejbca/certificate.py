@@ -1,5 +1,5 @@
 """
-EJBCA certificate creation.
+Certificate generation.
 """
 import logging
 import json
@@ -7,9 +7,11 @@ import requests
 from OpenSSL import crypto
 
 from src.config import CONFIG
+from src.utils import Utils
 
 LOGGER = logging.getLogger('urllib3')
 LOGGER.setLevel(logging.CRITICAL)
+
 
 class Certificate:
     """
@@ -17,6 +19,8 @@ class Certificate:
     """
 
     def __init__(self, thing_id):
+        Utils.validate_thing_id(thing_id)
+
         self.c_name = thing_id
         self.key = {"raw": "", "pem": self.generate_private_key()}
         self.csr = {"raw": "", "pem": self.generate_csr()}
@@ -95,12 +99,10 @@ class Certificate:
         return crypto.dump_certificate_request(crypto.FILETYPE_PEM, req).decode("ascii")
 
 
-    def create_ejbca_user(self, _certificate_profile_name="CFREE",
-                          _end_entity_profile_name="EMPTY_CFREE") -> None:
+    def create_ejbca_user(self) -> None:
         """
         Makes a requisition to EJBCA to create a user.
         """
-        ca_name = CONFIG['security']['ejbca_ca_name']
         # create the ejbca user
         req = json.dumps({
             "username": self.c_name

@@ -1,11 +1,15 @@
 """
 Utils functions.
 """
+from logging import NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL
 import sys
 
-from decimal import Decimal
+from decimal import Decimal, getcontext
 import paho.mqtt.client as mqtt
 from locust import events
+
+# Fix Decimal type precision
+getcontext().prec = 5
 
 class Utils():
     """Project Utils class."""
@@ -22,7 +26,7 @@ class Utils():
             int: difference between the two times (in milliseconds).
         """
 
-        return int(Decimal(end - start) * 1000)
+        return int((Decimal(end) - Decimal(start)) * 1000)
 
     @staticmethod
     def fire_locust_failure(**kwargs):
@@ -111,3 +115,76 @@ class Utils():
         Checks if the code is being run by a Locust slave.
         """
         return "--slave" in sys.argv
+
+    @staticmethod
+    def log_level(level_name: str) -> int:
+        """
+        Parses the log level and returns the correct values for the logging package.
+
+        Args:
+            level_name: wanted log level.
+
+        Returns the value that the logging package understands.
+        """
+        level = -1
+        level_name = level_name.lower()
+
+        if level_name == "notset":
+            level = NOTSET
+        elif level_name == "debug":
+            level = DEBUG
+        elif level_name == "info":
+            level = INFO
+        elif level_name == "warning":
+            level = WARNING
+        elif level_name == "error":
+            level = ERROR
+        elif level_name == "critical":
+            level = CRITICAL
+
+        return level
+
+    @staticmethod
+    def validate_device_id(device_id: str) -> None:
+        """
+        Validates the device ID.
+
+        Raises a ValueError when the ID is invalid.
+        """
+        if len(device_id) < 1:
+            raise ValueError("the device ID must have at least one character")
+
+    @staticmethod
+    def validate_tenant(tenant: str) -> None:
+        """
+        Validates the tenant.
+
+        Raises a ValueError when the tenant is invalid.
+        """
+        if len(tenant) < 1:
+            raise ValueError("the tenant name must have at least one character")
+
+    @staticmethod
+    def validate_thing_id(thing_id: str) -> None:
+        """
+        Validates a thing ID. Its format must be tenant:deviceid.
+
+        Raises a ValueError when the thing ID is invalid.
+        """
+        split = thing_id.split(":")
+
+        if len(split) != 2:
+            raise ValueError("the thing ID must be in the format tenant:deviceid")
+
+        Utils.validate_tenant(split[0])
+        Utils.validate_device_id(split[1])
+
+    @staticmethod
+    def create_thing_id(tenant: str, device_id: str) -> str:
+        """
+        Create the thing ID.
+        """
+        Utils.validate_tenant(tenant)
+        Utils.validate_device_id(device_id)
+
+        return f"{tenant}:{device_id}"

@@ -1,12 +1,13 @@
 """
-Certificate and private key related module.
+Certificate utilities.
 """
 import logging
 import requests
 from OpenSSL import crypto
 
-from src.ejbca.thing import Thing
 from src.config import CONFIG
+from src.utils import Utils
+from src.ejbca.thing import Thing
 
 class CertClient:
     """
@@ -18,6 +19,7 @@ class CertClient:
         """
         Creates the key filename.
         """
+        Utils.validate_device_id(device_id)
         return "{0}.key".format(device_id)
 
     @staticmethod
@@ -25,10 +27,11 @@ class CertClient:
         """
         Creates the certificate filename.
         """
+        Utils.validate_device_id(device_id)
         return "{0}.crt".format(device_id)
 
     @staticmethod
-    def create_cert_files(device_id: str, thing: Thing, directory: str = "/cert") -> None:
+    def create_cert_files(thing: Thing, directory: str = "/cert/") -> None:
         """Creates the .key and .crt files for a device.
 
         Args:
@@ -36,7 +39,7 @@ class CertClient:
             thing: Thing object with certificate's info.
             directory: directory to save the files.
         """
-        thing_path = directory + device_id
+        thing_path = directory + thing.device_id
 
         try:
             with open(thing_path + ".key", "w") as key_file:
@@ -53,11 +56,9 @@ class CertClient:
         """
         Creates/renovates the certificate for a device.
         """
-        thing = None
-        try:
-            thing = Thing(tenant + ":" + device_id)
-        except Exception as exception:
-            logging.error("Error: %s", str(exception))
+        Utils.validate_tenant(tenant)
+        Utils.validate_device_id(device_id)
+        thing = Thing(tenant, device_id)
 
         return thing
 
@@ -96,9 +97,8 @@ class CertClient:
         res = requests.get(url)
         res_json = res.json()
 
-        if res_json["status"]:
+        if res_json.get("status") and res_json["status"].get("return"):
             return res_json["status"]["return"]["reason"] == 0
         else:
-            logging.error("Error: 'status' not present in EJBCA certificate status checking \
-                response")
+            logging.error("Error: invalid response from EJBCA")
             return False
