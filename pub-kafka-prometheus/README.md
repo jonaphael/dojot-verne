@@ -14,7 +14,7 @@ The start timestamp in seconds must be within the  payload (publication MQTT) an
 
 `{"attrs": {"timestamp": 1575978282.524759 }}`
 
-And the final timestamp in miliseconds is exposed by kafka.
+And the final timestamp in miliseconds is exposed by kafka in extra information.
 
 
 ## **Environment variables**
@@ -29,7 +29,7 @@ PROMETHEUS_PORT         | Port of prometheus client                             
 
 ### Grafana
 
-There is a dashboard configuration for use with this service in [dashboard](./dashboard-grafana/Dojot100kV2.json).
+There is a dashboard configuration for use with this service in [dashboard](./examples/dashboard-grafana/Dojot100kV2.json).
 
 ### Node exporter
 
