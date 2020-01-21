@@ -28,7 +28,7 @@ We use **TLS** mutual authentication to provide a secure communication between d
 
 In **TLS** each device and broker should be provisioned with a private key and corresponding public certificate sign from **CA** (certificate authority) and a root certificate (public certificate of **CA**), the **CA** is include in **PKI** (public key infrastructure). A **PKI**  ([EJBCA](./ejbca)) is a system for the creation, storage, and distribution of digital certificates.
 
-An **ACL** (access-control list) based authorization is provided to manage permissions, a device can publish and subscription in own topic, the topics are: 
+An **ACL** (access-control list) based authorization is provided to manage permissions, so a device can only publish and subscribe to its own topic, the topics are: 
 
 - For publish: ***tenant***_:_***device_id***_/attrs_
 - For subscription: ***tenant***_:_***device_id***_/config_
@@ -42,9 +42,9 @@ Also a PKI includes the certificate revocation list (**CRL**), which is a list o
 
 The process of obtaining certificates for client (Fig. 2):
 
-- Creation of entity at EJBCA, usually this unique entity consisting of ***tenant***_:_***device_id***.
+- Creation of entity at EJBCA, usually this unique entity consists of ***tenant***_:_***device_id***.
 
-- Obtaining a public certificate for the client, which happens with the creation of the CSR (Certificate signing request, It usually contains the public key, identifying information such as a hostname and unique identification) and sending this CSR to obtain a public certificate.
+- Obtaining a public certificate for the client, which happens with the creation of the CSR (Certificate Signing Request, it usually contains the public key, identifying information such as a hostname and unique identification) and its submission to obtain a public certificate.
 
 - Obtaining the root certificate (public certificate of **CA**).
 
@@ -52,13 +52,13 @@ The process of obtaining certificates for client (Fig. 2):
 
 Fig. 2 - Client retrives certificates from PKI (EJBCA)
 
-The step by step how to get a certificate for a client will be explained later, see [here](##how-to-get-a-certificate-for-a-client-to-use-with-dojot-vernemq).
+The step by step on how to get a certificate for a client will be explained later, see [here](##how-to-get-a-certificate-for-a-client-to-use-with-dojot-vernemq).
 
-The process of obtaining certificates for VerneMQ, K2V Brige and K2V-bridge (services) instances follows the same steps as for the client, with some more (Fig. 3):
+The process of obtaining certificates for VerneMQ, K2V Brige and K2V-bridge (services) instances follows the same steps as for the client, with some more followed by (Fig. 3):
 
 - At each defined time (CHECK_EXPIRATION_TIME), it's checked if the root certificate and public certificate of the service instance will expire in the next CHECKEND_EXPIRATION_SEC seconds.
 
-- At each defined time (CHECK_BROKER_CERT_REVOKED_TIME), it's checked if the public certificate of the service instance has revoked.
+- At each defined time (CHECK_BROKER_CERT_REVOKED_TIME), it's checked if the public certificate of the service instance has been revoked.
 
 - CRL updated the CRL certificate every time by setting in CRL_UPDATE_TIME
 
@@ -69,7 +69,7 @@ The process of obtaining certificates for VerneMQ, K2V Brige and K2V-bridge (ser
 Fig. 3 - VerneMQ (Broker) retrive certificates from PKI (EJBCA)
 
 The TLS connection has a maximum life time, see more about [Disconnect Plugin](vernemq/plugins/dojot_disconnect_plugin) for VerneMQ.
-The TLS connection also has a timeout configurable, this is a VerneMQ configuration.
+The TLS connection also has a configurable timeout, which is a VerneMQ configuration..
 
 Environment variables mentioned above are more described in [here](./vernemq)
 
@@ -77,7 +77,7 @@ Environment variables mentioned above are more described in [here](./vernemq)
 
 ### **Before**
 
-- Create device in dojot and get device id and tenant.
+- Create a device in Dojot and get a tenant and a device ID.
 - Install [openssl](https://www.openssl.org/), [jq](https://stedolan.github.io/jq/) and [cURL](https://curl.haxx.se/).
 
 Environment variables
@@ -117,8 +117,8 @@ export CA_NAME=IOTmidCA
 Change the value of the DOJOT_USERNAME and DOJOT_PASSWORD variables from the code block below and execute:
 
 ```console
-export DOJOT_USERNAME=admin
-export DOJOT_PASSWORD=admin
+export DOJOT_USERNAME=user
+export DOJOT_PASSWORD=password
 ```
 
 
@@ -259,14 +259,14 @@ In this example we will use [mosquitto](https://mosquitto.org/) client.
 
 - **-m**: Send a single message from the command line.
 
-##### Example how publish:
+##### Example on how to publish:
 
 ```console
 mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"attr_example": 10 }' --cert client.crt  --key client.key --cafile root.crt 
 ```
 Note: In this case, the message is a publish  on an attribute with the label attr_example and a new value 10.
 
-##### Example how subscription:
+##### Example on how to subscribe:
 
 ```console
 mosquitto_sub -h myhost -p 30011 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt
