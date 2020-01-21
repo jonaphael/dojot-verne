@@ -22,9 +22,7 @@ class Metrics {
   }
 
   isNotEmptyAllTimes() {
-    if (this.allTimes && this.allTimes.length > 0) return true;
-
-    return false;
+    return (this.allTimes && this.allTimes.length > 0);
   }
 
   getMax() {
