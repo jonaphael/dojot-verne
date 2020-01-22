@@ -2,7 +2,7 @@
  * Unit test for config file
  */
 
-const config = require('../config');
+const config = require('../../app/config');
 
 describe('Configuration', () => {
   it('should test toBoolean when a number is given', () => {

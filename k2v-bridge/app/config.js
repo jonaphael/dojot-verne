@@ -2,7 +2,6 @@ const toBoolean = (mode) => ((mode || false) && (mode.toString().toLowerCase().t
 
 const app = {
   mqtt_log_level: process.env.LOG_LEVEL || 'info',
-  enable_dojot: toBoolean(process.env.ENABLE_DOJOT),
   hostname: process.env.HOSTNAME,
 };
 

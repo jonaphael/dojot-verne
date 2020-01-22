@@ -3,7 +3,7 @@ const { IoTAgent } = require('@jonaphael/iotagent-nodejs');
 const fs = require('fs');
 const mqtt = require('mqtt');
 const util = require('util');
-const ProjectUtils = require('../utils/utils');
+const ProjectUtils = require('./utils/utils');
 const defaultConfig = require('./config');
 
 const TAG = { filename: 'MqttClientApp' };
@@ -39,29 +39,14 @@ class App {
     this.iotagent = new IoTAgent();
     this.iotagent.init().then(() => {
       /* Actuation message handler */
-      if (this.config.app.enable_dojot === true) {
-        logger.info('Dojot is enable', TAG);
-        this.iotagent.on('iotagent.device', 'device.configure', (tenant, event) => {
-          logger.debug(`Got device actuation message. Tenant is ${tenant}.`, TAG);
+      this.iotagent.on('iotagent.device', 'device.configure', (tenant, event) => {
+        logger.debug(`Got device actuation message. Tenant is ${tenant}.`, TAG);
 
-          const configTopic = ProjectUtils.generateActuationTopic(event.meta.service,
-            event.data.id);
+        const configTopic = ProjectUtils.generateActuationTopic(event.meta.service,
+          event.data.id);
 
-          this.publishMessage(configTopic, JSON.stringify(event.data.attrs));
-        });
-      } else {
-        // 100k epic
-        logger.info('100K is enable', TAG);
-        this.iotagent.on('device-data', 'message', (_tenant, message, extraInfo) => {
-          logger.debug(`The extra info is ${util.inspect(extraInfo, { depth: null })}`, TAG);
-          try {
-            const data = JSON.parse(message);
-            this.publishMessage(`${extraInfo.key}/config`, JSON.stringify(data.attrs));
-          } catch (error) {
-            logger.error(`Error parsing Kafka message: ${error}`, TAG);
-          }
-        });
-      }
+        this.publishMessage(configTopic, JSON.stringify(event.data.attrs));
+      });
     }).catch(() => {
       logger.error('An error occurred while initializing the IoTAgent. Bailing out!', TAG);
     });

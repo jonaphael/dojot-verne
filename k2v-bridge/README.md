@@ -24,7 +24,6 @@ KAFKA_HOSTS              | Address of the kafka broker                          
 DOJOT_MQTT_HOST          | Address of the verne broker                                         |vernemq-k8s      | hostname/IP    |
 DOJOT_MQTT_PORT          | Port of the verne broker                                            |1883             | integer        |
 CERT_DNS                 | DNS of the service                                                  |localhost        | hostname       |
-ENABLE_DOJOT             | Enable dojot or 100k                                                |false            | string         |
 
 # **Issues and help**
 
