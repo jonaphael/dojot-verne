@@ -15,7 +15,13 @@
   roles:
     - role: dojot-basic
 
-# Metrics
+- hosts: dojot-k8s[0]
+  any_errors_fatal: true
+  tags: dojot-minio
+  roles:
+    - role: minio
+
+#Metrics
 - hosts: dojot-k8s[0]
   any_errors_fatal: true
   tags: dojot-metrics-prometheus-grafana
@@ -30,6 +36,7 @@
   roles:
     - role: zookeeper
       when: not dojot_zk_use_external
+
 
 # Deploy postgreSQL to the environment
 # TODO: Add possibility of using an external postgres by setting DB config variables
@@ -49,14 +56,14 @@
   roles:
     - role: databases/postgres-ejbca
 
-# # Deploy mongoDB to the environment
-# # TODO: Add possibility of using an external mongodb by setting DB config variables
-# # TODO: Support a HA cluster
-# # - hosts: dojot-k8s[0]
-# #   any_errors_fatal: true
-# #   tags: dojot-mongodb
-# #   roles:
-# #     - role: databases/mongodb
+# Deploy mongoDB to the environment
+# TODO: Add possibility of using an external mongodb by setting DB config variables
+# TODO: Support a HA cluster
+- hosts: dojot-k8s[0]
+  any_errors_fatal: true
+  tags: dojot-mongodb
+  roles:
+    - role: databases/mongodb
 
 # Deploy Kafka to the environment
 # TODO: Add possibility of using an external kafka by setting config variables
@@ -78,11 +85,11 @@
 
 # Deploy RabbitMQ to the environment
 # TODO: Add possibility of using an external rabbit by setting config variables
-# - hosts: dojot-k8s[0]
-#   any_errors_fatal: true
-#   tags: dojot-rabbitmq
-#   roles:
-#     - role: rabbitmq
+- hosts: dojot-k8s[0]
+  any_errors_fatal: true
+  tags: dojot-rabbitmq
+  roles:
+    - role: rabbitmq
 
 # Deploy Kong as the API Gateway to the environment
 # Deploy the dojot services
@@ -90,22 +97,22 @@
   any_errors_fatal: true
   tags: dojot-components
   roles:
+    - role: image-manager
     - role: apigw
     - role: auth
+    - role: backstage
     - role: data-broker
     - role: ejbca-node
+    - role: device-manager
+    - role: history
+    - role: persister
+    - role: gui
+    - role: iotagent-lwm2m
+    - role: flowbroker
+    - role: data-manager
+    - role: cron
     - role: v2k-bridge
     - role: k2v-bridge
     - role: pub-kafka-prometheus
-    # - role: device-manager
-    # - role: ejbca-rest
-    # - role: history
-    # - role: persister
-    #- role: gui
-    #- role: iotagent-mosca
-    #- role: flowbroker
-    #- role: data-manager
-    #- role: backstage
-    #- role: cron
 
-# # TODO: Dojot users?
+

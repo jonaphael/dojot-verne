@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: pub-kafka-prometheus
-  namespace: dojot
+  namespace: {{ dojot_namespace }}
 spec:
   endpoints:
   - interval: 2s

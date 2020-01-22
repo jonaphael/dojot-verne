@@ -14,7 +14,7 @@ spec:
     - name: K8S_ENV
       value: "y"
     - name: CERT_EJBCA_API_BROKER
-      value: "ejbca-simple"
+      value: "ejbca-wrapper"
     - name: CERT_EJBCA_API_PORT
       value: "5583"
     - name: CRL_UPDATE_TIME

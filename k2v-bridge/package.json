@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest tests/**/*.test.js --coverage",
     "test:watch": "jest --watch tests/**/*.test.js --coverage",
-    "run-client": "node src/index.js"
+    "run-client": "node app/index.js"
   },
   "keywords": [
     "node",

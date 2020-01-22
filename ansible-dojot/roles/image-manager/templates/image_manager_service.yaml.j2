@@ -2,13 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: ejbca
-  name: ejbca
+    name: image-manager
+  name: image-manager
   namespace: {{ dojot_namespace }}
 spec:
   ports:
-  - port: 5583
-    targetPort: 5583
+  - port: 5000
+    targetPort: 5000
   selector:
-    name: ejbca
+    name: image-manager
     app: dojot

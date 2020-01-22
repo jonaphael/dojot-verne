@@ -18,7 +18,6 @@ data:
             sleep 2
         done
 
-        echo
 
         echo "Kong is up, configuring routes"
 
@@ -102,6 +101,19 @@ data:
         PAYLOAD
         authConfig "image"
 
+        # auth-permissions-service
+
+        (curl -o /dev/null ${kong}/apis -sS -X POST \
+            --header "Content-Type: application/json" \
+            -d @- ) <<PAYLOAD
+        {
+            "name": "auth-permissions-service",
+            "uris": ["/auth/pap"],
+            "strip_uri": true,
+            "upstream_url": "http://auth-broker:80"
+        }
+        PAYLOAD
+        authConfig "auth-permissions-service"
 
         (curl -o /dev/null ${kong}/apis -s -S -X POST \
             --header "Content-Type: application/json" \
@@ -113,6 +125,9 @@ data:
             "upstream_url": "http://auth:5000"
         }
         PAYLOAD
+
+
+
         # no auth: this is actually the endpoint used to get a token
         # rate plugin limit to avoid brute-force atacks
         curl -o /dev/null -sS -X POST ${kong}/apis/auth-service/plugins \
@@ -208,7 +223,7 @@ data:
             "name": "ejbca-paths",
             "uris": [ "/sign", "/ca", "/user"],
             "strip_uri": false,
-            "upstream_url": "http://ejbca:5583/"
+            "upstream_url": "http://ejbca-wrapper:5583/"
         }
         PAYLOAD
         authConfig "ejbca-paths"
@@ -262,5 +277,5 @@ data:
         }
         PAYLOAD
         authConfig "cron"
-
+        
         echo "API Gateway Paths configured"

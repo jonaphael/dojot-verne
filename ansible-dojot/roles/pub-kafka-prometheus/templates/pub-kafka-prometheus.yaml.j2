@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pub-kafka-prometheus
-  namespace: dojot
+  namespace: {{ dojot_namespace }}
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: pub-kafka-prometheus
-        image: mprevide/prom_test
+        image: dojot/pub-kafka-prometheus:{{ dojot_pub_kafka_prometheus_version }}
         env:
         - name: PROMETHEUS_PORT
           value: "3055"

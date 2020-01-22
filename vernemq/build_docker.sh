@@ -8,5 +8,4 @@ cd plugins || exit
 ./plugin_builder.sh
 
 cd .. 
-docker build -t dojot/vernemq:"$TAG" .
-docker push dojot/vernemq:"$TAG"
+docker build -t vernemq-dojot:"$TAG" .

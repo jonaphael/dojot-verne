@@ -1,1 +1,4 @@
-#TODO:create env variables for ejbca
+---
+# This files has the default values 
+
+dojot_ejbca_version: "{{ dojot_version }}"

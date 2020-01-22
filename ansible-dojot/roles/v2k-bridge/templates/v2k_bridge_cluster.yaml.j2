@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: v2k-bridge-verne
-  replicas: 4
+  replicas: 1
   template: #templates for the pods
     metadata:
       labels:
@@ -25,7 +25,7 @@ spec:
                 - verne-kafka
       containers:
       - name: v2k-bridge-verne
-        image: jonaphael/v2k-bridge
+        image: dojot/v2k-bridge-verne:{{ dojot_v2k_version}}
         env:
         - name: AUTH_URL
           value: "http://auth:5000"
@@ -42,9 +42,9 @@ spec:
         - name: DOJOT_MQTT_PORT
           value: "8883"
         - name: CERT_DNS
-          value: "mqtt-bridge"
+          value: "v2k-bridge-verne"
         - name: CERT_EJBCA_API_BROKER
-          value: "ejbca-simple"
+          value: "ejbca-wrapper"
         - name: CERT_EJBCA_API_PORT
           value: "5583"
         - name: MQTT_CLIENT_LOG_LEVEL
