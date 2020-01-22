@@ -1,7 +1,7 @@
 const metrics = require('../../app/Metrics');
 const KafkaMessenger = require('../../app/KafkaMessenger');
 
-jest.mock('@jonaphael/dojot-module');
+jest.mock('@dojot/dojot-module');
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('../../app/Config.js');
 jest.mock('../../app/Metrics');
@@ -14,7 +14,7 @@ const mockMessenger = {
 
 };
 
-jest.mock('@jonaphael/dojot-module', () => ({
+jest.mock('@dojot/dojot-module', () => ({
   Messenger: jest.fn(() => mockMessenger.Messenger),
 }));
 
