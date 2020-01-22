@@ -92,25 +92,6 @@ describe('Testing app', () => {
     await mockedApp.initApp();
   });
 
-  // it('should initialize agent correctly for 100k', async () => {
-  //   mockConfig.Messenger.init.mockReturnValue(Promise.resolve());
-
-  //   mockedApp = new App();
-
-  //   // -- should not parse json
-  //   await mockedApp.initApp();
-
-  //   const onMock = jest.fn((arg0, _arg1, callback) => {
-  //     const arg1Modified = JSON.stringify({ attrs: 'attrs ' });
-  //     callback(arg0, arg1Modified, { key: 'key' });
-  //   });
-  //   mockConfig.Messenger.on.mockImplementation(onMock);
-  //   //-------------------------------------------------------
-  //   await mockedApp.initApp();
-  //   expect(mockConfig.Messenger.on).toHaveBeenCalled();
-  //   //-------------------------------------------------------
-  // });
-
   it('should publish a message', async () => {
     mockConfig.Messenger.init.mockReturnValue(Promise.resolve());
     mockedApp = new App();
