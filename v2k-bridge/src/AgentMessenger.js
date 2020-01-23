@@ -1,4 +1,4 @@
-const { IoTAgent } = require('@jonaphael/iotagent-nodejs');
+const { IoTAgent } = require('@dojot/iotagent-nodejs');
 const { logger } = require('@dojot/dojot-module-logger');
 const defaultConfig = require('./config');
 const Utils = require('./utils/utils');
