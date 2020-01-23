@@ -4,7 +4,8 @@
   "description": "MQTT message transmitter",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest tests/**/*.test.js --coverage",
+    "test:watch": "jest --watch tests/**/*.test.js --coverage",
     "run-client": "node src/index.js"
   },
   "keywords": [
@@ -24,5 +25,17 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.19.1",
     "jest": "^24.9.0"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "app/**/*.js",
+      "!app/index.js"
+    ],
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

@@ -10,7 +10,7 @@
 
 
 const mqtt = require('mqtt');
-const App = require('../app');
+const App = require('../../app/app.js');
 
 const fakeArg = (arg1) => ({ meta: { service: arg1 }, data: { id: arg1 } });
 
@@ -52,14 +52,13 @@ const mockDefaultConfig = {
   },
   app: {
     mqtt_log_level: 'debug',
-    enable_dojot: true,
   },
   toBoolean: (val) => val,
 };
 
 
 jest.mock('fs');
-jest.mock('../../utils/utils');
+jest.mock('../../app/utils/utils');
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('@dojot//iotagent-nodejs', () => ({
   IoTAgent: jest.fn(() => mockConfig.Messenger),
@@ -91,25 +90,6 @@ describe('Testing app', () => {
     mockConfig.Messenger.init.mockReturnValue(Promise.resolve());
     mockedApp = new App(mockDefaultConfig);
     await mockedApp.initApp();
-  });
-
-  it('should initialize agent correctly for 100k', async () => {
-    mockConfig.Messenger.init.mockReturnValue(Promise.resolve());
-
-    mockedApp = new App();
-
-    // -- should not parse json
-    await mockedApp.initApp();
-
-    const onMock = jest.fn((arg0, _arg1, callback) => {
-      const arg1Modified = JSON.stringify({ attrs: 'attrs ' });
-      callback(arg0, arg1Modified, { key: 'key' });
-    });
-    mockConfig.Messenger.on.mockImplementation(onMock);
-    //-------------------------------------------------------
-    await mockedApp.initApp();
-    expect(mockConfig.Messenger.on).toHaveBeenCalled();
-    //-------------------------------------------------------
   });
 
   it('should publish a message', async () => {

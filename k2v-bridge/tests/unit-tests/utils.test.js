@@ -2,7 +2,7 @@
  * Unit test for utils file
  */
 
-const ProjecUtils = require('../../utils/utils');
+const ProjecUtils = require('../../app/utils/utils');
 
 describe('Tetsing project utils', () => {
   it('should generate the configuration topic', () => {
