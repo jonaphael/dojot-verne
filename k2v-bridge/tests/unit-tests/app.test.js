@@ -60,7 +60,7 @@ const mockDefaultConfig = {
 jest.mock('fs');
 jest.mock('../../app/utils/utils');
 jest.mock('@dojot/dojot-module-logger');
-jest.mock('@jonaphael/iotagent-nodejs', () => ({
+jest.mock('@dojot//iotagent-nodejs', () => ({
   IoTAgent: jest.fn(() => mockConfig.Messenger),
 }));
 

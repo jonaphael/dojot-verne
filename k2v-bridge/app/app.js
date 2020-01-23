@@ -1,5 +1,5 @@
 const { logger } = require('@dojot/dojot-module-logger');
-const { IoTAgent } = require('@jonaphael/iotagent-nodejs');
+const { IoTAgent } = require('@dojot/iotagent-nodejs');
 const fs = require('fs');
 const mqtt = require('mqtt');
 const util = require('util');

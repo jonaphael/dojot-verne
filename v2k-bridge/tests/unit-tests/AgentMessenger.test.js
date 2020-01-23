@@ -1,4 +1,4 @@
-jest.mock('@jonaphael/dojot-module');
+jest.mock('@dojot/dojot-module');
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('../../src/utils/utils');
 
@@ -39,7 +39,7 @@ const mockConfig = {
 
 };
 
-jest.mock('@jonaphael/iotagent-nodejs', () => ({
+jest.mock('@dojot/iotagent-nodejs', () => ({
   IoTAgent: jest.fn(() => mockConfig.Messenger),
 }));
 

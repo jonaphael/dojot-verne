@@ -311,6 +311,12 @@ if __name__ == "__main__":
         action="store_true",
         default=False
     )
+    MEGROUP.add_argument(
+        "--export",
+        help="exports the certificates",
+        action="store_true",
+        default=False
+    )
     ARGS = PARSER.parse_args()
 
     logging.basicConfig(**CONFIG["app"]["log_config"])
@@ -348,3 +354,9 @@ if __name__ == "__main__":
 
     if ARGS.cleardb:
         clear_db()
+
+    if ARGS.export:
+        # Exports the certificates' files
+        export_certs()
+        # Retrieving the CA certificate
+        retrieve_ca_cert()

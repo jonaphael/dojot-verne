@@ -1,4 +1,4 @@
-jest.mock('@jonaphael/dojot-module');
+jest.mock('@dojot/dojot-module');
 jest.mock('@dojot/dojot-module-logger');
 jest.mock('fs');
 
@@ -24,7 +24,7 @@ const mockConfig = {
 
 const mqtt = require('mqtt');
 
-jest.mock('@jonaphael/iotagent-nodejs');
+jest.mock('@dojot/iotagent-nodejs');
 
 jest.mock('mqtt', () => ({
   connect: jest.fn(() => mockConfig.fakeMqtt),
