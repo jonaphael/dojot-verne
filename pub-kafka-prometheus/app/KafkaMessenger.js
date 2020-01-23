@@ -1,4 +1,4 @@
-const { Messenger } = require('@jonaphael/dojot-module');
+const { Messenger } = require('@dojot/dojot-module');
 const { logger } = require('@dojot/dojot-module-logger');
 const util = require('util');
 
