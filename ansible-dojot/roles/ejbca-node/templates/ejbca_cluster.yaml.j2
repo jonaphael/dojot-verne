@@ -26,7 +26,7 @@ spec:
       hostname: localhost
       containers:
       - name: ejbca-wrapper
-        image: dojot/ejbca-wrapper:{{ dojot_ejbca_version }} 
+        image: dojot/ejbca-wrapper:{{ dojot_version  }}  ## change to dojot_ejbca_version
         env:
         - name: DATABASE_JDBC_URL
           value: "jdbc:postgresql://postgres-ejbca:5433/ejbca_db"
