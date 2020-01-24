@@ -35,6 +35,6 @@ spec:
         - name: CERT_DNS
           value: "mqtt-client"
         - name: CERT_EJBCA_API_BROKER
-          value: "ejbca-wrapper"
+          value: "ejbca-simple"
         - name: CERT_EJBCA_API_PORT
           value: "5583"

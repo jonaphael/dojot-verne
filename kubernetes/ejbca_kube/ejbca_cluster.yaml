@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ejbca-wrapper
+  name: ejbca-simple
 spec:
   selector:
     matchLabels:
-      app: ejbca-wrapper
+      app: ejbca-simple
   replicas: 1
   template: #templates for the pods
     metadata:
       labels:
-        app: ejbca-wrapper
+        app: ejbca-simple
     spec:
       hostname: localhost
       containers:
-      - name: ejbca-wrapper
+      - name: ejbca-simple
         image: mprevide/ejbca
         env:
         - name: DATABASE_JDBC_URL

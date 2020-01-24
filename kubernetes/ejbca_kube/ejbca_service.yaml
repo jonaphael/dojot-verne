@@ -1,26 +1,26 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ejbca-wrapper
+  name: ejbca-simple
 spec:
   type: ClusterIP
   selector:
-    app: ejbca-wrapper
+    app: ejbca-simple
   ports:
-  - name: ejbca-wrapper
+  - name: ejbca-simple
     port: 5583
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ejbca-wrapper
+  name: ejbca-simple
 
 spec:
   # This defines which pods are going to be represented by this Service
   # The service becomes a network endpoint for either other services
   # or maybe external users to connect to (eg browser)
   selector:
-    app: ejbca-wrapper
+    app: ejbca-simple
 
   ports:
     - name: ejbca
