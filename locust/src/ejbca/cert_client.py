@@ -9,6 +9,7 @@ from src.config import CONFIG
 from src.utils import Utils
 from src.ejbca.thing import Thing
 
+
 class CertClient:
     """
     Handles certificate-related operations.
@@ -50,6 +51,7 @@ class CertClient:
 
         except Exception as exception:
             logging.error("Error: %s", str(exception))
+            raise Exception(str(exception))
 
     @staticmethod
     def new_cert(tenant: str, device_id: str) -> Thing:
@@ -96,6 +98,8 @@ class CertClient:
 
         res = requests.get(url)
         res_json = res.json()
+
+        print(45*'*', res_json.get('asfdg'))
 
         if res_json.get("status") and res_json["status"].get("return"):
             return res_json["status"]["return"]["reason"] == 0

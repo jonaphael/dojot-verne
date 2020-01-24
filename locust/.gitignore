@@ -13,3 +13,4 @@ pyvenv.cfg
 # Certificates
 cert
 db
+/htmlcov

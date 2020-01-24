@@ -1,8 +1,8 @@
 [run]
 omit =
     *__init__.py
-    lib/*
+    env/*
+    #lib/*
     tests/*
-    src/config.py
 branch = True
-source = src/*.py
+# source = src/*.py
