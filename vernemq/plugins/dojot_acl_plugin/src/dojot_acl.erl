@@ -1,6 +1,6 @@
 -module(dojot_acl).
 
--define(K2VBridge, erlang:list_to_binary(os:getenv("K2VBRIDGE_SERVICE_NAME", "k2v-bridge-"))).
+-define(K2VBridge, erlang:list_to_binary(os:getenv("K2VBRIDGE_SERVICE_NAME", "k2v-bridge-verne"))).
 -define(V2KBridge, erlang:list_to_binary(os:getenv("V2KBRIDGE_SERVICE_NAME", "v2k-bridge-verne"))).
 
 
@@ -14,7 +14,7 @@ check_topic(Username, Topic) ->
     ConfigTopic = <<"config">>,
     % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
     [PaternOne|PaternTwo] = Topic,
-    
+
     % we need to check if our mqtt client that was sent the message
     ResponseMatch = binary:match(Username, ?K2VBridge),
 
