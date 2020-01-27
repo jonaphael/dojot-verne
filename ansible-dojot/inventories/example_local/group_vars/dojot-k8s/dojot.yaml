@@ -27,3 +27,8 @@ dojot_auth_email_enabled: false
 dojot_ejbca_persistent_volumes: false
 
 dojot_storage_class_name: "local-storage"
+
+# Set number of replicas for vernemq-dojot, k2v-vernemq-dojot,
+# v2k-vernemq-dojot, data-broker {kafka - Partitions, not replicas},
+# pub-kafka-prometheus
+dojot_vernemq_mqqt_replicas_to_scale: 4
