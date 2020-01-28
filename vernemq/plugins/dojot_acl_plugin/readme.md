@@ -33,4 +33,4 @@ Key                      | Purpose                                           | D
 -----------------------  | --------------------------------------------------| --------------       |----------------
 PLUGIN_ACL_K2V_SERVICENAME   | service name for k2v-bridge                       | k2v-bridge-verne     | string
 PLUGIN_ACL_V2K_SERVICENAME   | service name for v2k-bridge                       | v2k-bridge-verne     | string
-PLUGIN_ACL_CHAIN             |  Use "y" if there's other plugin with same hook   | "n"                  | y or n
+PLUGIN_ACL_CHAIN             |  Plugin ACL - Use "y" if there is another plugin with the same hook and this other plugin will be executed after the ACL one    | "n"                  | y or n

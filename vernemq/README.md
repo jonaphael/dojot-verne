@@ -16,7 +16,7 @@ CHECK_EXPIRATION_TIME    | Checks if the certificates expires every define time 
 CHECK_BROKER_CERT_REVOKED_TIME  | Checks if the public certificate of broker has revoked every define time by cron  | "0 */3 * * *" | cron schedule expressions
 CRL_UPDATE_TIME          | Update CRL certificate every define time by cron              | "0 */2 * * *" | cron schedule expressions
 CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200  | seconds
-PLUGIN_ACL_CHAIN             | Plugin ACL - Use "y" if there's other plugin with same hook    | "n"               | y or n
+PLUGIN_ACL_CHAIN             | Plugin ACL - Use "y" if there is another plugin with the same hook and this other plugin will be executed after the ACL one    | "n"               | y or n
 PLUGIN_ACL_K2V_SERVICENAME   | service name for k2v-bridge                                    | k2v-bridge-verne  | string
 PLUGIN_ACL_V2K_SERVICENAME       | service name for v2k-bridge                                    | v2k-bridge-verne  | string
 PLUGIN_DISC_LIFETIME_SESSION | Plugin Disconnect -  session lifetime                          | 30 min            | integer (miliseconds)
