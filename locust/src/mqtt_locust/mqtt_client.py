@@ -259,6 +259,7 @@ class MQTTClient:
         end_time = time.time()
         message = self.submmap.pop(mid, None)
 
+
         if message is None:
             Utils.fire_locust_failure(
                 request_type=REQUEST_TYPE,
@@ -351,6 +352,7 @@ class MQTTClient:
                 publish_time = float(json.loads(message.payload.decode())["timestamp"])
             except Exception as exception:
                 logging.error("Error while parsing the message payload: %s", str(exception))
+                raise Exception(str(exception))
             else:
                 Utils.fire_locust_success(
                     request_type=REQUEST_TYPE,
@@ -379,6 +381,7 @@ class MQTTClient:
                     response_length=0,
                     exception=exception
                 )
+                raise Exception(str(exception))
 
             else:
                 Utils.fire_locust_success(
@@ -405,6 +408,7 @@ class MQTTClient:
                     response_length=0,
                     exception=exception
                 )
+                raise Exception(str(exception))
 
             else:
                 if CertClient.has_been_revoked(self.new_cert):

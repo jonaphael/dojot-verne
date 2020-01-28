@@ -99,8 +99,6 @@ class CertClient:
         res = requests.get(url)
         res_json = res.json()
 
-        print(45*'*', res_json.get('asfdg'))
-
         if res_json.get("status") and res_json["status"].get("return"):
             return res_json["status"]["return"]["reason"] == 0
         else:

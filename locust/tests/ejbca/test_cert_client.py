@@ -52,7 +52,6 @@ class TestCertClient(unittest.TestCase):
         with patch('src.ejbca.cert_client.open', mock_open()) as mock_builtin_open:
             CertClient.create_cert_files(mock_thing, directory)
 
-            print(mock_builtin_open.mock_calls)
             calls = [call(thing_path + '.key', "w"),
                      call(thing_path + '.crt', "w"),
                      call().write(mock_thing.thing_certificate),
@@ -143,11 +142,9 @@ class TestCertClient(unittest.TestCase):
         mock_request.get.assert_called_with(url)
         self.assertTrue(result)
 
-        # print(100 * '6', mock_request.mock_calls, 100 * '6')
         mock_request.get().json.return_value = {}
 
         result = CertClient.has_been_revoked(mock_thing)
-        print(result)
         self.assertFalse(result)
 
 
