@@ -1,42 +1,42 @@
 # **Dojot VerneMQ**
 
-The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq/vernemq) with some features for dojot case.  
+The Dojot VerneMQ service is a extension of [VerneMQ](https://github.com/vernemq/vernemq) with some features for dojot case. 
 
 
 ## **Environment variables**
 
 Key                      | Purpose                                                       | Default Value  | Accepted values
------------------------  | --------------------------------------------------------------| -------------- |-------------------------
-CERT_EJBCA_API_BROKER    | Cluster address                                               | "localhost"    | IP or DNSs
-CERT_EJBCA_API_PORT      | Ejbca service port                                            | "5583"         | port values
-K8S_ENV                  | K8s environment  (yes if use with vmq-operator                | "n"            | y or n 
+-----------------------  | --------------------------------------------------------------| -------------- |------------
+EJBCA_HOSTNAME           | Cluster address                                               | "ejbca-wrapper"| IP or DNSs
+EJBCA_PORT               | Ejbca service port                                            | "5583"         | port values
+USE_VMQ_OPERATOR         | yes if use with vmq-operator                                  | "n"            | y or n
 HOSTNAME                 | Name to container                                             | "broker"       | string
-BASE_DIR                 | Path base to tls files                                        | "/vernemq"     | path
-CERT_DNS                 | Server hostname (THIS DNS/ADDR MUST BE EQUAL TO KUBERNETES ADDR (OR PROXY/LB)) | "localhost"    | hostname
+SERVER_HOSTNAME          | Server hostname (the host to connect)                         | "localhost"    | hostname
 CHECK_EXPIRATION_TIME    | Checks if the certificates expires every define time by cron  | "0 1 * * *" | cron schedule expressions
-CHECK_BROKER_CERT_REVOKED_TIME    | Checks if the public certificate of broker has revoked every define time by cron  | "0 */3 * * *" | cron schedule expressions
-CRL_UPDATE_TIME          | Update CRL certificate every define time by cron               | "0 */2 * * *" | cron schedule expressions
-CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200          | seconds
-ACL_CHAIN  | Plugin ACL - Use "y" if there's other plugin | "n"          | y or n
+CHECK_BROKER_CERT_REVOKED_TIME  | Checks if the public certificate of broker has revoked every define time by cron  | "0 */3 * * *" | cron schedule expressions
+CRL_UPDATE_TIME          | Update CRL certificate every define time by cron              | "0 */2 * * *" | cron schedule expressions
+CHECKEND_EXPIRATION_SEC  | When expiration check certificates run, renew if the certificates expires within the next arg seconds| 43200  | seconds
+PLUGIN_ACL_CHAIN             | Plugin ACL - Use "y" if there's other plugin with same hook    | "n"               | y or n
+PLUGIN_ACL_K2V_SERVICENAME   | service name for k2v-bridge                                    | k2v-bridge-verne  | string
+PLUGIN_ACL_V2K_SERVICENAME       | service name for v2k-bridge                                    | v2k-bridge-verne  | string
+PLUGIN_DISC_LIFETIME_SESSION | Plugin Disconnect -  session lifetime                          | 30 min            | integer (miliseconds)
 
 
 ### **VerneMQ Configuration**
 
-See vernemq [documentation](https://docs.vernemq.com/) or [vernemq_example.conf](vernemq_example.conf)
+In dojot case we use this configuration [see here](./vernemq.conf).
 
-All configuration parameters that are available in [vernemq_example.conf](vernemq_example.conf) can be defined using the DOCKER_VERNEMQ prefix followed by the confguration parameter name. E.g: allow_anonymous=on is -e "DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on" or allow_register_during_netsplit=on is -e "DOCKER_VERNEMQ_ALLOW_REGISTER_DURING_NETSPLIT=on". 
+See more about verneMQ configuration in [documentation](https://docs.vernemq.com/).
 
-### **Building Docker image by yourself**
+### **Building Docker image with plugins**
 
-```shell
-docker build -t verne .
-docker run -it --name vernemq_run --env-file vernemq.env verne
-```
-
-Note: You can change the setting in this case at [vernemq.env](./vernemq.env)
-
-### Find the IP of a docker container
+Example:
 
 ```shell
-docker inspect vernemq_run  | grep \"IPAddress\").
+cd plugins
+./plugin_builder.sh
+
+cd ..
+docker build -t verne_img .
+
 ```

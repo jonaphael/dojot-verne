@@ -9,7 +9,7 @@
          auth_on_subscribe/3]).
 
 auth_on_register({_IpAddr, _Port} = Peer, {_MountPoint, _ClientId} = SubscriberId, UserName, Password, CleanSession) ->
-    
+
     case clean_sess:is_dojot_user(UserName) of
         is_user ->
             ok = clean_sess:set_connection_timeout(SubscriberId),

@@ -12,14 +12,16 @@ auth_on_register({_IpAddr, _Port} = Peer, {_MountPoint, _ClientId} = SubscriberI
     ok.
 
 auth_on_publish(UserName, {_MountPoint, _ClientId} = SubscriberId, QoS, Topic, Payload, IsRetain) ->
-    Result  = dojot_acl:check_topic(UserName, Topic),
-    Chained = erlang:list_to_binary([os:getenv("ACL_CHAIN")]),
+    Result  = dojot_acl:check_valid_topic(UserName, Topic),
+    Chained = erlang:list_to_binary([os:getenv("PLUGIN_ACL_CHAIN")]),
+
     case Result of
         % the topic match with config
         ok ->
             ok;
-        % the topic match is not config
+        % the topic match and is valid not config
         next ->
+            % if there's other plugin with same hook
             case Chained of
                 <<"y">> ->
                     next;
@@ -32,7 +34,8 @@ auth_on_publish(UserName, {_MountPoint, _ClientId} = SubscriberId, QoS, Topic, P
     end.
 
 auth_on_subscribe(UserName, ClientId, [{_Topic, _QoS}|_] = Topics) ->
-    Result  = dojot_acl:config_auth(UserName, Topics),
+
+    Result  = dojot_acl:check_config_topic(UserName, Topics),
 
     case Result of
         % the topic match with config

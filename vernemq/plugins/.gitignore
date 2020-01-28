@@ -1,0 +1,5 @@
+
+dojot_acl_plugin/_build/*
+dojot_disconnect_plugin/_build/*
+dojot_acl_plugin/rebar.lock
+dojot_disconnect_plugin/rebar.lock

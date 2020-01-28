@@ -1,21 +1,21 @@
 -module(dojot_acl).
 
--define(K2VBridge, erlang:list_to_binary(os:getenv("K2VBRIDGE_SERVICE_NAME", "k2v-bridge-"))).
--define(V2KBridge, erlang:list_to_binary(os:getenv("V2KBRIDGE_SERVICE_NAME", "v2k-bridge-verne"))).
+-define(K2VBridge, erlang:list_to_binary(os:getenv("PLUGIN_ACL_K2V_SERVICENAME", "k2v-bridge-"))).
+-define(V2KBridge, erlang:list_to_binary(os:getenv("PLUGIN_ACL_V2K_SERVICENAME", "v2k-bridge-verne"))).
 
 
 -export([
-    check_topic/2,
-    config_auth/2
+    check_valid_topic/2,
+    check_config_topic/2
 ]).
 
-check_topic(Username, Topic) ->
+check_valid_topic(Username, Topic) ->
     AttrsTopic = <<"attrs">>,
     ConfigTopic = <<"config">>,
     % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
     [PaternOne|PaternTwo] = Topic,
-    
-    % we need to check if our mqtt client that was sent the message
+
+    % we need to check if our K2VBridge that was sent the message
     ResponseMatch = binary:match(Username, ?K2VBridge),
 
     [RestTopic| _] = PaternTwo,
@@ -33,10 +33,10 @@ check_topic(Username, Topic) ->
             ok
     end.
 
-config_auth(Username, Topic) ->
+check_config_topic(Username, Topic) ->
     ConfigTopic = <<"config">>,
 
-    %if the subscribed service is the mqtt-bridge, we can auth to subscribe to every topic
+    %if the subscribed service is the V2KBridge, we can auth to subscribe to every topic
     ResponseMatch = binary:match(Username, ?V2KBridge),
 
 

@@ -34,4 +34,4 @@ the effect of this plugin.
 
 Key                      | Purpose                                                       | Default Value  | Accepted values
 -----------------------  | --------------------------------------------------------------| -------------- |-------------------------
-LIFETIME_SESSION    | session lifetime                                                | 30 min    | integer (miliseconds)
+PLUGIN_DISC_LIFETIME_SESSION    | session lifetime                                                | 30 min    | integer (miliseconds)

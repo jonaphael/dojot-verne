@@ -1,5 +1,5 @@
 const app = {
-  mqtt_log_level: process.env.MQTT_CLIENT_LOG_LEVEL || 'info',
+  mqtt_log_level: process.env.LOG_LEVEL || 'info',
 };
 
 const mqtt = {

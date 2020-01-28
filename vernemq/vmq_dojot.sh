@@ -4,10 +4,10 @@
 ### Required Packages: openssl, curl, jq
 ### Expected environment variables, example:
 #
-# export CERT_EJBCA_API_BROKER='localhost'
-# export CERT_EJBCA_API_PORT='5583'
+# export EJBCA_HOSTNAME='localhost'
+# export EJBCA_PORT='5583'
 # export STATIC_CERT='n'
-# export K8S_ENV='n'
+# export USE_VMQ_OPERATOR='n'
 # export HOSTNAME='broker'
 # export CRL_UPDATE_TIME='*/30 * * * *'
 # export BASE_DIR='/vernemq'
@@ -44,7 +44,7 @@ _connectEJBCA()
 {
   # Waiting for dojot MQTT broker for at most 3 minutes
   START_TIME=$(date +'%s')
-  echo "Waiting for dojot EJBCA Broker fully start. Host '${CERT_EJBCA_API_BROKER}', '${CERT_EJBCA_API_PORT}'..."
+  echo "Waiting for dojot EJBCA Broker fully start. Host '${EJBCA_HOSTNAME}', '${EJBCA_PORT}'..."
   echo "Try to connect to dojot EJBCA Broker ... "
   RESPONSE=$(curl --fail -s "${certEjbcaApiUrl}"/ejbca/version || echo "")
   echo "$RESPONSE"
@@ -60,7 +60,7 @@ _connectEJBCA()
           exit 3
       fi
   done
-  echo "dojot EJBCA broker at host '${CERT_EJBCA_API_BROKER}', port '${CERT_EJBCA_API_PORT}' fully started."
+  echo "dojot EJBCA broker at host '${EJBCA_HOSTNAME}', port '${EJBCA_PORT}' fully started."
 
   # give time for EJBCA fully started
   sleep 5
