@@ -26,6 +26,17 @@ PLUGIN_DISC_LIFETIME_SESSION | Plugin Disconnect -  session lifetime            
 
 In dojot case we use this configuration [see here](./vernemq.conf).
 
+You can pass a environment variable VERNEMQ_CONF in base64 with the contents of the [configuration.](./vernemq.conf)
+
+Example of part of a yaml
+
+```yaml
+ env:
+      ## BASE-64 config
+    - name: VERNEMQ_CONF
+      value: "YWNjZXB0X2V1bGEgPSB5ZXMKbWV0YW..." # just the beginning of base64
+```
+
 See more about verneMQ configuration in [documentation](https://docs.vernemq.com/).
 
 ### **Building Docker image with plugins**
