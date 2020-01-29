@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: v2k-bridge-verne
-  replicas: {{ dojot_vernemq_mqqt_replicas_to_scale }}
+  replicas: {{ dojot_vernemq_mqtt_replicas_to_scale }}
   template: #templates for the pods
     metadata:
       labels:

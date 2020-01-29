@@ -4,7 +4,7 @@ metadata:
   name: pub-kafka-prometheus
   namespace: {{ dojot_namespace }}
 spec:
-  replicas: {{ dojot_vernemq_mqqt_replicas_to_scale }}
+  replicas: {{ dojot_vernemq_mqtt_replicas_to_scale }}
   selector:
     matchLabels:
       app: pub-kafka-prometheus
