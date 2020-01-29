@@ -32,7 +32,7 @@ spec:
               fieldPath: metadata.name
         - name: OPERATOR_NAME
           value: vmq-operator
-        image: muhamedavila/vmq-operator
+        image: dojot/vmq-operator-dojot:{{ dojot_verne_operator_version }}
         name: vmq-operator
       nodeSelector:
         beta.kubernetes.io/os: linux

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: ejbca-simple
+  name: ejbca-wrapper
   namespace: {{ dojot_namespace }}
 spec:
   affinity:
@@ -16,17 +16,17 @@ spec:
             - verne-kafka
   selector:
     matchLabels:
-      app: ejbca-simple
+      app: ejbca-wrapper
   replicas: 1
   template: #templates for the pods
     metadata:
       labels:
-        app: ejbca-simple
+        app: ejbca-wrapper
     spec:
       hostname: localhost
       containers:
-      - name: ejbca-simple
-        image: muhamedavila/ejbca_node
+      - name: ejbca-wrapper
+        image: dojot/ejbca-wrapper:{{ dojot_version  }}  ## change to dojot_ejbca_version
         env:
         - name: DATABASE_JDBC_URL
           value: "jdbc:postgresql://postgres-ejbca:5433/ejbca_db"

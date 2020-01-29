@@ -91,7 +91,7 @@ is found on the document:
 
 ## Metrics
 
-Prometheus: http(s)://clusterip:30014/
+Prometheus: http(s)://clusterip:30017/
 
 Grafana: http(s)://clusterip:30033/
 

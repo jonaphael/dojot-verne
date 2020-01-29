@@ -80,6 +80,8 @@ Environment variables mentioned above are more described in [here](./vernemq)
 - Create a device in Dojot and get a tenant and a device ID.
 - Install [openssl](https://www.openssl.org/), [jq](https://stedolan.github.io/jq/) and [cURL](https://curl.haxx.se/).
 
+NOTE: Ports and address may change depending on the deployment
+
 Environment variables
 
 ### Steps
@@ -165,7 +167,7 @@ export DEVICE_ID=a1998e
 ##### Create entity in EJBCA
 
 ```console
-curl --silent -X POST ${DOJOT_URL}/user \
+curl  -X POST ${DOJOT_URL}/user \
     -H "Authorization: Bearer ${JWT}" \
     -H "Content-Type:application/json" \
     -H "Accept:application/json" \
@@ -197,7 +199,7 @@ export CSR_CONTENT=$(cat client.csr | sed '1,1d;$ d' | tr -d '\r\n')
 Send CSR to EJBCA and save this environment variable
 
 ```console
-export CRT_ENTITY_CONTENT=$(curl --silent -X POST ${DOJOT_URL}/sign/${TENANT}:${DEVICE_ID}/pkcs10 \
+export CRT_ENTITY_CONTENT=$(curl  -X POST ${DOJOT_URL}/sign/${TENANT}:${DEVICE_ID}/pkcs10 \
 -H "Authorization: Bearer ${JWT}" \
 -H "Content-Type:application/json" \
 -H "Accept:application/json" \
@@ -221,7 +223,7 @@ echo "-----END CERTIFICATE-----" ) > client.crt
 Retrieve certificate and set in a environment variable
 
 ```console
-export CRT_ROOT_CONTENT=$(curl --silent -X GET ${DOJOT_URL}/ca/${CA_NAME} \
+export CRT_ROOT_CONTENT=$(curl  -X GET ${DOJOT_URL}/ca/${CA_NAME} \
 -H "Authorization: Bearer ${JWT}" \
 -H "Content-Type:application/json" \
 -H "Accept:application/json" | jq '.certificate' -r )
@@ -237,17 +239,17 @@ echo ${CRT_ROOT_CONTENT}
 echo "-----END CERTIFICATE-----" ) > root.crt
 ```
 
-#### 9. Use certificates to communicate with VerneMQ
+### How  to communicate with VerneMQ
 
-The tree files are require: *client.crt*, *client.key* and *root.crt*. See example:
+NOTE: Ports and address may change depending on the deployment
 
-In this example we will use [mosquitto](https://mosquitto.org/) client.
+In these examples we will use [mosquitto](https://mosquitto.org/) client.
 
 ##### Some options for mosquitto_pub and mosquitto_sub
 
 - **-h**: Specify the host to connect to. Defaults to localhost. In this case: *myhost*.
 
-- **-p**: Connect to the port specified. If not given, the default of 1883 for plain MQTT or 8883 for MQTT over TLS will be used. In this case: *30011*.
+- **-p**: Connect to the port specified. If not given, the default of 1883 for plain MQTT or 8883 for MQTT over TLS will be used. In this case: *30311*.
 
 - **-t**: The MQTT topic on which to publish the message. See mqtt(7) for more information on MQTT topics. In this case: *admin:a1998e/attrs* to publish and *admin:a1998e/config* to subscription.
 
@@ -259,15 +261,39 @@ In this example we will use [mosquitto](https://mosquitto.org/) client.
 
 - **-m**: Send a single message from the command line.
 
+- **-u**: Provide a username to be used for authenticating with the broker.
+
+#### Use certificates to communicate with VerneMQ
+
+The tree files are require: *client.crt*, *client.key* and *root.crt*. See example:
+
 ##### Example on how to publish:
 
 ```console
-mosquitto_pub -h myhost -p 30011 -t admin:a1998e/attrs -m '{"attr_example": 10 }' --cert client.crt  --key client.key --cafile root.crt 
+mosquitto_pub -h myhost -p 30311 -t admin:a1998e/attrs -m '{"attr_example": 10 }' --cert client.crt  --key client.key --cafile root.crt
+```
+
+Note: In this case, the message is a publish  on an attribute with the label attr_example and a new value 10.
+
+##### Example on how to subscribe:
+
+```console
+mosquitto_sub -h myhost -p 30311 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt
+```
+
+####  MQTT without Security: VerneMQ + ACL
+
+MQTT without security is not recommended, use this for testing only.
+
+##### Example on how to publish:
+
+```console
+ mosquitto_pub -h myhost -p 30310 -t admin:a1998e/attrs -m '{"attr_example": 10 }' -u admin:a1998e
 ```
 Note: In this case, the message is a publish  on an attribute with the label attr_example and a new value 10.
 
 ##### Example on how to subscribe:
 
 ```console
-mosquitto_sub -h myhost -p 30011 -t admin:a1998e/config --cert client.crt  --key client.key --cafile root.crt
+ mosquitto_sub -h myhost -p 30310 -t admin:a1998e/attrs -u admin:a1998e
 ```
