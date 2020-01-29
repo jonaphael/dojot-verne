@@ -4,8 +4,8 @@
 ### Required Packages: openssl, curl, jq
 ### Expected environment variables, example:
 : '
-export CERT_EJBCA_API_BROKER='192.168.15.24'
-export CERT_EJBCA_API_PORT='5583'
+export EJBCA_HOSTNAME='192.168.15.24'
+export EJBCA_PORT='5583'
 export HOSTNAME='broker'
 export BASE_DIR='/opt/mqtt_client'
 '
@@ -37,7 +37,7 @@ _createCRTDir()
 {
   # Waiting for dojot MQTT broker for at most 3 minutes
   START_TIME=$(date +'%s')
-  echo "Waiting for dojot EJBCA Broker fully start. Host '${CERT_EJBCA_API_BROKER}', '${CERT_EJBCA_API_PORT}'..."
+  echo "Waiting for dojot EJBCA Broker fully start. Host '${EJBCA_HOSTNAME}', '${EJBCA_PORT}'..."
   echo "Try to connect to dojot EJBCA Broker ... "
   RESPONSE=`curl --fail -s ${certEjbcaApiUrl}/ejbca/version || echo ""`
   echo $RESPONSE
@@ -53,7 +53,7 @@ _createCRTDir()
           exit 3
       fi
   done
-  echo "dojot EJBCA broker at host '${CERT_EJBCA_API_BROKER}', port '${CERT_EJBCA_API_PORT}' fully started."
+  echo "dojot EJBCA broker at host '${EJBCA_HOSTNAME}', port '${EJBCA_PORT}' fully started."
 
   # give time for EJBCA fully started
   sleep 5

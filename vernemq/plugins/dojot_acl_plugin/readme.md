@@ -2,8 +2,8 @@
 
 This plugin enable the ACL for dojot. The important files are:
 
-- src/dojot_acl.erl 
-- src/dojot_acl.app.src
+- src/dojot_acl.erl
+- src/dojot_acl_plugin.app.src
 
 This plugin use Erlang OTP.
 
@@ -29,7 +29,8 @@ the effect of this plugin.
 
 ## **Environment variables**
 
-Key                      | Purpose                                                       | Default Value  | Accepted values
------------------------  | --------------------------------------------------------------| -------------- |-------------------------
-K2VBRIDGE_SERVICE_NAME   | service name for k2v-bridge                                   | k2v-bridge     | string
-V2KBRIDGE_SERVICE_NAME   | service name for v2k-bridge                                   | v2k-bridge-verne     | string
+Key                      | Purpose                                           | Default Value        | Accepted values
+-----------------------  | --------------------------------------------------| --------------       |----------------
+PLUGIN_ACL_K2V_SERVICENAME   | service name for k2v-bridge                       | k2v-bridge-verne     | string
+PLUGIN_ACL_V2K_SERVICENAME   | service name for v2k-bridge                       | v2k-bridge-verne     | string
+PLUGIN_ACL_CHAIN             |  Plugin ACL - Use "y" if there is another plugin with the same hook and this other plugin will be executed after the ACL one    | "n"                  | y or n

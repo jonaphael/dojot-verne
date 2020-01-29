@@ -13,17 +13,16 @@ Key                      | Purpose                                              
 ------------------------ | ------------------------------------------------------------------- | --------------- | -------------- |
 LOG_LEVEL                | Log level for debug                                                 | info            | string         |
 DATA_BROKER_CONN_RETRIES | How many time data broker tries to reconnect when fails             | 10              | integer        |
-BASE_DIR                 | Base directory where the /certs dir will be found                   | opt/mqtt_client | directory name |
 HOSTNAME                 | Hostname to be used in the certificate common name                  | broker          | hostname/IP    |
-CERT_EJBCA_API_BROKER    | Address of the EJBCA broker                                         | localhost       | hostname/IP    |
-CERT_EJBCA_API_PORT      | Port of the EJBCA broker                                            | 5583            | integer        |
+EJBCA_HOSTNAME    | Address of the EJBCA broker                                         | localhost       | hostname/IP    |
+EJBCA_PORT      | Port of the EJBCA broker                                            | 5583            | integer        |
 AUTH_URL                 | Address of the auth service                                         | http://auth:5000| hostname/IP    |
 DATA_BROKER              | Address of the data broker                                          | data-broker:80  | hostname/IP    |
 DATA_BROKER_PORT         | Port of the data broker                                             | 80              | integer        |
 KAFKA_HOSTS              | Address of the kafka broker                                         |kafka-server:9092| hostname/IP    |
 DOJOT_MQTT_HOST          | Address of the verne broker                                         |vernemq-k8s      | hostname/IP    |
 DOJOT_MQTT_PORT          | Port of the verne broker                                            |1883             | integer        |
-CERT_DNS                 | DNS of the service                                                  |localhost        | hostname       |
+SERVER_HOSTNAME                 | DNS of the service                                                  |localhost        | hostname       |
 
 # **Issues and help**
 

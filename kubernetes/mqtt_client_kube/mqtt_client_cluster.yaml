@@ -32,9 +32,9 @@ spec:
           value: "vernemq-k8s"
         - name: DOJOT_MQTT_PORT
           value: "30010"
-        - name: CERT_DNS
+        - name: SERVER_HOSTNAME
           value: "mqtt-client"
-        - name: CERT_EJBCA_API_BROKER
+        - name: EJBCA_HOSTNAME
           value: "ejbca-simple"
-        - name: CERT_EJBCA_API_PORT
+        - name: EJBCA_PORT
           value: "5583"

@@ -6,19 +6,19 @@ services:
       - 1883:1883
       - 8883:8883
     environment:
-      CERT_EJBCA_API_BROKER: "ejbca_simple"
-      CERT_EJBCA_API_PORT: "5583"
+      EJBCA_HOSTNAME: "ejbca_simple"
+      EJBCA_PORT: "5583"
       STATIC_CERT: "n"
-      K8S_ENV: "n"
+      USE_VMQ_OPERATOR: "n"
       HOSTNAME: "broker"
-      CERT_DNS: "localhost"
+      SERVER_HOSTNAME: "localhost"
       CRL_UPDATE_TIME: "*/30 * * * *" #every 30 min
       CHECK_EXPIRATION_TIME:  "*/30 * * * *" #every 30 min
       CHECK_BROKER_CERT_REVOKED_TIME:  "*/30 * * * *" #every 30 min
       CHECKEND_EXPIRATION_SEC: '43200' #12h
       BASE_DIR: '/vernemq'
       DOCKER_VERNEMQ_LOG__CONSOLE: "console"
-      ACL_CHAIN: "n"
+      PLUGIN_ACL_CHAIN: "n"
       DOCKER_VERNEMQ_LOG__CONSOLE__LEVEL: "info"
       DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "off"
       DOCKER_VERNEMQ_PLUGINS__VMQ_WEBHOOKS: "on"
