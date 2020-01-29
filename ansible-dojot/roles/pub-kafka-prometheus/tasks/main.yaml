@@ -1,4 +1,4 @@
-- name: pub-kafka-prometheus 
+- name: latency-pub-test-prometheus 
   k8s:
     kubeconfig: "{{ dojot_kubeconfig_file_path | default(omit) }}"
     state: present
@@ -8,6 +8,6 @@
   retries: 30
   delay: 10
   loop:
-  - "{{ lookup('template', 'pub-kafka-prometheus_service.yaml.j2') | from_yaml }}"
-  - "{{ lookup('template', 'pub-kafka-prometheus_monitor.yaml.j2') | from_yaml }}"
-  - "{{ lookup('template', 'pub-kafka-prometheus.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'latency-pub-test-prometheus_service.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'latency-pub-test-prometheus_monitor.yaml.j2') | from_yaml }}"
+  - "{{ lookup('template', 'latency-pub-test-prometheus.yaml.j2') | from_yaml }}"

@@ -113,6 +113,6 @@
     - role: cron
     - role: v2k-bridge
     - role: k2v-bridge
-    - role: pub-kafka-prometheus
+    - role: latency-pub-test-prometheus
 
 
