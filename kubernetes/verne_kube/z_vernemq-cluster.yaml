@@ -7,15 +7,15 @@ metadata:
 spec:
   baseImage: mprevide/verne
   env:
-    - name: ACL_CHAIN
+    - name: PLUGIN_ACL_CHAIN
       value: "n"
     - name: STATIC_CERT
       value: "n"
-    - name: K8S_ENV
+    - name: USE_VMQ_OPERATOR
       value: "y"
-    - name: CERT_EJBCA_API_BROKER
+    - name: EJBCA_HOSTNAME
       value: "ejbca-simple"
-    - name: CERT_EJBCA_API_PORT
+    - name: EJBCA_PORT
       value: "5583"
     - name: CRL_UPDATE_TIME
       value: "*/30 * * * *" #every 30 min
@@ -25,7 +25,7 @@ spec:
       value: "*/30 * * * *" #every 30 min
     - name: CHECKEND_EXPIRATION_SEC
       value: "43200" #12h 
-    - name: CERT_DNS
+    - name: SERVER_HOSTNAME
       value: "10.50.11.235"
     ## BASE-64 config
     - name: VERNEMQ_CONF

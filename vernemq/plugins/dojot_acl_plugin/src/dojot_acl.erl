@@ -5,17 +5,17 @@
 
 
 -export([
-    check_topic/2,
-    config_auth/2
+    check_valid_topic/2,
+    check_config_topic/2
 ]).
 
-check_topic(Username, Topic) ->
+check_valid_topic(Username, Topic) ->
     AttrsTopic = <<"attrs">>,
     ConfigTopic = <<"config">>,
     % Topic must be equal: username/attrs and username must be equal: tenant:deviceid
     [PaternOne|PaternTwo] = Topic,
 
-    % we need to check if our mqtt client that was sent the message
+    % we need to check if our K2VBridge that was sent the message
     ResponseMatch = binary:match(Username, ?K2VBridge),
 
     [RestTopic| _] = PaternTwo,
@@ -33,10 +33,10 @@ check_topic(Username, Topic) ->
             ok
     end.
 
-config_auth(Username, Topic) ->
+check_config_topic(Username, Topic) ->
     ConfigTopic = <<"config">>,
 
-    %if the subscribed service is the mqtt-bridge, we can auth to subscribe to every topic
+    %if the subscribed service is the V2KBridge, we can auth to subscribe to every topic
     ResponseMatch = binary:match(Username, ?V2KBridge),
 
 

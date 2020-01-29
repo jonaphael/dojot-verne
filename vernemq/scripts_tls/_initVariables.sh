@@ -4,12 +4,12 @@
 BASE_DIR=${BASE_DIR:-"/vernemq"}
 HOSTNAME="${HOSTNAME:-"broker"}"
 CERT_CNAME="${HOSTNAME:-"broker"}"
-CERT_EJBCA_API_BROKER=${CERT_EJBCA_API_BROKER:-"localhost"}
-CERT_EJBCA_API_PORT=${CERT_EJBCA_API_PORT:-"5583"}
+EJBCA_HOSTNAME=${EJBCA_HOSTNAME:-"ejbca-wrapper"}
+EJBCA_PORT=${EJBCA_PORT:-"5583"}
 
 export CHECKEND_EXPIRATION_SEC="${CHECKEND_EXPIRATION_SEC:-43200}" #12h
-export CERT_EJBCA_URL="http://${CERT_EJBCA_API_BROKER}"
-export CERT_DNS="${CERT_DNS:-"localhost"}"
+export CERT_EJBCA_URL="http://${EJBCA_HOSTNAME}"
+export SERVER_HOSTNAME="${SERVER_HOSTNAME:-"localhost"}"
 export CERT_CA_FILE='ca.crt'
 export CERT_CRL_FILE='ca.crl'
 export CERT_CERT_FILE="$HOSTNAME.crt"
@@ -25,11 +25,11 @@ export CHECK_EXPIRATION_TIME="${CHECK_EXPIRATION_TIME:-"0 1 * * *"}"
 export CHECK_BROKER_CERT_REVOKED_TIME="${CHECK_BROKER_CERT_REVOKED_TIME:-"0 */3 * * *"}"
 
 # variables for internal use in scripts
-export isK8sEnv=${K8S_ENV:-"n"}
+export isK8sEnv=${USE_VMQ_OPERATOR:-"n"}
 export certCAName=$CERT_CANAME
-export certEjbcaApiUrl="${CERT_EJBCA_URL}:${CERT_EJBCA_API_PORT}"
+export certEjbcaApiUrl="${CERT_EJBCA_URL}:${EJBCA_PORT}"
 export certCname=$CERT_CNAME
-export certDns=$CERT_DNS
+export certDns=$SERVER_HOSTNAME
 export certCaFile=$CERT_CA_FILE
 export certCertFile=$CERT_CERT_FILE
 export certKeyFile=$CERT_KEY_FILE

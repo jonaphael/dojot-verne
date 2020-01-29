@@ -41,11 +41,11 @@ spec:
           value: "vernemq-k8s"
         - name: DOJOT_MQTT_PORT
           value: "8883"
-        - name: CERT_DNS
-          value: "v2k-bridge-verne"
-        - name: CERT_EJBCA_API_BROKER
-          value: "ejbca-wrapper"
-        - name: CERT_EJBCA_API_PORT
+        - name: SERVER_HOSTNAME
+          value: "mqtt-bridge"
+        - name: EJBCA_HOSTNAME
+          value: "ejbca-simple"
+        - name: EJBCA_PORT
           value: "5583"
-        - name: MQTT_CLIENT_LOG_LEVEL
+        - name: LOG_LEVEL
           value: "info"
