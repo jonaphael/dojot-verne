@@ -10,17 +10,17 @@ RUN apk update && apk add --no-cache g++ \
     musl-dev \
     ca-certificates \
     openssl-dev \
-    libc6-compat \ 
-    krb5-dev  \ 
-    zlib-dev \ 
-    zeromq-dev \  
-    gcc \ 
+    libc6-compat \
+    krb5-dev  \
+    zlib-dev \
+    zeromq-dev \
+    gcc \
     git
 
 COPY package.json .
 COPY package-lock.json .
 
-COPY entrypoint.sh ./entrypoint.sh
+COPY bin/entrypoint.sh ./entrypoint.sh
 
 COPY app ./app
 RUN npm install
