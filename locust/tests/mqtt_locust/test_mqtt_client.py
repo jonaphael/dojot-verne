@@ -1,292 +1,773 @@
 """
 Tests for the MQTT client class.
 """
+
 import unittest
-import logging
-from unittest.mock import MagicMock
-import paho.mqtt.client as paho
+from mock import patch, MagicMock
+import paho.mqtt.client as mqtt
+from src.mqtt_locust.mqtt_client import MQTTClient
 
-import src.mqtt_locust.mqtt_client as mqtt_client
-from src.ejbca.cert_client import CertClient
-from src.utils import Utils
+MOCK_CONFIG = {
+    'app': {
+        'tenant': 'tenant',
+        'log_config': {
+            'format':   "format",
+            'level': 'level',
+            'datefmt':  "dateformat",
+        }
+    },
+    'security': {
+        'cert_dir': 'cert-dir',
+        'revoke_cert_dir': 'revoke-cert-dir',
+        'renew_cert_dir': 'renew-cert-dir',
+        'ca_cert_file': 'ca-cert-file',
+        'min_time_reconn': 0,
+        'max_time_reconn': 1,
+        'time_to_renew': 100,
+        'time_to_revoke': 100
+    },
+    'mqtt': {
+        'host': 'host',
+        'port': 0,
+        'con_timeout': 0,
+        'qos': 0
+    }
+}
 
+
+@patch('src.mqtt_locust.mqtt_client.json')
+@patch('src.mqtt_locust.mqtt_client.mqtt')
+@patch('src.mqtt_locust.mqtt_client.CertClient')
+@patch('src.mqtt_locust.mqtt_client.logging')
+@patch('src.mqtt_locust.mqtt_client.Utils')
+@patch.dict('src.mqtt_locust.mqtt_client.CONFIG', MOCK_CONFIG)
 class TestMQTTClientInitialization(unittest.TestCase):
     """
-    Tests the constructor and initialization functions from MQTTClient.
+        Mqtt Client tests
     """
-    def setUp(self):
-        logging.basicConfig = MagicMock()
 
-        paho.Client.tls_set = MagicMock()
-        paho.Client.tls_insecure_set = MagicMock()
-        paho.Client.reconnect_delay_set = MagicMock()
-
-        CertClient.new_cert = MagicMock()
-        CertClient.create_cert_files = MagicMock()
-
-
-    # __init__() #
-    @classmethod
-    def test_constructor_success(cls):
+    def test_constructor_success(self, mock_utils,
+                                 mock_logging,
+                                 mock_cert_client,
+                                 paho_mqtt_mock,
+                                 json_mock):
         """
-        Should create a MQTTClient instance.
+            Should create a MQTTClient instance.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        client = MQTTClient('123', '987', False, False)
+        mock_utils.validate_tenant.assert_called_once_with(
+            MOCK_CONFIG['app']['tenant'])
+        mock_utils.validate_device_id.assert_called_once_with('123')
 
-        assert client.__class__ == mqtt_client.MQTTClient
-        assert client.device_id == "123"
-        assert client.run_id == "987"
-        assert not client.should_revoke
-        assert not client.should_renew
+        self.assertEqual(client.device_id, '123')
+        self.assertEqual(client.run_id, '987')
+        self.assertEqual(client.should_revoke, False)
+        self.assertEqual(client.should_renew, False)
+        self.assertEqual(client.tenant, MOCK_CONFIG['app']['tenant'])
 
-        assert not client.is_connected
-        assert client.mqttc is None
+        self.assertFalse(client.is_connected)
+        self.assertIsNone(client.mqttc)
 
-        assert client.username == ""
-        assert client.topic == ""
-        assert client.sub_topic == ""
+        self.assertEqual(client.username, "")
+        self.assertEqual(client.topic, "")
+        self.assertEqual(client.sub_topic, "")
 
-        assert client.device_cert_dir == ""
-        assert client.new_cert is None
+        self.assertEqual(client.device_cert_dir, "")
+        self.assertIsNone(client.new_cert)
 
-        assert client.pubmmap == {}
-        assert client.submmap == {}
+        self.assertEqual(client.pubmmap, {})
+        self.assertEqual(client.submmap, {})
 
-        assert client.start_time == 0
+        self.assertEqual(client.start_time, 0)
 
-    def test_constructor_invalid_device_id(self):
-        """
-        Should raise a ValueError when passing an invalid device_id.
-        """
-        with self.assertRaises(ValueError):
-            mqtt_client.MQTTClient("", "987", False, False)
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    def test_constructor_invalid_run_id(self):
+    def test_constructor_invalid_run_id(self, mock_utils,
+                                        mock_logging,
+                                        mock_cert_client,
+                                        paho_mqtt_mock,
+                                        json_mock):
         """
         Should raise a ValueError when passing an invalid run_id.
         """
         with self.assertRaises(ValueError):
-            mqtt_client.MQTTClient("123", "", False, False)
+            MQTTClient("123", "", False, False)
 
-    def test_constructor_both_true(self):
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_constructor_both_true(self, mock_utils,
+                                   mock_logging,
+                                   mock_cert_client,
+                                   paho_mqtt_mock,
+                                   json_mock):
         """
         Should raise a ValueError when passing True to both should_revoke
         and should_renew.
         """
         with self.assertRaises(ValueError):
-            mqtt_client.MQTTClient("", "987", True, True)
+            MQTTClient("123", "987", True, True)
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    # setup() #
-    @classmethod
-    def test_setup_success(cls):
+    def test_setup_success(self, mock_utils,
+                           mock_logging,
+                           mock_cert_client,
+                           paho_mqtt_mock,
+                           json_mock):
         """
         Should setup the parameters successfully.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+
+        client = MQTTClient("123", "987", False, False)
+        client.configure_mqtt = MagicMock()
         client.setup()
+        mock_logging.basicConfig.assert_called_once()
+        client.configure_mqtt.assert_called_once()
 
-        assert logging.basicConfig.called
-        assert client.new_cert is None
-        assert not CertClient.new_cert.called
-        assert not CertClient.create_cert_files.called
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    @classmethod
-    def test_setup_success_revoke(cls):
+    def test_setup_success_revoke(self, mock_utils,
+                                  mock_logging,
+                                  mock_cert_client,
+                                  paho_mqtt_mock,
+                                  json_mock):
         """
         Should setup the parameters successfully with certificate revocation.
         """
-        client = mqtt_client.MQTTClient("123", "987", True, False)
+        client = MQTTClient("123", "987", True, False)
+        client.configure_mqtt = MagicMock()
         client.setup()
 
-        assert logging.basicConfig.called
-        assert client.new_cert is not None
-        assert CertClient.new_cert.called
-        assert CertClient.create_cert_files.called
+        mock_cert_client.new_cert.assert_called_once_with(
+            client.tenant, client.device_id)
+        mock_cert_client.create_cert_files.assert_called_once_with(
+            client.new_cert, client.device_cert_dir)
 
-    @classmethod
-    def test_setup_success_renew(cls):
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_setup_success_renew(self, mock_utils,
+                                 mock_logging,
+                                 mock_cert_client,
+                                 paho_mqtt_mock,
+                                 json_mock):
         """
         Should setup the parameters successfully with certificate renovation.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, True)
+        client = MQTTClient("123", "987", False, True)
+        client.configure_mqtt = MagicMock()
         client.setup()
 
-        assert logging.basicConfig.called
-        assert client.new_cert is not None
-        assert CertClient.new_cert.called
-        assert CertClient.create_cert_files.called
+        mock_cert_client.new_cert.assert_called_once_with(
+            client.tenant, client.device_id)
+        mock_cert_client.create_cert_files.assert_called_once_with(
+            client.new_cert, client.device_cert_dir)
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    # configure_mqtt() #
-    def test_configure_mqtt(self):
+    def test_configure_mqtt(self, mock_utils,
+                            mock_logging,
+                            mock_cert_client,
+                            paho_mqtt_mock,
+                            json_mock):
         """
         Should configure the MQTT connection.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, True)
+        client = MQTTClient("123", "987", False, True)
         client.configure_mqtt()
 
-        assert client.mqttc is not None
+        mock_cert_client.get_certificate_file.assert_called_once_with(
+            client.device_id)
+        mock_cert_client.get_private_key_file.assert_called_once_with(
+            client.device_id)
 
-        assert client.mqttc.on_connect is not None
-        assert client.mqttc.on_disconnect is not None
-        assert client.mqttc.on_publish is not None
-        assert client.mqttc.on_subscribe is not None
-        assert client.mqttc.on_message is not None
+        self.assertIsNotNone(client.mqttc)
+        paho_mqtt_mock.Client.assert_called_once_with(
+            client_id=client.device_id)
+        paho_mqtt_mock.Client().reconnect_delay_set.assert_called_once_with(
+            min_delay=MOCK_CONFIG["security"]["min_time_reconn"],
+            max_delay=MOCK_CONFIG["security"]["max_time_reconn"])
 
-        assert paho.Client.reconnect_delay_set.called
-        assert paho.Client.tls_set.called
-        assert paho.Client.tls_insecure_set.called
+        paho_mqtt_mock.Client().tls_set.assert_called_once()
+        paho_mqtt_mock.Client().tls_insecure_set.assert_called_once_with(True)
 
+        self.assertIsNotNone(client.mqttc.on_connect)
+        self.assertIsNotNone(client.mqttc.on_disconnect)
+        self.assertIsNotNone(client.mqttc.on_publish)
+        self.assertIsNotNone(client.mqttc.on_subscribe)
+        self.assertIsNotNone(client.mqttc.on_message)
 
-class TestMQTTClient(unittest.TestCase):
-    """
-    Tests the other methods from MQTTClient class.
-    """
-    def setUp(self):
-        logging.basicConfig = MagicMock()
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-        paho.Client.tls_set = MagicMock()
-        paho.Client.tls_insecure_set = MagicMock()
-        paho.Client.reconnect_delay_set = MagicMock()
-
-        CertClient.new_cert = MagicMock()
-        CertClient.create_cert_files = MagicMock()
-
-
-    # connect() #
-    def test_connect(self):
+    def test_connect(self, mock_utils,
+                     mock_logging,
+                     mock_cert_client,
+                     paho_mqtt_mock,
+                     json_mock):
         """
         Should connect to the broker successfully.
         """
-        paho.Client.connect_async = MagicMock()
-        paho.Client.loop_start = MagicMock()
-
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        client = MQTTClient("123", "987", False, False)
         client.setup()
 
         client.connect()
+        paho_mqtt_mock.Client().connect_async.assert_called_once_with(
+            host=MOCK_CONFIG['mqtt']['host'],
+            port=MOCK_CONFIG['mqtt']['port'],
+            keepalive=MOCK_CONFIG['mqtt']['con_timeout'])
 
-        assert paho.Client.connect_async.called
-        assert paho.Client.loop_start.called
+        paho_mqtt_mock.Client().loop_start.assert_called_once()
 
-    def test_connect_async_error(self):
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_connect_error(self, mock_utils,
+                           mock_logging,
+                           mock_cert_client,
+                           paho_mqtt_mock,
+                           json_mock):
         """
         Should not connect to the broker successfully - connect_async error.
         """
-        paho.Client.connect_async = MagicMock()
-        paho.Client.connect_async.side_effect = Exception("fake error")
-        paho.Client.loop_start = MagicMock()
+        paho_mqtt_mock.Client().connect_async = Exception("fake error")
 
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        client = MQTTClient("123", "987", False, False)
         client.setup()
 
-        Utils.fire_locust_failure = MagicMock()
-
+        # when exception raises
         client.connect()
+        mock_utils.fire_locust_failure.assert_called_once()
 
-        assert Utils.fire_locust_failure.called
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    def test_connect_loop_start_error(self):
+    def test_publishing_succes(self, mock_utils,
+                               mock_logging,
+                               mock_cert_client,
+                               paho_mqtt_mock,
+                               json_mock):
         """
-        Should not connect to the broker successfully - loop_start error.
+        Should publish a message successfully
         """
-        paho.Client.connect_async = MagicMock()
-        paho.Client.loop_start = MagicMock()
-        paho.Client.loop_start.side_effect = Exception("fake error")
-
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        paho_mqtt_mock.Client().publish.return_value = (0, MagicMock())
+        client = MQTTClient("123", "987", False, False)
         client.setup()
 
-        Utils.fire_locust_failure = MagicMock()
+        client.publishing()
+        paho_mqtt_mock.Client().publish.assert_called_once()
+        keys_len = len(client.pubmmap.keys())
+        self.assertGreater(keys_len, 0)
 
-        client.connect()
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-        assert Utils.fire_locust_failure.called
+    def test_publishing_error(self, mock_utils,
+                              mock_logging,
+                              mock_cert_client,
+                              paho_mqtt_mock,
+                              json_mock):
+        """
+        Should not publish a message successfully
+        """
+        paho_mqtt_mock.Client().publish.return_value = (10, MagicMock())
+        client = MQTTClient("123", "987", False, False)
+        client.setup()
 
+        client.publishing()
+        mock_utils.error_message.assert_called_once_with(10)
+        mock_utils.fire_locust_failure.assert_called_once()
 
-    # publishing() #
-    # subscribing() #
-    # locust_on_subscribe() #
-    # locust_on_publish() #
-    # locust_on_connect() #
-    # locust_on_disconnect() #
-    # locust_on_message() #
-    # renew_cert() #
-    # revoke_cert() #
-    # should_renew_now() #
-    def test_should_renew_now(self):
+        keys_len = len(client.pubmmap.keys())
+        self.assertEqual(keys_len, 0)
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_subcribe_succes(self, mock_utils,
+                             mock_logging,
+                             mock_cert_client,
+                             paho_mqtt_mock,
+                             json_mock):
+        """
+        Should subscribe a message successfully
+        """
+        paho_mqtt_mock.Client().subscribe.return_value = (0, MagicMock())
+        client = MQTTClient("123", "987", False, False)
+        client.setup()
+
+        client.subscribing()
+        paho_mqtt_mock.Client().subscribe.assert_called_once()
+        keys_len = len(client.submmap.keys())
+        self.assertGreater(keys_len, 0)
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_subscribe_error(self, mock_utils,
+                             mock_logging,
+                             mock_cert_client,
+                             paho_mqtt_mock,
+                             json_mock):
+        """
+        Should not subscribe a message successfully
+        """
+        paho_mqtt_mock.Client().subscribe.return_value = (10, MagicMock())
+        client = MQTTClient("123", "987", False, False)
+        client.setup()
+
+        client.subscribing()
+        mock_utils.error_message.assert_called_once_with(10)
+        mock_utils.fire_locust_failure.assert_called_once()
+
+        keys_len = len(client.pubmmap.keys())
+        self.assertEqual(keys_len, 0)
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    # callbacks
+    def test_locust_on_subcribing(self, mock_utils,
+                                  mock_logging,
+                                  mock_cert_client,
+                                  paho_mqtt_mock,
+                                  json_mock):
+        """
+        Should fire locust success
+        """
+        mid = MagicMock()
+        client = MQTTClient("123", "987", False, False)
+        client.submmap[mid] = {'name': 'name', 'start_time': 'time'}
+        client.locust_on_subscribe(client.mqttc, {}, mid, 0)
+        mock_utils.time_delta.assert_called_once()
+        mock_utils.fire_locust_success.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_subcribing_failure(self, mock_utils,
+                                          mock_logging,
+                                          mock_cert_client,
+                                          paho_mqtt_mock,
+                                          json_mock):
+        """
+        Should fire locust failure
+        """
+        client = MQTTClient("123", "987", False, False)
+
+        client.locust_on_subscribe(client.mqttc, {}, 0, 0)
+        mock_utils.fire_locust_failure.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_publish(self, mock_utils,
+                               mock_logging,
+                               mock_cert_client,
+                               paho_mqtt_mock,
+                               json_mock):
+        """
+        Should fire locust success on publish callback
+        """
+        mid = MagicMock()
+        client = MQTTClient("123", "987", False, False)
+        client.pubmmap[mid] = {'name': 'name',
+                               'start_time': 'time', 'payload': 'payload'}
+        client.locust_on_publish(client.mqttc, {}, mid)
+        mock_utils.time_delta.assert_called_once()
+        mock_utils.fire_locust_success.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_publish_failure(self, mock_utils,
+                                       mock_logging,
+                                       mock_cert_client,
+                                       paho_mqtt_mock,
+                                       json_mock):
+        """
+        Should fire locust failure on publish
+        """
+        client = MQTTClient("123", "987", False, False)
+        client.locust_on_publish(client.mqttc, {}, 0)
+        mock_utils.fire_locust_failure.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_connect(self, mock_utils,
+                               mock_logging,
+                               mock_cert_client,
+                               paho_mqtt_mock,
+                               json_mock):
+        """
+        Should fire locust success on connection callback
+        """
+        paho_mqtt_mock.MQTT_ERR_SUCCESS = 1
+        client = MQTTClient("123", "987", False, False)
+        client.subscribing = MagicMock()
+        client.locust_on_connect(client.mqttc, {}, {}, 1)
+        client.subscribing.assert_called_once()
+        mock_utils.fire_locust_success.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_connect_failure(self, mock_utils,
+                                       mock_logging,
+                                       mock_cert_client,
+                                       paho_mqtt_mock,
+                                       json_mock):
+        """
+        Should fire locust failure on connection callback
+        """
+        paho_mqtt_mock.MQTT_ERR_SUCCESS = 1
+        client = MQTTClient("123", "987", False, False)
+        client.locust_on_connect(client.mqttc, {}, {}, 101010)
+        mock_utils.error_message.assert_called_once()
+        mock_utils.fire_locust_failure.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_disconnect(self, mock_utils,
+                                  mock_logging,
+                                  mock_cert_client,
+                                  paho_mqtt_mock,
+                                  json_mock):
+        """
+        Should fire locust failure on disconnect callback
+        """
+        paho_mqtt_mock.MQTT_ERR_SUCCESS = 1
+        client = MQTTClient("123", "987", False, False)
+        client.setup()
+        client.locust_on_disconnect(client.mqttc, {}, 1010)
+
+        self.assertFalse(client.is_connected)
+        mock_utils.fire_locust_failure.assert_called_once()
+        paho_mqtt_mock.Client().reconnect.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_disconnect_fail(self, mock_utils,
+                                       mock_logging,
+                                       mock_cert_client,
+                                       paho_mqtt_mock,
+                                       json_mock):
+        """
+        Should fire locust failure on disconnect callback
+        """
+        paho_mqtt_mock.MQTT_ERR_SUCCESS = 1
+        client = MQTTClient("123", "987", False, False)
+        client.setup()
+        client.locust_on_disconnect(client.mqttc, {}, 1)
+
+        self.assertFalse(client.is_connected)
+        paho_mqtt_mock.Client().reconnect.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_message(self, mock_utils,
+                               mock_logging,
+                               mock_cert_client,
+                               paho_mqtt_mock,
+                               json_mock):
+        """
+        Should fire locust sucess on message callback
+        """
+        message: mqtt.MQTTMessage = mqtt.MQTTMessage()
+        message.payload = str.encode(str({"timestamp": 0}))
+        json_mock.loads.return_value = {"timestamp": 0}
+        client = MQTTClient("123", "987", False, False)
+        MQTTClient.locust_on_message(client.mqttc, {}, message)
+
+        mock_utils.fire_locust_success.assert_called_once()
+        mock_utils.time_delta.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_locust_on_message_exception(self, mock_utils,
+                                         mock_logging,
+                                         mock_cert_client,
+                                         paho_mqtt_mock,
+                                         json_mock):
+        """
+        Should raize an exception on message callback
+        """
+        client = MQTTClient("123", "987", False, False)
+
+        with self.assertRaises(Exception):
+            MQTTClient.locust_on_message(client.mqttc, {}, {})
+
+        MQTTClient.locust_on_message(client.mqttc, {}, None)
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_should_renew_now(self, mock_utils,
+                              mock_logging,
+                              mock_cert_client,
+                              paho_mqtt_mock,
+                              json_mock):
         """
         Should renew the certificate now.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, True)
+        mock_utils.time_delta.return_value = 100
+        client = MQTTClient("123", "987", False, True)
         client.setup()
+        self.assertTrue(client.should_renew_now())
 
-        should_renew = client.should_renew_now()
-        assert should_renew
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    def test_should_not_renew_now(self):
+    def test_should_not_renew_now(self, mock_utils,
+                                  mock_logging,
+                                  mock_cert_client,
+                                  paho_mqtt_mock,
+                                  json_mock):
         """
         Should not renew the certificate now.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        mock_utils.time_delta.return_value = 1202010
+        client = MQTTClient("123", "987", False, False)
         client.setup()
-        client.start_time = 0
 
-        should_renew = client.should_renew_now()
-        assert not should_renew
+        self.assertFalse(client.should_renew_now())
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    # should_revoke_now() #
-    def test_should_revoke_now(self):
+    def test_should_revoke_now(self, mock_utils,
+                               mock_logging,
+                               mock_cert_client,
+                               paho_mqtt_mock,
+                               json_mock):
         """
         Should revoke the certificate now.
         """
-        client = mqtt_client.MQTTClient("123", "987", True, False)
+        mock_utils.time_delta.return_value = 1202010
+        client = MQTTClient("123", "987", True, False)
         client.setup()
 
-        should_revoke = client.should_revoke_now()
-        assert should_revoke
+        self.assertTrue(client.should_revoke_now())
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-    def test_should_not_revoke_now(self):
+    def test_should_not_revoke_now(self, mock_utils,
+                                   mock_logging,
+                                   mock_cert_client,
+                                   paho_mqtt_mock,
+                                   json_mock):
         """
         Should not revoke the certificate now.
         """
-        client = mqtt_client.MQTTClient("123", "987", False, False)
+        mock_utils.time_delta.return_value = 0
+        client = MQTTClient("123", "987", False, False)
         client.setup()
-        client.start_time = 0
 
-        should_revoke = client.should_revoke_now()
-        assert not should_revoke
+        self.assertFalse(client.should_revoke_now())
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
+    def test_renew_cert(self, mock_utils,
+                        mock_logging,
+                        mock_cert_client,
+                        paho_mqtt_mock,
+                        json_mock):
+        "Sould renew cert"
+        client = MQTTClient("123", "987", False, True)
 
+        client.should_renew_now = MagicMock()
+        client.should_renew_now.return_value = True
+        mock_cert_client.new_cert().renew_cert.return_value = True
 
+        client.setup()
+        client.renew_cert()
 
+        client.new_cert.renew_cert.assert_called_once()
+        mock_utils.fire_locust_success.assert_called_once()
+        self.assertFalse(client.should_renew)
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
-class TestMQTTClientConnect(unittest.TestCase):
-    """
-    Tests the connection in MQTTClient class.
-    """
-    def setUp(self):
-        logging.basicConfig = MagicMock()
+    def test_not_renew_cert(self, mock_utils,
+                            mock_logging,
+                            mock_cert_client,
+                            paho_mqtt_mock,
+                            json_mock):
+        "Sould not renew cert"
 
-        paho.Client.tls_set = MagicMock()
-        paho.Client.tls_insecure_set = MagicMock()
-        paho.Client.reconnect_delay_set = MagicMock()
+        client = MQTTClient("123", "987", False, False)
+        client.should_renew_now = MagicMock()
+        client.should_renew_now.return_value = True
 
-        CertClient.new_cert = MagicMock()
-        CertClient.create_cert_files = MagicMock()
+        mock_cert_client.new_cert().renew_cert.return_value = Exception('exception')
 
-        self.client = mqtt_client.MQTTClient("123", "987", False, False)
-        self.client.setup()
+        with self.assertRaises(Exception):
+            client.renew_cert()
 
+        mock_utils.fire_locust_failure.assert_called_once()
 
+        client.should_renew_now.return_value = False
+        client.renew_cert()
 
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
+    def test_revoke_cert(self, mock_utils,
+                         mock_logging,
+                         mock_cert_client,
+                         paho_mqtt_mock,
+                         json_mock):
+        "Sould not revoke cert"
+        client = MQTTClient("123", "987", True, False)
 
+        client.should_revoke_now = MagicMock()
+        client.should_revoke_now.return_value = True
+        mock_cert_client.revoke_cert.return_value = MagicMock()
+        mock_cert_client.has_been_revoked.return_value = True
 
+        client.setup()
+        client.revoke_cert()
+
+        mock_cert_client.revoke_cert.assert_called_once()
+        mock_cert_client.has_been_revoked.assert_called_once()
+        mock_utils.fire_locust_success.assert_called_once()
+
+        mock_cert_client.has_been_revoked.return_value = False
+        client.revoke_cert()
+        mock_utils.fire_locust_success.assert_called_once()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
+
+    def test_not_revoke_cert(self, mock_utils,
+                             mock_logging,
+                             mock_cert_client,
+                             paho_mqtt_mock,
+                             json_mock):
+        "Sould not revoke cert"
+        client = MQTTClient("123", "987", True, False)
+
+        client.should_revoke_now = MagicMock()
+        client.should_revoke_now.return_value = True
+        mock_cert_client.revoke_cert = None
+
+        client.setup()
+
+        with self.assertRaises(Exception):
+            client.revoke_cert()
+
+        mock_utils.fire_locust_failure.assert_called_once()
+
+        client.should_revoke_now.return_value = False
+        client.revoke_cert()
+
+        mock_utils.reset_mock()
+        mock_logging.reset_mock()
+        mock_cert_client.reset_mock()
+        paho_mqtt_mock.reset_mock()
+        json_mock.reset_mock()
 
 
 if __name__ == "__main__":

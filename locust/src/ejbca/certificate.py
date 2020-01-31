@@ -50,7 +50,7 @@ class Certificate:
         except Exception as exception:
             logging.error("Error while generating the private key.")
             logging.error("Error: %s", exception)
-            return ""
+            raise Exception("Error: {0}".format(str(exception)))
 
     def generate_csr(self) -> str:
         """
@@ -59,13 +59,10 @@ class Certificate:
         # based on https://github.com/cjcotton/python-csr
 
         dnsname = CONFIG['security']['dns_cert']
-        ipaddr = []
 
         ss = []
         for i in dnsname:
             ss.append("DNS: %s" % i)
-        for i in ipaddr:
-            ss.append("IP: %s" % i)
         ss = ", ".join(ss)
 
 

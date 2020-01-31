@@ -1,309 +1,151 @@
 """
 Tests for the certification module.
 """
-import shutil
-import os
-import unittest
-from unittest.mock import MagicMock
-import requests
-from OpenSSL import crypto
 
-from src.ejbca.cert_client import CertClient
-import src.ejbca.certificate as certificate
-from src.ejbca.thing import Thing
-from src.utils import Utils
+import unittest
+from mock import patch, MagicMock
+from src.ejbca.certificate import Certificate
+
+MOCK_CONFIG = {
+    'security': {
+        'dns_cert': ['1', '2'],
+        'ejbca_url': 'ejbca-url'
+    }
+}
+
 
 class TestCertificate(unittest.TestCase):
     """
-    Certificate class tests.
+        Certificate class tests.
     """
-    def setUp(self):
-        self.pem_key = "-----BEGIN CERTIFICATE-----\nfakePemKey\n-----END CERTIFICATE-----\n"
-        self.pem_csr = "-----BEGIN CERTIFICATE-----\nfakePemCsr\n-----END CERTIFICATE-----\n"
-        self.pem_crt = "-----BEGIN CERTIFICATE-----\nfakePemCrt\n-----END CERTIFICATE-----\n"
-
-        self.cert = MagicMock(
-            c_name="admin:123",
-            key={
-                "raw": "fakeRawKey",
-                "pem": ""
-            },
-            csr={
-                "raw": "fakeRawCsr",
-                "pem": ""
-            },
-            crt={
-                "raw": "fakeRawCrt",
-                "pem": ""
-            }
-        )
-
-    def test_save_crt(self):
+    @staticmethod
+    @patch('src.ejbca.certificate.logging')
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    def test_constructor(_mock_json, _mock_crypto, mock_utils, _mock_requests, _mock_log):
         """
-        Should create the PEM CRT certificate.
+            Certificate class tests.
         """
-        certificate.Certificate = self.cert
+        mock_utils.validate_thing_id.return_value = 'thing-id'
+        _cert = Certificate('thing-id')
+        mock_utils.validate_thing_id.assert_called_once_with('thing-id')
+        _mock_requests.reset_mock()
 
-        crt = certificate.Certificate.save_crt()
-
-        correct_crt = "-----BEGIN CERTIFICATE-----\n"\
-                + self.cert.crt["pem"]\
-                + "\n-----END CERTIFICATE-----\n"
-
-        assert crt == correct_crt
-
-
-
-
-
-
-
-class TestCertClient(unittest.TestCase):
-    """
-    CertClient class tests.
-    """
-
-    mock_thing = MagicMock(thing_certificate="test_cert")
-
-    # get_private_key_file() #
-    @classmethod
-    def test_get_private_key_file(cls):
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    def test_save_cert(self, _mock_json, _mock_crypto, _mock_utils, _mock_requests):
         """
-        Should build a correct filename for the key.
+            Test saving the cert
         """
-        device_id = "testID"
-        filename = device_id + ".key"
-        assert filename == CertClient.get_private_key_file(device_id)
+        thing = Certificate('thing-id')
+        save_cert_result = ("-----BEGIN CERTIFICATE-----\n"
+                            + thing.crt["raw"]
+                            + "\n-----END CERTIFICATE-----\n")
+        self.assertEqual(thing.save_crt(), save_cert_result)
+        _mock_requests.reset_mock()
 
-    def test_get_private_key_file_empty_id(self):
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    def test_generate_private_cert(self, _mock_json, mock_crypto, _mock_utils, _mock_requests):
         """
-        Should not build a key's filename with an empty ID.
+            Test generate private cert
         """
-        device_id = ""
-        with self.assertRaises(ValueError):
-            CertClient.get_private_key_file(device_id)
+        mock_crypto.dump_privatekey.return_value = MagicMock()
+        mock_crypto.dump_privatekey().decode.return_value = 'return-value'
+        thing = Certificate('thing-id')
 
+        value = thing.generate_private_key()
+        self.assertEqual(value, 'return-value')
+        mock_crypto.dump_privatekey.assert_called()
+        mock_crypto.dump_privatekey().decode.assert_called()
+        mock_crypto.dump_privatekey.side_effect = Exception('abc')
+        self.assertRaises(Exception, thing.generate_private_key)
+        _mock_requests.reset_mock()
 
-    # get_certificate_file() #
-    @classmethod
-    def test_get_certificate_file(cls):
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    @patch.dict('src.ejbca.certificate.CONFIG', MOCK_CONFIG)
+    def test_generate_csr(self, _mock_json, mock_crypto, _mock_utils, _mock_requests):
         """
-        Should build a correct filename for the certificate.
+            Test generate private csr
         """
-        device_id = "testID"
-        filename = device_id + ".crt"
-        assert filename == CertClient.get_certificate_file(device_id)
+        mock_crypto.dump_certificate_request.return_value = MagicMock()
+        mock_crypto.dump_certificate_request().decode.return_value = 'return-value'
 
-    def test_get_certificate_file_empty_id(self):
+        thing = Certificate('thing-id')
+        value = thing.generate_csr()
+        self.assertEqual(value, 'return-value')
+        _mock_requests.reset_mock()
+
+    @staticmethod
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    @patch.dict('src.ejbca.certificate.CONFIG', MOCK_CONFIG)
+    def test_create_ejbca_user(_mock_json, _mock_crypto, _mock_utils, mock_requests):
         """
-        Should not build a certificate's filename with an empty ID.
+            Test generate private csr
         """
-        device_id = ""
-        with self.assertRaises(ValueError):
-            CertClient.get_certificate_file(device_id)
+        mock_requests.post.return_value = MagicMock()
+        mock_requests.post().status_code = 201
+        mock_requests.post().connection.return_value = MagicMock()
 
+        thing = Certificate('thing-id')
+        thing.create_ejbca_user()
+        mock_requests.post.assert_called()
+        mock_requests.post().connection.close.assert_called()
 
-    # create_cert_files() #
-    def test_create_cert_files(self):
+        mock_requests.post().status_code = 200
+        thing.create_ejbca_user()
+        mock_requests.post().connection.close.assert_called()
+        mock_requests.reset_mock()
+
+    @staticmethod
+    @patch('src.ejbca.certificate.logging')
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    @patch.dict('src.ejbca.certificate.CONFIG', MOCK_CONFIG)
+    def test_sign_cert(mock_json, _mock_crypto, _mock_utils, mock_requests, _mock_log):
         """
-        Should write to the files.
+            Test generate private csr
         """
-        # Creating a temporary folder to hold the certificate files
-        temp_dir = "tests/tmp/"
-        cert_dir = temp_dir + "cert/"
-        os.makedirs(cert_dir, exist_ok=True)
+        mock_requests.post.return_value = MagicMock()
+        mock_requests.post().status_code = 200
+        mock_requests.post().connection.return_value = MagicMock()
 
-        certificate.Certificate = MagicMock()
-        thing = Thing("admin", "123")
-        CertClient.create_cert_files(thing, directory=cert_dir)
+        thing = Certificate('thing-id')
+        thing.sign_cert()
+        mock_requests.post.assert_called()
+        mock_requests.post().connection.close.assert_called()
 
-        assert os.path.exists(cert_dir + thing.device_id + ".key")
-        assert os.path.exists(cert_dir + thing.thing_certificate + ".crt")
+        mock_requests.post().status_code = 200
+        thing.sign_cert()
+        mock_requests.reset_mock()
 
-        # Removing all the temporary files
-        shutil.rmtree(temp_dir)
-
-
-    # new_cert() #
-    @classmethod
-    def test_new_cert(cls):
+    @patch('src.ejbca.certificate.logging')
+    @patch('src.ejbca.certificate.requests')
+    @patch('src.ejbca.certificate.Utils')
+    @patch('src.ejbca.certificate.crypto')
+    @patch('src.ejbca.certificate.json')
+    @patch.dict('src.ejbca.certificate.CONFIG', MOCK_CONFIG)
+    def test_renew_cert(self, _mock_json, _mock_crypto, _mock_utils, _mock_requests, _mock_log):
         """
-        Should build a new Thing instance.
+            Test generate private csr
         """
-        thing = CertClient.new_cert("admin", "123")
-        assert thing is not None
-
-    def test_new_cert_invalid(self):
-        """
-        Should not build a new Thing instance with invalid arguments.
-        """
-        with self.assertRaises(ValueError):
-            CertClient.new_cert("admin", "")
-
-        with self.assertRaises(ValueError):
-            CertClient.new_cert("", "123")
-
-
-    # revoke_cert() #
-    def test_revoke_cert(self):
-        """
-        Should revoke the certificate.
-        """
-        requests.delete = MagicMock()
-        crypto.load_certificate = MagicMock()
-        CertClient.revoke_cert(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.delete.called
-
-
-    # revoke_cert() #
-    def test_has_been_revoked(self):
-        """
-        Should check that the certificate was successfully revoked.
-        """
-        response: requests.Response = MagicMock()
-        response.json = MagicMock(return_value={"status": {"return": {"reason": 0}}})
-        requests.get = MagicMock(return_value=response)
-        crypto.load_certificate = MagicMock()
-
-        assert CertClient.has_been_revoked(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.get.called
-
-    def test_has_not_been_revoked(self):
-        """
-        Should check that the certificate was not successfully revoked.
-        """
-        response = MagicMock()
-        response.json = MagicMock(return_value={"status": {"return": {"reason": 1}}})
-        requests.get = MagicMock(return_value=response)
-        crypto.load_certificate = MagicMock()
-
-        assert not CertClient.has_been_revoked(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.get.called
-
-    def test_has_been_revoked_invalid_response(self):
-        """
-        Should check that the response from EJBCA is incorrect.
-        """
-        # Empty response
-        response = MagicMock()
-        response.json = MagicMock(return_value={})
-        requests.get = MagicMock(return_value=response)
-        crypto.load_certificate = MagicMock()
-
-        assert not CertClient.has_been_revoked(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.get.called
-
-        # Response with empty status
-        response.json = MagicMock(return_value={"status":{}})
-        requests.get.reset_mock()
-        crypto.load_certificate.reset_mock()
-
-        assert not CertClient.has_been_revoked(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.get.called
-
-        # Response with empty status.return
-        response.json = MagicMock(return_value={"status":{"return":{}}})
-        requests.get.reset_mock()
-        crypto.load_certificate.reset_mock()
-
-        assert not CertClient.has_been_revoked(self.mock_thing)
-
-        assert crypto.load_certificate.called
-        assert requests.get.called
-
-
-class TestThingConstructor(unittest.TestCase):
-    """
-    Thing class constructor tests.
-    """
-
-    @classmethod
-    def test_success(cls):
-        """
-        Should build a correct Thing instance.
-        """
-        certificate.Certificate = MagicMock()
-
-        tenant = "admin"
-        device_id = "123"
-        thing_id = Utils.create_thing_id(tenant, device_id)
-
-        thing = Thing(tenant, device_id)
-
-        assert thing.tenant is not None
-        assert thing.device_id is not None
-        assert thing.thing_id is not None
-        assert thing.cert is not None
-        assert thing.private_key is not None
-        assert thing.thing_certificate is not None
-
-        assert thing.tenant == tenant
-        assert thing.device_id == device_id
-        assert thing.thing_id == thing_id
-
-    def test_failure(self):
-        """
-        Should not build a Thing instance with invalid arguments.
-        """
-        certificate.Certificate = MagicMock()
-
-        tenant = ""
-        device_id = "123"
-
-        with self.assertRaises(ValueError):
-            _thing = Thing(tenant, device_id)
-
-        tenant = "admin"
-        device_id = ""
-
-        with self.assertRaises(ValueError):
-            _thing = Thing(tenant, device_id)
-
-
-class TestThingMethods(unittest.TestCase):
-    """
-    Thing class methods tests.
-    """
-    tenant = "admin"
-    device_id = "123"
-
-    certificate.Certificate = MagicMock()
-
-    def setUp(self):
-        self.thing = Thing(self.tenant, self.device_id)
-
-    def tearDown(self):
-        self.thing = None
-
-    def test_renew_cert(self):
-        """
-        Should call the renew_cert from Certificate class.
-        """
-        requests.post = MagicMock()
-        assert self.thing.cert.renew_cert.called
-
-    def test_get_args_in_dict(self):
-        """
-        Should correctly return the arguments in a dictionary.
-        """
-        args_dict = self.thing.get_args_in_dict()
-        correct_dict = {
-            "thing_id": self.thing.thing_id,
-            "private_key": self.thing.private_key,
-            "thing_certificate": self.thing.thing_certificate
-        }
-
-        assert args_dict == correct_dict
+        thing = Certificate('thing-id')
+        thing.renew_cert()
+        self.assertIsNotNone(thing.crt['pem'])
 
 
 if __name__ == "__main__":
