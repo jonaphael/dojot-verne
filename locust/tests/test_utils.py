@@ -5,8 +5,8 @@
 import sys
 import unittest
 from unittest.mock import patch
-import paho.mqtt.client as mqtt
 from logging import DEBUG, NOTSET, WARNING, ERROR, CRITICAL, INFO
+import paho.mqtt.client as mqtt
 from src.utils import Utils
 
 
@@ -15,7 +15,6 @@ class TestUtils(unittest.TestCase):
       Test Utils Testcase
     """
 
-    # time_delta() #
     def test_time_delta(self):
         """
         time_delta() should return correct time.
@@ -25,7 +24,6 @@ class TestUtils(unittest.TestCase):
         result = Utils.time_delta(start, end)
         self.assertEqual(result, 300)
 
-    # str_to_bool() #
     def test_str_to_bool_true(self):
         """
             str_to_bool("True") should return boolean True.
@@ -44,7 +42,6 @@ class TestUtils(unittest.TestCase):
         """
         self.assertFalse(Utils.str_to_bool("other"))
 
-    # error_message() #
     def test_error_message(self):
         """
         error_message() should return the correct names for errors.
@@ -86,7 +83,6 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(Utils.error_message(
             101010), "101010\n")
 
-    # log_level() #
     def test_log_level(self):
         """"
             should return correct log
@@ -99,7 +95,6 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(Utils.log_level('critical'), CRITICAL)
         self.assertEqual(Utils.log_level('not-exist'), -1)
 
-    # validate_device_id()
     def test_validate_device_id(self):
         """"
         test_validate_device_id(dev-id) raised an exception when (dev-id) < 1
@@ -126,13 +121,13 @@ class TestUtils(unittest.TestCase):
         """"
         test_create_thing_id() should create a thing id
         """
-        self.assertEqual(Utils.create_thing_id('tenant', 'dev-id'), 'tenant:dev-id')
+        self.assertEqual(Utils.create_thing_id(
+            'tenant', 'dev-id'), 'tenant:dev-id')
         with self.assertRaises(ValueError):
             self.assertEqual(Utils.create_thing_id('tenant', ''), None)
             self.assertEqual(Utils.create_thing_id('', 'dev-id'), None)
             self.assertEqual(Utils.create_thing_id('', ''), None)
 
-    # validate_tenant()
     def test_validate_tenant(self):
         """"
         test_validate_tenant(dev-id) raised an exception when (tenant) < 1
@@ -144,7 +139,6 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(ValueError):
             Utils.validate_tenant('')
 
-    # is_master()
     def test_is_master(self):
         """
         is_master() should return True when the program is run with --master flag
@@ -153,7 +147,6 @@ class TestUtils(unittest.TestCase):
         with patch.object(sys, "argv", master_flag):
             self.assertTrue(Utils.is_master())
 
-    # is_slave()
     def test_is_slave(self):
         """
         is_slave() should return True when the program is run with --slave flag
@@ -162,7 +155,6 @@ class TestUtils(unittest.TestCase):
         with patch.object(sys, "argv", slave_flag):
             self.assertTrue(Utils.is_slave())
 
-    # fire_locust_failure
     @staticmethod
     @patch('src.utils.events')
     def test_fire_locust_failure(mock_events):
@@ -172,7 +164,6 @@ class TestUtils(unittest.TestCase):
         Utils.fire_locust_failure()
         mock_events.request_failure.fire.assert_called_once()
 
-    # fire_locust_success
     @staticmethod
     @patch('src.utils.events')
     def test_fire_locust_success(mock_events):

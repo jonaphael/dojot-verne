@@ -6,4 +6,3 @@ omit =
     tests/*
     src/config.py
 branch = True
-# source = src/*.py

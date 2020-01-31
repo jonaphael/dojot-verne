@@ -226,7 +226,6 @@ class TestMQTTClientInitialization(unittest.TestCase):
         paho_mqtt_mock.reset_mock()
         json_mock.reset_mock()
 
-    # connect() #
     def test_connect(self, mock_utils,
                      mock_logging,
                      mock_cert_client,
