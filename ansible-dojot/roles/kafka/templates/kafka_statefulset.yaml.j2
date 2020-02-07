@@ -13,14 +13,17 @@ spec:
         name: kafka-server
     spec:
       affinity:
-#        nodeAffinity:
-#          requiredDuringSchedulingIgnoredDuringExecution:
-#            nodeSelectorTerms:
-#            - matchExpressions:
-#              - key: kubernetes.io/hostname
-#                operator: In
-#                values:
-#                - verne-kafka
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - verne-worker
+                - verne-worker-2
+                - verne-worker-3
+                - verne-worker-4
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:

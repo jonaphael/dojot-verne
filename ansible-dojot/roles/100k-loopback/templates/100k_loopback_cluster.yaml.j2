@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: 100k-loopback
+  namespace: {{ dojot_namespace }}
+spec:
+  serviceName: "100k-loopback"
+  selector:
+    matchLabels:
+      app: 100k-loopback
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: 100k-loopback
+    spec:
+      containers:
+      - name: 100k-loopback
+        image: jonaphael/100k-loopback

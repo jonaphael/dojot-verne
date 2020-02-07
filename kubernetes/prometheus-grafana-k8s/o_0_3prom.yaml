@@ -13,6 +13,18 @@ spec:
       labels:
         app: dojot-prom
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - verne-worker
+                - verne-worker-2
+                - verne-worker-3
+                - verne-worker-4
       containers:
       - name: dojot-prom
         image: mprevide/prom_test

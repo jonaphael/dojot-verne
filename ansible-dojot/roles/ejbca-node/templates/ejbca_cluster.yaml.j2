@@ -23,6 +23,18 @@ spec:
       labels:
         app: ejbca-wrapper
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - verne-worker
+                - verne-worker-2
+                - verne-worker-3
+                - verne-worker-4
       hostname: localhost
       containers:
       - name: ejbca-wrapper

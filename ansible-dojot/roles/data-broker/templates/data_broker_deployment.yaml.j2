@@ -15,7 +15,8 @@ spec:
         app: dojot
     spec:
       containers:
-      - image: dojot/data-broker:{{ dojot_data_broker_version }}
+      #- image: dojot/data-broker:{{ dojot_data_broker_version }}
+      - image: eduardogmisiuk/data-broker:kafka_env_vars
         name: data-broker
         env:
         - name: KAFKA_HOSTS
