@@ -13,7 +13,7 @@ AUTH_URL="${AUTH_HOST}"
 AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"
 DEVICE_DATA=${DEVICE_DATA:-"device-data"}
 DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"iotagent.device"}
-KAFKA_HOST=${KAFKA_HOST:-"dojot_kafka_1"}
+KAFKA_HOSTS=${KAFKA_HOSTS:-"dojot_kafka_1"}
 LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
 
 # device data
@@ -32,9 +32,9 @@ then
     then
 
         echo "Starting loopback ...."
-        kafkacat -C -b ${KAFKA_HOST} -q -f '{ "key": "%k" , "msg": %s }\n' -u -G ${LOOPBACK_CONSUMER_GROUP} ${DEVICE_DATA_TOPIC} | \
+        kafkacat -C -b ${KAFKA_HOSTS} -q -f '{ "key": "%k" , "msg": %s }\n' -u -G ${LOOPBACK_CONSUMER_GROUP} ${DEVICE_DATA_TOPIC} | \
         unbuffer -p jq -r '"\(.key)@{\"event\": \"configure\",\"meta\": {\"service\": \"\(.msg.metadata.tenant)\",\"timestamp\": \(.msg.metadata.timestamp)},\"data\" : {\"id\" : \"\(.msg.metadata.deviceid)\",\"attrs\": \(.msg.attrs)}}"' \
-        |  kafkacat -P -b ${KAFKA_HOST} -t ${DEVICE_CONFIGURE_TOPIC} -K @ -l
+        |  kafkacat -P -b ${KAFKA_HOSTS} -t ${DEVICE_CONFIGURE_TOPIC} -K @ -l
         
         echo "Application Stopped restarting ..."
     else

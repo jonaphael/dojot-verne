@@ -1,6 +1,6 @@
 # 100K Loopback
 
-This service is a helper for 100k-epic, its functionality is to transfer incomming payload from a **device-data** topic to **iotagent-devce** topic.
+This service is a helper for 100k-epic, its functionality is to transfer incomming payload from a **device-data** topic to **iotagent-device** topic.
 
 # Configurations
 ## Environment Variables
