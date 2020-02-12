@@ -1,6 +1,6 @@
 FROM confluentinc/cp-kafkacat
 
-RUN apt update; apt install -y curl jq
+RUN apt update; apt install -y curl jq expect
 
 WORKDIR /opt/loopback/
 
