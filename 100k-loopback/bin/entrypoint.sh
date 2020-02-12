@@ -11,13 +11,12 @@ JSON_CONTENT_TYPE="Content-Type:application/json"
 # auth
 AUTH_URL="${AUTH_HOST}"
 AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"
-DEVICE_DATA="device-data"
-DEVICE_CONFIGURE="iotagent.device"
+DEVICE_DATA=${DEVICE_DATA:-"device-data"}
+DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"iotagent.device"}
 KAFKA_HOST=${KAFKA_HOST:-"dojot_kafka_1"}
 LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
 
 # device data
-TO=$(curl --silent -X POST ${AUTH_URL} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}")
 TOKEN=$(curl --silent -X POST ${AUTH_URL} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}" | jq '.jwt' -r)
 
 if [ ! -z "$TOKEN" ]
