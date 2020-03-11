@@ -3,21 +3,19 @@ echo "100k-loopback start"
 
 DOJOT_USERNAME=${DOJOT_USERNAME:-"admin"}
 DOJOT_PASSWORD=${DOJOT_PASSWORD:-"admin"}
-AUTH_HOST=${AUTH_HOST:-"http://dojot_auth_1:5000"}
-DATA_BROKER_HOST=${DATA_BROKER_HOST:-"http://dojot_data-broker_1"}
 
-JSON_CONTENT_TYPE="Content-Type:application/json"
+AUTH_HOST=${AUTH_HOST:-"http://auth:5000"}
+DATA_BROKER_HOST=${DATA_BROKER_HOST:-"http://data-broker:80"}
+KAFKA_HOSTS=${KAFKA_HOSTS:-"kafka-server:9092"}
 
-# auth
-AUTH_URL="${AUTH_HOST}"
-AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"
+LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
 DEVICE_DATA=${DEVICE_DATA:-"device-data"}
 DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"iotagent.device"}
-KAFKA_HOSTS=${KAFKA_HOSTS:-"dojot_kafka_1"}
-LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
 
-# device data
-TOKEN=$(curl --silent -X POST ${AUTH_URL} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}" | jq '.jwt' -r)
+# auth
+readonly AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"
+readonly JSON_CONTENT_TYPE="Content-Type:application/json"
+readonly TOKEN=$(curl --silent -X POST ${AUTH_HOST} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}" | jq '.jwt' -r)
 
 if [ ! -z "$TOKEN" ]
 then
