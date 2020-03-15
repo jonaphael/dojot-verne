@@ -10,7 +10,7 @@ KAFKA_HOSTS=${KAFKA_HOSTS:-"kafka-server:9092"}
 
 LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
 DEVICE_DATA=${DEVICE_DATA:-"device-data"}
-DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"iotagent.device"}
+DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"dojot.device-manager.device"}
 
 # auth
 readonly AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"

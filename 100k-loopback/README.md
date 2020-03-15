@@ -14,7 +14,7 @@ DATA_BROKER_HOST         | dojot data broker url to fetch the the topics        
 KAFKA_HOSTS              | Address of the kafka broker                                         | kafka-server:9092			| hostname/IP    |
 LOOPBACK_CONSUMER_GROUP  | Kafaka consumer group                                               | 100k-loopback-group        | string         |
 DEVICE_DATA  			 | topic to consume from                                               | device-data        		| string         |
-DEVICE_CONFIGURE         | topic to produce the messages                                       | iotagent.device            | string         |
+DEVICE_CONFIGURE         | topic to produce the messages                                       | dojot.device-manager.device| string         |
 
 # Example
 As a specific component for dojot device there is an example
