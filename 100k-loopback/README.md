@@ -1,25 +1,25 @@
 # 100K Loopback
 
-This service is a helper for 100k-epic, its functionality is to transfer incomming payload from a **device-data** topic to **iotagent-device** topic.
+This service is a helper for 100k-epic, transfers incoming payload from a **device-data** topic to **device-manager** topic in the dojot style.
 
 # Configurations
 ## Environment Variables
 
-Key                      | Purpose                                                             | Default Value   			| Valid Values   |
------------------------- | ------------------------------------------------------------------- | -------------------------- | -------------- |
-DOJOT_USERNAME           | username to login on auth and retrieve token						   | admin           			| string   		 |
-DOJOT_PASSWORD           | password to login on auth and retrieve token						   | admin           			| string   		 |
-AUTH_HOST                | Address of the auth service                                         | http://dojot_auth_1:5000   | hostname/IP    |
-DATA_BROKER_HOST         | dojot data broker url to fetch the the topics                       | http://dojot_data-broker_1	| hostname/IP    |
-KAFKA_HOSTS              | Address of the kafka broker                                         | kafka-server:9092			| hostname/IP    |
-LOOPBACK_CONSUMER_GROUP  | Kafaka consumer group                                               | 100k-loopback-group        | string         |
-DEVICE_DATA  			 | topic to consume from                                               | device-data        		| string         |
-DEVICE_CONFIGURE         | topic to produce the messages                                       | dojot.device-manager.device| string         |
+Key                      | Purpose                                                             | Default Value   			| Valid Values      |
+------------------------ | ------------------------------------------------------------------- | -------------------------- | ----------------- |
+DOJOT_USERNAME           | username to login on auth and retrieve token						   | admin           			| string   		    |
+DOJOT_PASSWORD           | password to login on auth and retrieve token						   | admin           			| string   		    |
+AUTH_ADDRESS             | Address of the auth service                                         | http://auth:5000           | hostname/IP:port  |
+DATA_BROKER_ADDRESS      | Address of the data broker service                                  | http://data-broker:80    	| hostname/IP:port  |
+KAFKA_BROKER_LIST        | Addresses of the kafka brokers separated by a comma                 | kafka-server:9092			| hostname/IP:port  |
+LOOPBACK_CONSUMER_GROUP  | Kafka consumer group                                                | loopback-group             | string            |
+DEVICE_DATA_TOPIC    	 | Topic to consume from                                               | device-data        		| string            |
+DEVICE_MANAGER_TOPIC     | Topic to produce the modified messages                              | dojot.device-manager.device| string            |
 
 # Example
 As a specific component for dojot device there is an example
 
-Device data received mesage
+Device data received message
 ```
 {
     "metadata": { 
@@ -33,7 +33,7 @@ Device data received mesage
 }
 ```
 
-Device configure final payload
+Device manager modified payload
 ```
 {
     "metadata": {
@@ -47,4 +47,4 @@ Device configure final payload
 }
 ```
 
-More infomations can be find [here](https://dojotdocs.readthedocs.io/projects/DeviceManager/en/latest/kafka-messages.html).
+More information can be find [here](https://dojotdocs.readthedocs.io/projects/DeviceManager/en/latest/kafka-messages.html).

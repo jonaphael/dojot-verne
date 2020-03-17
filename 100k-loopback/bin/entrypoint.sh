@@ -1,42 +1,55 @@
 #!/bin/sh
-echo "100k-loopback start"
+
+# -e       Exit immediately if a command exits with a non-zero status.
+# -x       Print commands and their arguments as they are executed
+set -e
+
+# DEBUG
+if [ ! -z "${DEBUG+x}" ]; then
+    set -x
+fi
+
+
+echo "Loopback start"
 
 DOJOT_USERNAME=${DOJOT_USERNAME:-"admin"}
 DOJOT_PASSWORD=${DOJOT_PASSWORD:-"admin"}
 
-AUTH_HOST=${AUTH_HOST:-"http://auth:5000"}
-DATA_BROKER_HOST=${DATA_BROKER_HOST:-"http://data-broker:80"}
-KAFKA_HOSTS=${KAFKA_HOSTS:-"kafka-server:9092"}
+AUTH_ADDRESS=${AUTH_ADDRESS:-"http://auth:5000"}
+DATA_BROKER_ADDRESS=${DATA_BROKER_ADDRESS:-"http://data-broker:80"}
+KAFKA_BROKER_LIST=${KAFKA_BROKER_LIST:-"kafka-server:9092"}
 
-LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"100k-loopback-group"}
-DEVICE_DATA=${DEVICE_DATA:-"device-data"}
-DEVICE_CONFIGURE=${DEVICE_CONFIGURE:-"dojot.device-manager.device"}
+LOOPBACK_CONSUMER_GROUP=${LOOPBACK_CONSUMER_GROUP:-"loopback-group"}
+DEVICE_DATA_TOPIC=${DEVICE_DATA_TOPIC:-"device-data"}
+DEVICE_MANAGER_TOPIC=${DEVICE_MANAGER_TOPIC:-"dojot.device-manager.device"}
 
 # auth
 readonly AUTH_DATA="{\"username\": \"${DOJOT_USERNAME}\", \"passwd\":\"${DOJOT_PASSWORD}\"}"
 readonly JSON_CONTENT_TYPE="Content-Type:application/json"
-readonly TOKEN=$(curl --silent -X POST ${AUTH_HOST} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}" | jq '.jwt' -r)
+readonly TOKEN=$(curl --silent -X POST ${AUTH_ADDRESS} -H "${JSON_CONTENT_TYPE}" -d "${AUTH_DATA}" | jq '.jwt' -r)
 
 if [ ! -z "$TOKEN" ]
 then
     echo "Retrived token sucessfully ..."
-    DEVICE_DATA_TOPIC=$(curl --silent -X GET ${DATA_BROKER_HOST}/topic/${DEVICE_DATA} -H "Authorization: Bearer ${TOKEN}" | jq '.topic' -r)
-    DEVICE_CONFIGURE_TOPIC=$(curl --silent -X GET ${DATA_BROKER_HOST}/topic/${DEVICE_CONFIGURE} -H "Authorization: Bearer ${TOKEN}" | jq '.topic' -r)
+    LDEVICE_DATA_TOPIC=$(curl --silent -X GET ${DATA_BROKER_ADDRESS}/topic/${DEVICE_DATA_TOPIC} -H "Authorization: Bearer ${TOKEN}" | jq '.topic' -r)
+    LDEVICE_MANAGER_TOPIC=$(curl --silent -X GET ${DATA_BROKER_ADDRESS}/topic/${DEVICE_MANAGER_TOPIC} -H "Authorization: Bearer ${TOKEN}" | jq '.topic' -r)
 
-    echo ${DEVICE_DATA_TOPIC}
-    echo ${DEVICE_CONFIGURE_TOPIC}
+    if [ ! -z "${DEBUG+x}" ]; then
+        echo ${LDEVICE_DATA_TOPIC}
+        echo ${LDEVICE_MANAGER_TOPIC}
+    fi
 
-    if [ ! -z "${DEVICE_DATA_TOPIC}" -a ! -z "${DEVICE_CONFIGURE_TOPIC}" ]
+    if [ ! -z "${DEVICE_DATA_TOPIC}" -a ! -z "${LDEVICE_MANAGER_TOPIC}" ]
     then
 
         echo "Starting loopback ...."
-        kafkacat -C -b ${KAFKA_HOSTS} -q -f '{ "key": "%k" , "msg": %s }\n' -u -G ${LOOPBACK_CONSUMER_GROUP} ${DEVICE_DATA_TOPIC} | \
+        kafkacat -C -b ${KAFKA_BROKER_LIST} -q -f '{ "key": "%k" , "msg": %s }\n' -u -G ${LOOPBACK_CONSUMER_GROUP} ${LDEVICE_DATA_TOPIC} | \
         unbuffer -p jq -r '"\(.key)@{\"event\": \"configure\",\"meta\": {\"service\": \"\(.msg.metadata.tenant)\",\"timestamp\": \(.msg.metadata.timestamp)},\"data\" : {\"id\" : \"\(.msg.metadata.deviceid)\",\"attrs\": \(.msg.attrs)}}"' \
-        |  kafkacat -P -b ${KAFKA_HOSTS} -t ${DEVICE_CONFIGURE_TOPIC} -K @ -l
+        |  kafkacat -P -b ${KAFKA_HOSTS} -t ${LDEVICE_MANAGER_TOPIC} -K @ -l
         
         echo "Application Stopped restarting ..."
     else
-        "Restarting - unable to retrieve '${DEVICE_DATA}' and '${DEVICE_CONFIGURE}' topics"
+        "Restarting - unable to retrieve '${DEVICE_DATA_TOPIC}' and '${DEVICE_MANAGER_TOPIC}' topics"
     fi
 else
    echo "Restarting token not available ..."
